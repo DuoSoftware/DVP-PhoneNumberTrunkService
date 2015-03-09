@@ -1,6 +1,7 @@
 var restify = require('restify');
 var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var gwBackendHandler = require('./TrunkBackendHandler.js');
+var number=require('./PhoneNumberManagement.js');
 //var xmlGen = require('./XmlResponseGenerator.js');
 
 var server = restify.createServer({
@@ -11,8 +12,6 @@ var server = restify.createServer({
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
-
-var dd = gwBackendHandler.getGrpUsersById(1);
 
 
 /*
@@ -216,6 +215,41 @@ server.post('/DVP/API/:version/TrunkApi/GetTrunk/:id', function(req, res, next)
     }
 
     return next();
+
+});
+
+
+
+
+//PAWAN
+
+//.......................................post............................................................................
+
+server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/chng_availability/:phonenumber/:enable',function(req,res,err)
+{
+    number.ChangeNumberAvailability(req,res,err);
+
+});
+
+//.......................................post............................................................................
+
+server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/update_phone_schedule/:companyid/:phonenumber',function(req,res,err)
+{
+    number.UpdatePhoneDetails(req,res,err);
+
+});
+//.......................................get............................................................................
+
+server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_all/:CompanyId/:PhoneNumber',function(req,res,err)
+{
+    number.GetAllPhoneDetails(req,res,err);
+
+});
+//.......................................get............................................................................
+
+server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_phone/:CompanyId',function(req,res,err)
+{
+    number.GetCompanyPhones(req,res,err);
 
 });
 
