@@ -1,27 +1,27 @@
 var dbModel = require('./DVP-DBModels');
 
 
-var getGrpUsersById = function(grpId, callback)
-{
-    try
-    {
-        dbModel.UserGroup.find({ where: {id:grpId}, attributes: ['id'], include: [{model : dbModel.SipUACEndpoint, attributes:['id'], joinTableAttributes : ['createdAt']}]}).complete(function(err, trunkObj)
-        {
-            try
-            {
-                callback(err, trunkObj);
-            }
-            catch(ex)
-            {
-                callback(ex, undefined);
-            }
-        })
-    }
-    catch(ex)
-    {
-        callback(ex, false);
-    }
-};
+//var getGrpUsersById = function(grpId, callback)
+//{
+//    try
+//    {
+//        dbModel.UserGroup.find({ where: {id:grpId}, attributes: ['id'], include: [{model : dbModel.SipUACEndpoint, attributes:['id'], joinTableAttributes : ['createdAt']}]}).complete(function(err, trunkObj)
+//        {
+//            try
+//            {
+//                callback(err, trunkObj);
+//            }
+//            catch(ex)
+//            {
+//                callback(ex, undefined);
+//            }
+//        })
+//    }
+//    catch(ex)
+//    {
+//        callback(ex, false);
+//    }
+//};
 
 var getTrunkById = function(trunkId, callback)
 {
@@ -194,9 +194,55 @@ var updateTrunkConfiguration = function(trunkId, trunkInfo, callback)
     }
 };
 
+var addPhoneNumbersToTrunk = function(trunkId, phoneNumberInfo, callback)
+{
+    try
+    {
+        if(phoneNumberInfo)
+        {
+            dbModel.Trunk.find({where: [{id: trunkId}, {CompanyId: phoneNumberInfo.CompanyId}]}).complete(function (err, gwObj) {
+                if (err)
+                {
+                    callback(err, false);
+                }
+                else if (gwObj)
+                {
+
+                    dbModel.TrunkPhoneNumbers.find({where: [{PhoneNumber: phoneNumberInfo.PhoneNumber}, {CompanyId: {ne : phoneNumberInfo.CompanyId}}]}).complete(function (error, phnNum)
+                    {
+                        if(phnNum)
+                        {
+                            callback(new Error('Another company using same number'), false);
+                        }
+                        else
+                        {
+                            //add phone number
+                        }
+                        callback(phnNum, true);
+                    });
+
+
+                }
+                else {
+                    callback(new Error("Trunk Not Found for Given Id and Company"), false);
+                }
+            })
+        }
+        else
+        {
+            callback(new Error("Empty phone number info"), false);
+        }
+    }
+    catch(ex)
+    {
+        callback(ex, false);
+    }
+}
+
 module.exports.addTrunkConfiguration = addTrunkConfiguration;
 module.exports.assignTrunkToCloud = assignTrunkToCloud;
 module.exports.setTrunkEnabledStatus = setTrunkEnabledStatus;
 module.exports.getTrunkById = getTrunkById;
 module.exports.updateTrunkConfiguration = updateTrunkConfiguration;
-module.exports.getGrpUsersById = getGrpUsersById;
+//module.exports.getGrpUsersById = getGrpUsersById;
+module.exports.addPhoneNumbersToTrunk = addPhoneNumbersToTrunk;
