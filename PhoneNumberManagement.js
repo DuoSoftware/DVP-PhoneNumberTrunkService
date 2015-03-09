@@ -8,227 +8,224 @@ var stringify=require('stringify');
 
 
 
-function ChangeNumberAvailability(req,res,err)
-{
+function ChangeNumberAvailability(req,res,err) {
 
-    DbConn.TrunkPhoneNumbers.find({ where: [{ PhoneNumber: req.params.phonenumber  },{CompanyId:req.params.CompanyId}]}).complete(function(err, PhnObject) {
+    try
+    {
+    DbConn.TrunkPhoneNumbers.find({where: [{PhoneNumber: req.params.phonenumber}, {CompanyId: req.params.CompanyId}]}).complete(function (err, PhnObject) {
         //logger.info( 'Requested RefID: '+reqz.params.ref);
         // console.log(ExtObject);
-        if(!PhnObject)
-        {
-            console.log("No record found for the Phone Number : "+req.params.phonenumber);
+        if (!PhnObject) {
+            console.log("No record found for the Phone Number : " + req.params.phonenumber);
 
-            res.end();
+            var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, PhnObject);
+            res.end(jsonString);
         }
 
-        else if(!err ) {
-            console.log("Updating Availability for  : "+req.params.phonenumber);
-            DbConn.TrunkPhoneNumbers
-                .update(
-                {
-                    Enable: req.body.enable
-
-
-                },
-                {
-                    where: [{ PhoneNumber: req.body.phonenumber }]
-                }
-            ).success(function() {
-
-                    console.log(".......................Successfully Updated. ....................");
-                    res.end();
-
-                }).error(function(err) {
-
-                    console.log(".......................Error found in updating .................... ! "+ err);
-                    //handle error here
-                    res.end();
-
-                });
-            res.end();
-        }
-        else
+        else if (!err) {
+            console.log("Updating Availability for  : " + req.params.phonenumber);
+try {
+    DbConn.TrunkPhoneNumbers
+        .update(
         {
+            Enable: req.body.enable
 
-            res.end();
+
+        },
+        {
+            where: [{PhoneNumber: req.body.phonenumber}]
+        }
+    ).success(function (err,result) {
+
+            console.log(".......................Successfully Updated. ....................");
+            var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
+            res.end(jsonString);
+
+        }).error(function (err) {
+
+            console.log(".......................Error found in updating .................... ! " + err);
+            //handle error here
+            var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+            res.end(jsonString);
+
+        });
+}
+            catch(ex)
+            {
+                var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, result);
+                res.end(jsonString);
+            }
+
+        }
+        else {
+
+            var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
+            res.end(jsonString);
 
         }
 
     });
 
-
+}
+catch(ex)
+{
+    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, req);
+    res.end(jsonString);
+}
 }
 
 
 //
-function UpdatePhoneDetails(req,res,err)
-{
+function UpdatePhoneDetails(req,res,err) {
+try{
 
-
-    DbConn.TrunkPhoneNumbers.findAll({ where: [{ CompanyId: req.body.CompanyId  },{PhoneNumber: req.params.PhoneNumber }]}).complete(function(err, ScheduleObject) {
+    DbConn.TrunkPhoneNumbers.findAll({where: [{CompanyId: req.body.CompanyId}, {PhoneNumber: req.params.PhoneNumber}]}).complete(function (err, ScheduleObject) {
         //logger.info( 'Requested RefID: '+reqz.params.ref);
         // console.log(ExtObject);
-        if(!ScheduleObject)
-        {
-            console.log("Number entered is not belongs CompanyID : "+req.body.CompanyId);
+        if (!ScheduleObject) {
+            console.log("Number entered is not belongs CompanyID : " + req.body.CompanyId);
 
-            res.end();
+            var jsonString = messageFormatter.FormatMessage(err, "EMPTY", true, null);
+            res.end(jsonString);
         }
 
-        else if(!err ) {
+        else if (!err) {
 
-                    DbConn.TrunkPhoneNumbers
-                        .update(
-                        {
+            try {
 
-                            ObjClass:  obj.ObjClass,
-                            ObjType:  obj.ObjType,
-                            ObjCategory:  obj.ObjCategory
+                DbConn.TrunkPhoneNumbers
+                    .update(
+                    {
 
-
-
-                        },
-                        {
-                            where: [{ PhoneNumber: req.body.PhoneNumber }]
-                        }
-                    ).success(function(message) {
-
-                            console.log(".......................Successfully Updated. ....................");
-                            console.log("Returned : "+message);
-                            res.end();
-
-                        }).error(function(err) {
-
-                            console.log(".......................Error found in updating .................... ! "+ err);
-                            //handle error here
-                            res.end();
-
-                        });
-                    res.end();
+                        ObjClass: obj.ObjClass,
+                        ObjType: obj.ObjType,
+                        ObjCategory: obj.ObjCategory
 
 
+                    },
+                    {
+                        where: [{PhoneNumber: req.body.PhoneNumber}]
+                    }
+                ).success(function (message) {
+
+                        console.log(".......................Successfully Updated. ....................");
+                        console.log("Returned : " + message);
+                        var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, message);
+                        res.end(jsonString);
+
+                    }).error(function (err) {
+
+                        console.log(".......................Error found in updating .................... ! " + err);
+                        //handle error here
+                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", true, message);
+                        res.end(jsonString);
+
+                    });
+                res.end();
 
 
-
-
-
-            /*
-             if(ScheduleObject.ScheduleName.indexOf(req.params.schedulename)>-1)
-             {
-
-
-             DbConn.TrunkPhoneNumbers
-             .update(
-             {
-             ScheduleName: req.params.schedulename
-
-
-             },
-             {
-             where: [{ PhoneNumber: req.params.phonenumber }]
-             }
-             ).success(function() {
-
-             console.log(".......................Successfully Updated. ....................");
-             res.end();
-
-             }).error(function(err) {
-
-             console.log(".......................Error found in updating .................... ! "+ err);
-             //handle error here
-             res.end();
-
-             });
-             res.end();
-
-             }
-             else
-             {
-             console.log("Cannot change,This number is not available to your company....");
-             }
-             */
+            }catch(ex)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                res.end(jsonString);
+            }
 
 
         }
 
 
-
-        else
-        {
+        else {
 
             res.end();
 
         }
 
     });
+}
+catch(ex)
+{
+    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, req);
+    res.end(jsonString);
+}
 }
 
 function GetAllPhoneDetails(req,res,err)
 {
-    DbConn.TrunkPhoneNumbers.findAll({ where: [{ CompanyId: req.params.CompanyId  },{PhoneNumber: req.params.PhoneNumber }]}).complete(function(err, ScheduleObject) {
-        //logger.info( 'Requested RefID: '+reqz.params.ref);
-        // console.log(ExtObject);
-        if(!ScheduleObject)
-        {
-            console.log("Number entered is not belongs CompanyID : "+req.params.CompanyId);
+    try {
+        DbConn.TrunkPhoneNumbers.findAll({where: [{CompanyId: req.params.CompanyId}, {PhoneNumber: req.params.PhoneNumber}]}).complete(function (err, ScheduleObject) {
+            //logger.info( 'Requested RefID: '+reqz.params.ref);
+            // console.log(ExtObject);
+            if (!ScheduleObject && !err) {
+                console.log("Number entered is not belongs CompanyID : " + req.params.CompanyId);
 
-            res.end();
-        }
+                var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, ScheduleObject);
+                res.end(jsonString);
+            }
 
-        else if(!err) {
+            else if (!err) {
 
-            console.log("Records Found : ");
+                console.log("Records Found : ");
 
 
-            var result=JSON.stringify(ScheduleObject);
-            console.log(result);
+                var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, ScheduleObject);
+                res.end(jsonString);
+            }
 
-            res.end();
+            else if(err) {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ScheduleObject);
+                res.end(jsonString);
 
-        }
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ScheduleObject);
+                res.end(jsonString);
+            }
 
-        else
-        {
-            res.end();
-
-        }
-
-    });
-}
+        });
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, req);
+        res.end(jsonString);
+    }
+    }
 
 function GetCompanyPhones(req,res,err)
 {
-    ///DbConn.TrunkPhoneNumbers.findAll({ where: { CompanyId: req.params.CompanyId  },attributes: ['"CSDB_PhoneNumbers"."PhoneNumber"']}).complete(function(err, ScheduleObject) {
-    DbConn.TrunkPhoneNumbers.findAll({ where: { CompanyId: req.params.CompanyId  }}).complete(function(err, ScheduleObject) {
-        //logger.info( 'Requested RefID: '+reqz.params.ref);
-        // console.log(ExtObject);
-        if(!ScheduleObject)
-        {
-            console.log("Number entered is not belongs CompanyID : "+req.params.CompanyId);
+    try {
+        DbConn.TrunkPhoneNumbers.findAll({where: {CompanyId: req.params.CompanyId}}).complete(function (err, ScheduleObject) {
 
-            res.end();
-        }
+            if (!ScheduleObject && !err) {
+                console.log("Number entered is not belongs CompanyID : " + req.params.CompanyId);
 
-        else if(!err) {
+                var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, ScheduleObject);
+                res.end(jsonString);
+            }
 
-            console.log("Records Found : "+req.params.CompanyId);
+            else if (!err) {
 
-
-            var result=JSON.stringify(ScheduleObject);
-            console.log(result);
-
-            res.end();
+                console.log("Records Found : " + req.params.CompanyId);
 
 
-        }
+                var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, ScheduleObject);
+                res.end(jsonString);
 
-        else
-        {
-            res.end();
 
-        }
+            }
 
-    });
+            else  {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ScheduleObject);
+                res.end(jsonString);
+
+            }
+
+        });
+    }catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, req);
+        res.end(jsonString);
+    }
 }
 
 
