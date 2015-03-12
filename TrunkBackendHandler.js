@@ -1,4 +1,5 @@
 var dbModel = require('./DVP-DBModels');
+var underscore = require('underscore');
 
 
 //var getGrpUsersById = function(grpId, callback)
@@ -203,39 +204,98 @@ var addPhoneNumbersToTrunk = function(trunkId, phoneNumberInfo, callback)
             dbModel.Trunk.find({where: [{id: trunkId}, {CompanyId: phoneNumberInfo.CompanyId}]}).complete(function (err, gwObj) {
                 if (err)
                 {
-                    callback(err, false);
+                    callback(err, -1, false);
                 }
                 else if (gwObj)
                 {
 
-                    dbModel.TrunkPhoneNumbers.find({where: [{PhoneNumber: phoneNumberInfo.PhoneNumber}, {CompanyId: {ne : phoneNumberInfo.CompanyId}}]}).complete(function (error, phnNum)
+                    dbModel.TrunkPhoneNumbers.find({where: [{PhoneNumber: phoneNumberInfo.PhoneNumber}]}).complete(function (error, phnNum)
                     {
                         if(phnNum)
                         {
-                            callback(new Error('Another company using same number'), false);
+                            if(phnNum.CompanyId == phoneNumberInfo.CompanyId)
+                            {
+                                callback(new Error("Number already in use", -1, false));
+                            }
+                            else
+                            {
+                                callback(new Error("Another company using same phone number", -1, false));
+                            }
                         }
                         else
                         {
                             //add phone number
+                            var phoneNum = dbModel.TrunkPhoneNumbers.build({
+                                PhoneNumber: phoneNumberInfo.PhoneNumber,
+                                TrunkName: phoneNumberInfo.TrunkName,
+                                ObjClass: phoneNumberInfo.ObjClass,
+                                ObjType: phoneNumberInfo.ObjType,
+                                ObjCategory: phoneNumberInfo.ObjCategory,
+                                Enable: phoneNumberInfo.Enable,
+                                CompanyId: phoneNumberInfo.CompanyId,
+                                TenantId: phoneNumberInfo.TenantId,
+                                LimitId: phoneNumberInfo.LimitId
+                            });
+
+                            phoneNum
+                                .save()
+                                .complete(function (err) {
+                                    try {
+                                        if (err) {
+                                            callback(err, -1, false);
+                                        }
+                                        else
+                                        {
+                                            gwObj.addTrunkPhoneNumber(phoneNum).complete(function (err, rslt)
+                                            {
+                                                if(err)
+                                                {
+                                                    phoneNum.delete().complete(function (err1, rslt)
+                                                    {
+                                                        if(!err1)
+                                                        {
+                                                            callback(err, -1, false);
+                                                        }
+                                                        else
+                                                        {
+                                                            callback(err1, -1, false);
+                                                        }
+                                                    });
+
+                                                }
+                                                else
+                                                {
+                                                    callback(err, phoneNum.id, true);
+                                                }
+
+                                            });
+                                        }
+                                    }
+                                    catch (ex) {
+                                        callback(ex,-1, false);
+                                    }
+
+                                })
+
                         }
-                        callback(phnNum, true);
+
                     });
 
 
                 }
                 else {
-                    callback(new Error("Trunk Not Found for Given Id and Company"), false);
+                    callback(new Error("Trunk Not Found for Given Id and Company"), -1, false);
                 }
             })
         }
         else
         {
-            callback(new Error("Empty phone number info"), false);
+            callback(new Error("Empty phone number info"), -1, false);
         }
     }
     catch(ex)
     {
-        callback(ex, false);
+        callback(ex, -1, false);
     }
 }
 

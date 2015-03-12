@@ -13,6 +13,45 @@ server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
 
+server.post('/DVP/API/:version/TrunkApi/AddNumber/:id', function(req, res, next)
+{
+    try
+    {
+        var id = req.params.id;
+        var phnInfo = req.body;
+
+        if(phnInfo)
+        {
+            gwBackendHandler.addPhoneNumbersToTrunk(id, phnInfo, function(err, recordId, result){
+
+                if(err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, recordId);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Number Added Successfully", result, recordId);
+                    res.end(jsonString);
+                }
+            })
+        }
+        else
+        {
+            throw new Error("Empty Body");
+        }
+        return next();
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
 /*
  {"TrunkCode":"TestTrunk","TrunkName":"Test1","ObjClass":"DVP","ObjType":"Trunk","ObjCategory":"SIP","IpUrl":"192.168.1.198","Enable":"True","CompanyId":"1","TenantId":"3","Operator":"Dialog"}
  */
