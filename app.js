@@ -261,13 +261,22 @@ server.post('/DVP/API/:version/TrunkApi/GetTrunk/:id', function(req, res, next)
 
 
 
-//PAWAN
+//PAWAN :- Messageformatter and try catch Done
 
 //.......................................post............................................................................
 
 server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/chng_availability/:phonenumber/:enable',function(req,res,err)
 {
-    number.ChangeNumberAvailability(req,res,err);
+    try {
+        number.ChangeNumberAvailability(req, res, err);
+        var jsonString = messageFormatter.FormatMessage(null, "ChangeNumberAvailability Done", true, res);
+        res.end(jsonString);
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ChangeNumberAvailability failed", false, null);
+        res.end(jsonString);
+    }
 
 });
 
@@ -275,21 +284,55 @@ server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/chng_ava
 
 server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/update_phone_schedule/:companyid/:phonenumber',function(req,res,err)
 {
-    number.UpdatePhoneDetails(req,res,err);
+    try {
+        number.UpdatePhoneDetails(req, res, err);
+        var jsonString = messageFormatter.FormatMessage(null, "UpdatePhoneDetails Done", true, res);
+        res.end(jsonString);
+
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "UpdatePhoneDetails failed", false, res);
+        res.end(jsonString);
+    }
 
 });
 //.......................................get............................................................................
 
 server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_all/:CompanyId/:PhoneNumber',function(req,res,err)
 {
-    number.GetAllPhoneDetails(req,res,err);
+
+
+    try {
+        number.GetAllPhoneDetails(req,res,err);
+        var jsonString = messageFormatter.FormatMessage(null, "GetAllPhoneDetails Done", true, res);
+        res.end(jsonString);
+
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "GetAllPhoneDetails failed", false, res);
+        res.end(jsonString);
+    }
 
 });
 //.......................................get............................................................................
 
 server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_phone/:CompanyId',function(req,res,err)
 {
-    number.GetCompanyPhones(req,res,err);
+
+    try {
+        number.GetCompanyPhones(req,res,err);
+        var jsonString = messageFormatter.FormatMessage(null, "GetCompanyPhones Done", true, res);
+        res.end(jsonString);
+
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "GetCompanyPhones failed", false, res);
+        res.end(jsonString);
+    }
+
 
 });
 

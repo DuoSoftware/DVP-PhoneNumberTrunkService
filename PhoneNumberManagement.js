@@ -8,25 +8,25 @@ var stringify=require('stringify');
 var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 
 
-
+//MF and TC done
 function ChangeNumberAvailability(req,res,err) {
 
     try
     {
-        DbConn.TrunkPhoneNumbers.find({where: [{PhoneNumber: req.params.phonenumber}, {CompanyId: req.params.CompanyId}]}).complete(function (err, PhnObject) {
+        DbConn.TrunkPhoneNumber.find({where: [{PhoneNumber: req.params.phonenumber}, {CompanyId: req.params.CompanyId}]}).complete(function (err, PhnObject) {
             //logger.info( 'Requested RefID: '+reqz.params.ref);
             // console.log(ExtObject);
             if (!PhnObject) {
                 console.log("No record found for the Phone Number : " + req.params.phonenumber);
 
-                var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, PhnObject);
+                var jsonString = messageFormatter.FormatMessage(err, "null object found searching : "+req.params.CompanyId, false, PhnObject);
                 res.end(jsonString);
             }
 
-            else if (!err) {
+            else if (!err && PhnObject) {
                 console.log("Updating Availability for  : " + req.params.phonenumber);
                 try {
-                    DbConn.TrunkPhoneNumbers
+                    DbConn.TrunkPhoneNumber
                         .update(
                         {
                             Enable: req.body.enable
@@ -39,28 +39,28 @@ function ChangeNumberAvailability(req,res,err) {
                     ).success(function (err,result) {
 
                             console.log(".......................Successfully Updated. ....................");
-                            var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, result);
+                            var jsonString = messageFormatter.FormatMessage(err, "Updation succeeded", true, result);
                             res.end(jsonString);
 
                         }).error(function (err) {
 
                             console.log(".......................Error found in updating .................... ! " + err);
                             //handle error here
-                            var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                            var jsonString = messageFormatter.FormatMessage(err, "Error found in updation", false, result);
                             res.end(jsonString);
 
                         });
                 }
                 catch(ex)
                 {
-                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, result);
+                    var jsonString = messageFormatter.FormatMessage(ex, "Exception found in Updation ", false, result);
                     res.end(jsonString);
                 }
 
             }
             else {
 
-                var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, result);
+                var jsonString = messageFormatter.FormatMessage(err, "Error occures in updation", false, result);
                 res.end(jsonString);
 
             }
@@ -70,31 +70,31 @@ function ChangeNumberAvailability(req,res,err) {
     }
     catch(ex)
     {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, req);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception found in searching TrunkPhoneNumber ", false, req);
         res.end(jsonString);
     }
 }
 
 
-//
+//MF and TC done
 function UpdatePhoneDetails(req,res,err) {
     try{
 
-        DbConn.TrunkPhoneNumbers.findAll({where: [{CompanyId: req.body.CompanyId}, {PhoneNumber: req.params.PhoneNumber}]}).complete(function (err, ScheduleObject) {
+        DbConn.TrunkPhoneNumber.findAll({where: [{CompanyId: req.body.CompanyId}, {PhoneNumber: req.params.PhoneNumber}]}).complete(function (err, ScheduleObject) {
             //logger.info( 'Requested RefID: '+reqz.params.ref);
             // console.log(ExtObject);
             if (!ScheduleObject) {
                 console.log("Number entered is not belongs CompanyID : " + req.body.CompanyId);
 
-                var jsonString = messageFormatter.FormatMessage(err, "EMPTY", true, null);
+                var jsonString = messageFormatter.FormatMessage(err, "Null object returns while searching phonenumber and company", false, null);
                 res.end(jsonString);
             }
 
-            else if (!err) {
+            else if (!err && ScheduleObject) {
 
                 try {
 
-                    DbConn.TrunkPhoneNumbers
+                    DbConn.TrunkPhoneNumber
                         .update(
                         {
 
@@ -111,23 +111,23 @@ function UpdatePhoneDetails(req,res,err) {
 
                             console.log(".......................Successfully Updated. ....................");
                             console.log("Returned : " + message);
-                            var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, message);
+                            var jsonString = messageFormatter.FormatMessage(err, "Successfully updated", true, message);
                             res.end(jsonString);
 
                         }).error(function (err) {
 
                             console.log(".......................Error found in updating .................... ! " + err);
                             //handle error here
-                            var jsonString = messageFormatter.FormatMessage(err, "ERROR", true, message);
+                            var jsonString = messageFormatter.FormatMessage(err, "Error found in updating TrunkPhoneNumber details", true, message);
                             res.end(jsonString);
 
                         });
-                    res.end();
+                    //res.end();
 
 
                 }catch(ex)
                 {
-                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                    var jsonString = messageFormatter.FormatMessage(err, "Exception found in updating TrunkPhoneNumber ", false, result);
                     res.end(jsonString);
                 }
 
@@ -136,8 +136,9 @@ function UpdatePhoneDetails(req,res,err) {
 
 
             else {
+                var jsonString = messageFormatter.FormatMessage(err, "Error Occured in searching phone number : "+req.params.PhoneNumber, false, null);
+                res.end(jsonString);
 
-                res.end();
 
             }
 
@@ -145,21 +146,22 @@ function UpdatePhoneDetails(req,res,err) {
     }
     catch(ex)
     {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, req);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception found in searching TrunkPhoneNumber", false, req);
         res.end(jsonString);
     }
 }
 
+//MF and TC done
 function GetAllPhoneDetails(req,res,err)
 {
     try {
-        DbConn.TrunkPhoneNumbers.findAll({where: [{CompanyId: req.params.CompanyId}, {PhoneNumber: req.params.PhoneNumber}]}).complete(function (err, ScheduleObject) {
+        DbConn.TrunkPhoneNumber.findAll({where: [{CompanyId: req.params.CompanyId}, {PhoneNumber: req.params.PhoneNumber}]}).complete(function (err, ScheduleObject) {
             //logger.info( 'Requested RefID: '+reqz.params.ref);
             // console.log(ExtObject);
             if (!ScheduleObject && !err) {
                 console.log("Number entered is not belongs CompanyID : " + req.params.CompanyId);
 
-                var jsonString = messageFormatter.FormatMessage(err, "EMPTY", false, ScheduleObject);
+                var jsonString = messageFormatter.FormatMessage(err, "null object returned as result in serching : "+req.params.PhoneNumber, false, ScheduleObject);
                 res.end(jsonString);
             }
 
@@ -168,7 +170,7 @@ function GetAllPhoneDetails(req,res,err)
                 console.log("Records Found : ");
 
 
-                var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, ScheduleObject);
+                var jsonString = messageFormatter.FormatMessage(err, "Record Found : "+req.params.PhoneNumber + "and "+req.params.CompanyId, true, ScheduleObject);
                 res.end(jsonString);
             }
             else if (!err && ScheduleObject.length==0) {
@@ -176,19 +178,19 @@ function GetAllPhoneDetails(req,res,err)
                 console.log("Empty Found : ");
 
 
-                var jsonString = messageFormatter.FormatMessage(err, "EMPTY", true, ScheduleObject);
+                var jsonString = messageFormatter.FormatMessage(err, "Empty object returned : No record : No Error", false, ScheduleObject);
                 res.end(jsonString);
             }
 
 
             else if(err) {
-                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ScheduleObject);
+                var jsonString = messageFormatter.FormatMessage(err, "Error found in searching", false, ScheduleObject);
                 res.end(jsonString);
 
             }
             else
             {
-                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ScheduleObject);
+                var jsonString = messageFormatter.FormatMessage(err, "Error found", false, ScheduleObject);
                 res.end(jsonString);
             }
 
@@ -196,20 +198,21 @@ function GetAllPhoneDetails(req,res,err)
     }
     catch(ex)
     {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, req);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception found in searching", false, req);
         res.end(jsonString);
     }
 }
 
+//MF and TC done
 function GetCompanyPhones(req,res,err)
 {
     try {
-        DbConn.TrunkPhoneNumbers.findAll({where: {CompanyId: req.params.CompanyId}}).complete(function (err, ScheduleObject) {
+        DbConn.TrunkPhoneNumber.findAll({where: {CompanyId: req.params.CompanyId}}).complete(function (err, ScheduleObject) {
 
-            if (ScheduleObject>0 && !err) {
+            if (ScheduleObject.length>0 && !err) {
                 console.log("Number entered is not belongs CompanyID : " + req.params.CompanyId);
 
-                var jsonString = messageFormatter.FormatMessage(err, "SUCCESS", true, ScheduleObject);
+                var jsonString = messageFormatter.FormatMessage(err, ScheduleObject.length +"Records found", true, ScheduleObject);
                 res.end(jsonString);
             }
 
@@ -219,14 +222,14 @@ function GetCompanyPhones(req,res,err)
                 console.log("Empty Found : ");
 
 
-                var jsonString = messageFormatter.FormatMessage(err, "EMPTY", true, ScheduleObject);
+                var jsonString = messageFormatter.FormatMessage(err, "Empty object returned : No errors", false, ScheduleObject);
                 res.end(jsonString);
             }
 
 
 
             else  {
-                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, ScheduleObject);
+                var jsonString = messageFormatter.FormatMessage(err, "Some error occured", false, ScheduleObject);
                 res.end(jsonString);
 
             }
@@ -234,7 +237,7 @@ function GetCompanyPhones(req,res,err)
         });
     }catch(ex)
     {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, req);
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception found in searching ", false, req);
         res.end(jsonString);
     }
 }
