@@ -269,8 +269,7 @@ server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/chng_ava
 {
     try {
         number.ChangeNumberAvailability(req, res, err);
-        var jsonString = messageFormatter.FormatMessage(null, "ChangeNumberAvailability Done", true, res);
-        res.end(jsonString);
+
     }
     catch(ex)
     {
@@ -305,8 +304,7 @@ server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_all/:
 
     try {
         number.GetAllPhoneDetails(req,res,err);
-        var jsonString = messageFormatter.FormatMessage(null, "GetAllPhoneDetails Done", true, res);
-        res.end(jsonString);
+
 
     }
     catch(ex)
@@ -323,8 +321,7 @@ server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_phone
 
     try {
         number.GetCompanyPhones(req,res,err);
-        var jsonString = messageFormatter.FormatMessage(null, "GetCompanyPhones Done", true, res);
-        res.end(jsonString);
+
 
     }
     catch(ex)
