@@ -13,7 +13,7 @@ function ChangeNumberAvailability(req,res,err) {
 
     try
     {
-        DbConn.TrunkPhoneNumber.find({where: [{PhoneNumber: req.params.phonenumber}, {CompanyId: req.params.CompanyId}]}).complete(function (err, PhnObject) {
+        DbConn.TrunkPhoneNumber.find({where: [{PhoneNumber: req.params.phonenumber}, {CompanyId: req.params.companyid}]}).complete(function (err, PhnObject) {
             //logger.info( 'Requested RefID: '+reqz.params.ref);
             // console.log(ExtObject);
             if (!PhnObject) {
@@ -29,12 +29,12 @@ function ChangeNumberAvailability(req,res,err) {
                     DbConn.TrunkPhoneNumber
                         .update(
                         {
-                            Enable: req.body.enable
+                            Enable: req.params.enable
 
 
                         },
                         {
-                            where: [{PhoneNumber: req.body.phonenumber}]
+                            where: [{PhoneNumber: req.params.phonenumber}]
                         }
                     ).success(function (err,result) {
 
@@ -98,27 +98,27 @@ function UpdatePhoneDetails(req,res,err) {
                         .update(
                         {
 
-                            ObjClass: obj.ObjClass,
-                            ObjType: obj.ObjType,
-                            ObjCategory: obj.ObjCategory
+                            ObjClass: req.body.ObjClass,
+                            ObjType: req.body.ObjType,
+                            ObjCategory: req.body.ObjCategory
 
 
                         },
                         {
-                            where: [{PhoneNumber: req.body.PhoneNumber}]
+                            where: [{PhoneNumber: req.params.phonenumber},{CompanyId:req.params.companyid}]
                         }
                     ).success(function (message) {
 
                             console.log(".......................Successfully Updated. ....................");
                             console.log("Returned : " + message);
-                            var jsonString = messageFormatter.FormatMessage(err, "Successfully updated", true, message);
+                            var jsonString = messageFormatter.FormatMessage(err, "Successfully updated", true, null);
                             res.end(jsonString);
 
                         }).error(function (err) {
 
                             console.log(".......................Error found in updating .................... ! " + err);
                             //handle error here
-                            var jsonString = messageFormatter.FormatMessage(err, "Error found in updating TrunkPhoneNumber details", true, message);
+                            var jsonString = messageFormatter.FormatMessage(err, "Error found in updating TrunkPhoneNumber details", false, null);
                             res.end(jsonString);
 
                         });
@@ -167,10 +167,11 @@ function GetAllPhoneDetails(req,res,err)
 
             else if (!err && ScheduleObject.length>0) {
 
-                console.log("Records Found : ");
+                var Jresults = JSON.stringify(ScheduleObject);
+                console.log("Records Found : "+ScheduleObject);
 
 
-                var jsonString = messageFormatter.FormatMessage(err, "Record Found : "+req.params.PhoneNumber + "and "+req.params.CompanyId, true, ScheduleObject);
+                var jsonString = messageFormatter.FormatMessage(err, "Record Found : "+req.params.PhoneNumber + "and "+req.params.CompanyId, true, Jresults);
                 res.end(jsonString);
             }
             else if (!err && ScheduleObject.length==0) {
@@ -210,9 +211,10 @@ function GetCompanyPhones(req,res,err)
         DbConn.TrunkPhoneNumber.findAll({where: {CompanyId: req.params.CompanyId}}).complete(function (err, ScheduleObject) {
 
             if (ScheduleObject.length>0 && !err) {
-                console.log("Number entered is not belongs CompanyID : " + req.params.CompanyId);
+                console.log("Records found for CompanyID : " + req.params.CompanyId);
 
-                var jsonString = messageFormatter.FormatMessage(err, ScheduleObject.length +"Records found", true, ScheduleObject);
+                var Jresults = JSON.stringify(ScheduleObject);
+                var jsonString = messageFormatter.FormatMessage(err, ScheduleObject.length +"Records found", true, Jresults);
                 res.end(jsonString);
             }
 

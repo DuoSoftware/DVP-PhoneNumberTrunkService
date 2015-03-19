@@ -265,9 +265,10 @@ server.post('/DVP/API/:version/TrunkApi/GetTrunk/:id', function(req, res, next)
 
 //.......................................post............................................................................
 
-server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/chng_availability/:phonenumber/:enable',function(req,res,err)
+server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/chng_availability/:phonenumber/:companyid/:enable',function(req,res,err)
 {
     try {
+
         number.ChangeNumberAvailability(req, res, err);
 
     }
@@ -285,8 +286,8 @@ server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/update_p
 {
     try {
         number.UpdatePhoneDetails(req, res, err);
-        var jsonString = messageFormatter.FormatMessage(null, "UpdatePhoneDetails Done", true, res);
-        res.end(jsonString);
+        //var jsonString = messageFormatter.FormatMessage(null, "UpdatePhoneDetails Done", true, res);
+        //res.end(jsonString);
 
     }
     catch(ex)
