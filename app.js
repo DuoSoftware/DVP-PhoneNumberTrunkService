@@ -363,6 +363,23 @@ server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/update_p
     }
 
 });
+
+//.......................................post............................................................................
+
+server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/Update_category',function(req,res,err)
+{
+    try {
+
+        number.UpdatePhoneNumberObjCategory(req, res, err);
+
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "UpdatePhoneNumberObjCategory failed", false, null);
+        res.end(jsonString);
+    }
+
+});
 //.......................................get............................................................................
 
 server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_all/:CompanyId/:PhoneNumber',function(req,res,err)

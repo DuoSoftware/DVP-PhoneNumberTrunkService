@@ -244,6 +244,79 @@ function GetCompanyPhones(req,res,err)
     }
 }
 
+function UpdatePhoneNumberObjCategory(req,res,err)
+{
+    try{
+
+        DbConn.TrunkPhoneNumber.findAll({where: [{CompanyId: req.body.CompanyId}, {PhoneNumber: req.params.PhoneNumber}]}).complete(function (err, TrunkObject) {
+            //logger.info( 'Requested RefID: '+reqz.params.ref);
+            // console.log(ExtObject);
+            if (!TrunkObject) {
+                console.log("Number entered is not belongs CompanyID : " + req.body.CompanyId);
+
+                var jsonString = messageFormatter.FormatMessage(err, "Null object returns while searching phonenumber and company", false, null);
+                res.end(jsonString);
+            }
+
+            else if (!err && TrunkObject) {
+
+                try {
+
+                    DbConn.TrunkPhoneNumber
+                        .update(
+                        {
+
+
+                            ObjCategory: req.body.ObjCategory
+
+
+                        },
+                        {
+                            where: [{PhoneNumber: req.params.phonenumber},{CompanyId:req.params.companyid}]
+                        }
+                    ).success(function (message) {
+
+                            console.log(".......................Successfully Updated. ....................");
+                            console.log("Returned : " + message);
+                            var jsonString = messageFormatter.FormatMessage(err, "Successfully updated", true, null);
+                            res.end(jsonString);
+
+                        }).error(function (err) {
+
+                            console.log(".......................Error found in updating .................... ! " + err);
+                            //handle error here
+                            var jsonString = messageFormatter.FormatMessage(err, "Error found in updating TrunkPhoneNumber details", false, null);
+                            res.end(jsonString);
+
+                        });
+                    //res.end();
+
+
+                }catch(ex)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Exception found in updating TrunkPhoneNumber ", false, result);
+                    res.end(jsonString);
+                }
+
+
+            }
+
+
+            else {
+                var jsonString = messageFormatter.FormatMessage(err, "Error Occured in searching phone number : "+req.params.PhoneNumber, false, null);
+                res.end(jsonString);
+
+
+            }
+
+        });
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "Exception found in searching TrunkPhoneNumber", false, req);
+        res.end(jsonString);
+    }
+}
 
 
 
@@ -251,3 +324,4 @@ module.exports.ChangeNumberAvailability = ChangeNumberAvailability;
 module.exports.UpdatePhoneDetails = UpdatePhoneDetails;
 module.exports.GetAllPhoneDetails = GetAllPhoneDetails;
 module.exports.GetCompanyPhones = GetCompanyPhones;
+module.exports.UpdatePhoneNumberObjCategory = UpdatePhoneNumberObjCategory;
