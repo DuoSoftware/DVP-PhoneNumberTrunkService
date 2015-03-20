@@ -1,5 +1,6 @@
 var restify = require('restify');
 var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var logHandler = require('./DVP-Common/LogHandler/CommonLogHandler.js');
 var gwBackendHandler = require('./TrunkBackendHandler.js');
 var number=require('./PhoneNumberManagement.js');
 //var xmlGen = require('./XmlResponseGenerator.js');
@@ -50,6 +51,71 @@ server.post('/DVP/API/:version/TrunkApi/AddNumber/:id', function(req, res, next)
         res.end(jsonString);
     }
 
+    return next();
+
+});
+
+server.post('/DVP/API/:version/TrunkApi/DeleteNumber/:PhoneNumber/:CompanyId/',function(req, res, next)
+{
+
+    try
+    {
+        var phoneNum = req.params.PhoneNumber;
+        var companyId = req.params.CompanyId;
+
+        if (phoneNum && companyId)
+        {
+            gwBackendHandler.removePhoneNumber(phoneNum, companyId, 0, function (err, result) {
+
+                if (err) {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, -1);
+                    res.end(jsonString);
+                }
+                else {
+                    var jsonString = messageFormatter.FormatMessage(err, "Phone number removed successfully", result, -1);
+                    res.end(jsonString);
+                }
+            })
+        }
+        else {
+            throw new Error("Invalid url");
+        }
+        return next();
+    }
+    catch (ex) {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+
+    return next();
+});
+
+server.post('/DVP/API/:version/TrunkApi/BuyNumber/',function(req, res, next)
+{
+
+    logHandler.WriteLog('dsddd');
+    var phnInfo = req.body;
+
+    if(phnInfo)
+    {
+        gwBackendHandler.switchPhoneNumberCompany(phnInfo.PhoneNumber, phnInfo.CompanyId, phnInfo.TenantId, phnInfo.companyToChange, phnInfo.tenantToChange, function(err, result){
+
+            if(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, -1);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Number Buy Successful", result, -1);
+                res.end(jsonString);
+            }
+        })
+    }
+    else
+    {
+        throw new Error("Empty Body");
+    }
     return next();
 
 });

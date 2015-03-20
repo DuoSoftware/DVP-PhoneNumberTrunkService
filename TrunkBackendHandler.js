@@ -1,7 +1,5 @@
 var dbModel = require('./DVP-DBModels');
 var underscore = require('underscore');
-
-
 //var getGrpUsersById = function(grpId, callback)
 //{
 //    try
@@ -24,11 +22,47 @@ var underscore = require('underscore');
 //    }
 //};
 
+var switchPhoneNumberCompany = function(phoneNumber, companyId, tenantId, companyToChange, tenantToChange, callback)
+{
+    try
+    {
+        dbModel.TrunkPhoneNumber.find({ where: [{PhoneNumber: phoneNumber }, { CompanyId: companyId}]}).complete(function(err, phnNumInfo)
+        {
+            if(err)
+            {
+                callback(err, false);
+            }
+            else if(phnNumInfo)
+            {
+                //update
+                phnNumInfo.updateAttributes({CompanyId: companyToChange, TenantId: tenantToChange}).complete(function (err) {
+                    if (err)
+                    {
+                        callback(err, false);
+                    }
+                    else {
+
+                        callback(undefined, true);
+                    }
+                })
+            }
+            else
+            {
+                callback(new Error("Unable to find a phone number registered to given company"), false);
+            }
+        })
+    }
+    catch(ex)
+    {
+        callback(ex, false);
+    }
+}
+
 var getTrunkById = function(trunkId, callback)
 {
     try
     {
-        dbModel.Trunk.find({ id: trunkId }).complete(function(err, trunkObj)
+        dbModel.Trunk.find({where :[{id: trunkId }]}).complete(function(err, trunkObj)
         {
             try
             {
@@ -50,7 +84,7 @@ var setTrunkEnabledStatus = function(gwId, status, callback)
 {
     try
     {
-        dbModel.Trunk.find({ id: gwId }).complete(function(err, gwObj)
+        dbModel.Trunk.find({where :[{id: gwId}]}).complete(function(err, gwObj)
         {
             if(err)
             {
@@ -80,44 +114,50 @@ var setTrunkEnabledStatus = function(gwId, status, callback)
     }
 };
 
-
 var assignTrunkToCloud = function(gwId, cloudId, callback)
 {
-    dbModel.Cloud.find({where: [{id: cloudId}, {Activate: true}]}).complete(function (err, cloudRec)
+    try
     {
-        if (!err && cloudRec)
+        dbModel.Cloud.find({where: [{id: cloudId}, {Activate: true}]}).complete(function (err, cloudRec)
         {
-            dbModel.Trunk.find({where: [{id: gwId}]}).complete(function (err, gwRec)
+            if (!err && cloudRec)
             {
-                if (!err && gwRec)
+                dbModel.Trunk.find({where: [{id: gwId}]}).complete(function (err, gwRec)
                 {
-                    cloudRec.addTrunk(gwRec).complete(function (err, result)
+                    if (!err && gwRec)
                     {
-                        if(!err)
+                        cloudRec.addTrunk(gwRec).complete(function (err, result)
                         {
-                            callback(undefined, true);
-                        }
-                        else
-                        {
-                            callback(err, true);
-                        }
+                            if(!err)
+                            {
+                                callback(undefined, true);
+                            }
+                            else
+                            {
+                                callback(err, true);
+                            }
 
-                    })
-                }
-                else
-                {
-                    callback(undefined, false);
-                }
+                        })
+                    }
+                    else
+                    {
+                        callback(undefined, false);
+                    }
 
-            })
+                })
 
-        }
-        else
-        {
-            callback(undefined, false);
-        }})
+            }
+            else
+            {
+                callback(undefined, false);
+            }})
+    }
+    catch(ex)
+    {
+        callback(ex, false);
+    }
+
 };
-
 
 var addTrunkConfiguration = function(gwInfo, callback)
 {
@@ -165,7 +205,7 @@ var updateTrunkConfiguration = function(trunkId, trunkInfo, callback)
 {
     try
     {
-        dbModel.Trunk.find({ id: trunkId }).complete(function(err, gwObj)
+        dbModel.Trunk.find({where:[{ id: trunkId }]}).complete(function(err, gwObj)
         {
             if(err)
             {
@@ -223,7 +263,7 @@ var removePhoneNumber = function(phoneNumber, companyId, tenantId, callback)
                 }
                 else
                 {
-                    callback(new Error())
+                    callback(new Error('Cannot find a phone number for the company'), false);
                 }
 
             }
@@ -232,7 +272,7 @@ var removePhoneNumber = function(phoneNumber, companyId, tenantId, callback)
     }
     catch(ex)
     {
-
+        callback(ex, false);
     }
 }
 
@@ -388,5 +428,6 @@ module.exports.assignTrunkToCloud = assignTrunkToCloud;
 module.exports.setTrunkEnabledStatus = setTrunkEnabledStatus;
 module.exports.getTrunkById = getTrunkById;
 module.exports.updateTrunkConfiguration = updateTrunkConfiguration;
-//module.exports.getGrpUsersById = getGrpUsersById;
+module.exports.switchPhoneNumberCompany = switchPhoneNumberCompany;
+module.exports.removePhoneNumber = removePhoneNumber;
 module.exports.addPhoneNumbersToTrunk = addPhoneNumbersToTrunk;
