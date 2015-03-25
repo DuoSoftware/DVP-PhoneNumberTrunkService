@@ -331,11 +331,11 @@ server.post('/DVP/API/:version/TrunkApi/GetTrunk/:id', function(req, res, next)
 
 //.......................................post............................................................................
 
-server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/chng_availability/:phonenumber/:companyid/:enable',function(req,res,err)
+server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/chng_availability/:phonenumber/:companyid/:enable',function(req,res,next)
 {
     try {
 
-        number.ChangeNumberAvailability(req, res, err);
+        number.ChangeNumberAvailability(req, res);
 
     }
     catch(ex)
@@ -343,15 +343,15 @@ server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/chng_ava
         var jsonString = messageFormatter.FormatMessage(ex, "ChangeNumberAvailability failed", false, null);
         res.end(jsonString);
     }
-
+    return next();
 });
 
 //.......................................post............................................................................
 
-server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/update_phone_schedule/:companyid/:phonenumber',function(req,res,err)
+server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/update_phone_schedule/:companyid/:phonenumber',function(req,res,next)
 {
     try {
-        number.UpdatePhoneDetails(req, res, err);
+        number.UpdatePhoneDetails(req, res);
         //var jsonString = messageFormatter.FormatMessage(null, "UpdatePhoneDetails Done", true, res);
         //res.end(jsonString);
 
@@ -361,16 +361,16 @@ server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/update_p
         var jsonString = messageFormatter.FormatMessage(ex, "UpdatePhoneDetails failed", false, res);
         res.end(jsonString);
     }
-
+    return next();
 });
 
 //.......................................post............................................................................
 
-server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/Update_category',function(req,res,err)
+server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/Update_category',function(req,res,next)
 {
     try {
 
-        number.UpdatePhoneNumberObjCategory(req, res, err);
+        number.UpdatePhoneNumberObjCategory(req, res);
 
     }
     catch(ex)
@@ -378,16 +378,16 @@ server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/Update_c
         var jsonString = messageFormatter.FormatMessage(ex, "UpdatePhoneNumberObjCategory failed", false, null);
         res.end(jsonString);
     }
-
+    return next();
 });
 //.......................................get............................................................................
 
-server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_all/:CompanyId/:PhoneNumber',function(req,res,err)
+server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_all/:CompanyId/:PhoneNumber',function(req,res,next)
 {
 
 
     try {
-        number.GetAllPhoneDetails(req,res,err);
+        number.GetAllPhoneDetails(req,res);
 
 
     }
@@ -396,15 +396,15 @@ server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_all/:
         var jsonString = messageFormatter.FormatMessage(ex, "GetAllPhoneDetails failed", false, res);
         res.end(jsonString);
     }
-
+return next();
 });
 //.......................................get............................................................................
 
-server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_phone/:CompanyId',function(req,res,err)
+server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_phone/:CompanyId',function(req,res,next)
 {
 
     try {
-        number.GetCompanyPhones(req,res,err);
+        number.GetCompanyPhones(req,res);
 
 
     }
@@ -414,7 +414,7 @@ server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_phone
         res.end(jsonString);
     }
 
-
+return next();
 });
 
 

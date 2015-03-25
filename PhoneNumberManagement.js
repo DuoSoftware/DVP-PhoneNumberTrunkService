@@ -9,7 +9,7 @@ var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessag
 
 
 //MF and TC done
-function ChangeNumberAvailability(req,res,err) {
+function ChangeNumberAvailability(req,res) {
 
     try
     {
@@ -77,7 +77,7 @@ function ChangeNumberAvailability(req,res,err) {
 
 
 //MF and TC done
-function UpdatePhoneDetails(req,res,err) {
+function UpdatePhoneDetails(req,res) {
     try{
 
         DbConn.TrunkPhoneNumber.findAll({where: [{CompanyId: req.body.CompanyId}, {PhoneNumber: req.params.PhoneNumber}]}).complete(function (err, ScheduleObject) {
@@ -152,7 +152,7 @@ function UpdatePhoneDetails(req,res,err) {
 }
 
 //MF and TC done
-function GetAllPhoneDetails(req,res,err)
+function GetAllPhoneDetails(req,res)
 {
     try {
         DbConn.TrunkPhoneNumber.findAll({where: [{CompanyId: req.params.CompanyId}, {PhoneNumber: req.params.PhoneNumber}]}).complete(function (err, ScheduleObject) {
@@ -205,7 +205,7 @@ function GetAllPhoneDetails(req,res,err)
 }
 
 //MF and TC done
-function GetCompanyPhones(req,res,err)
+function GetCompanyPhones(req,res)
 {
     try {
         DbConn.TrunkPhoneNumber.findAll({where: {CompanyId: req.params.CompanyId}}).complete(function (err, ScheduleObject) {
@@ -244,7 +244,7 @@ function GetCompanyPhones(req,res,err)
     }
 }
 
-function UpdatePhoneNumberObjCategory(req,res,err)
+function UpdatePhoneNumberObjCategory(req,res)
 {
     try{
 
