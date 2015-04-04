@@ -114,19 +114,64 @@ var setTrunkEnabledStatus = function(gwId, status, callback)
     }
 };
 
-var assignTrunkToCloud = function(gwId, cloudId, callback)
+var AssignTrunkToProfile = function(gwId, profileId, callback)
 {
     try
     {
-        dbModel.Cloud.find({where: [{id: cloudId}, {Activate: true}]}).complete(function (err, cloudRec)
+        dbModel.SipNetworkProfile.find({where: [{id: profileId}, {ObjType: "EXTERNAL"}]}).complete(function (err, profRec)
         {
-            if (!err && cloudRec)
+            if (!err && profRec)
             {
                 dbModel.Trunk.find({where: [{id: gwId}]}).complete(function (err, gwRec)
                 {
                     if (!err && gwRec)
                     {
-                        cloudRec.addTrunk(gwRec).complete(function (err, result)
+                        profRec.addTrunk(gwRec).complete(function (err, result)
+                        {
+                            if(!err)
+                            {
+                                callback(undefined, true);
+                            }
+                            else
+                            {
+                                callback(err, true);
+                            }
+
+                        })
+                    }
+                    else
+                    {
+                        callback(undefined, false);
+                    }
+
+                })
+
+            }
+            else
+            {
+                callback(undefined, false);
+            }})
+    }
+    catch(ex)
+    {
+        callback(ex, false);
+    }
+
+};
+
+var AssignTrunkToLoadBalancer = function(gwId, lbId, callback)
+{
+    try
+    {
+        dbModel.LoadBalancer.find({where: [{id: lbId}]}).complete(function (err, lbRec)
+        {
+            if (!err && lbRec)
+            {
+                dbModel.Trunk.find({where: [{id: gwId}]}).complete(function (err, gwRec)
+                {
+                    if (!err && gwRec)
+                    {
+                        lbRec.addTrunk(gwRec).complete(function (err, result)
                         {
                             if(!err)
                             {
@@ -424,10 +469,11 @@ var addPhoneNumbersToTrunk = function(trunkId, phoneNumberInfo, callback)
 };
 
 module.exports.addTrunkConfiguration = addTrunkConfiguration;
-module.exports.assignTrunkToCloud = assignTrunkToCloud;
+module.exports.AssignTrunkToLoadBalancer = AssignTrunkToLoadBalancer;
 module.exports.setTrunkEnabledStatus = setTrunkEnabledStatus;
 module.exports.getTrunkById = getTrunkById;
 module.exports.updateTrunkConfiguration = updateTrunkConfiguration;
 module.exports.switchPhoneNumberCompany = switchPhoneNumberCompany;
 module.exports.removePhoneNumber = removePhoneNumber;
 module.exports.addPhoneNumbersToTrunk = addPhoneNumbersToTrunk;
+module.exports.AssignTrunkToProfile = AssignTrunkToProfile;

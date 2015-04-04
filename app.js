@@ -200,16 +200,16 @@ server.post('/DVP/API/:version/TrunkApi/UpdateTrunk/:id', function(req, res, nex
 
 });
 
-server.post('/DVP/API/:version/TrunkApi/AssignCloudToTrunk/:id/Cloud/:cloudId', function(req, res, next)
+server.post('/DVP/API/:version/TrunkApi/AssignTrunkToLoadBalancer/:id/:lbId', function(req, res, next)
 {
     try
     {
         var trunkId = parseInt(req.params.id);
-        var cloudId = parseInt(req.params.cloudId);
+        var lbId = parseInt(req.params.lbId);
 
-        if(trunkId && cloudId)
+        if(trunkId && lbId)
         {
-            gwBackendHandler.assignTrunkToCloud(trunkId, cloudId, function(err, result){
+            gwBackendHandler.AssignTrunkToLoadBalancer(trunkId, lbId, function(err, result){
 
                 try
                 {
@@ -220,7 +220,7 @@ server.post('/DVP/API/:version/TrunkApi/AssignCloudToTrunk/:id/Cloud/:cloudId', 
                     }
                     else
                     {
-                        var jsonString = messageFormatter.FormatMessage(err, "Cloud added successfully", result, null);
+                        var jsonString = messageFormatter.FormatMessage(err, "Load Balancer added successfully", result, null);
                         res.end(jsonString);
                     }
                 }
@@ -233,7 +233,52 @@ server.post('/DVP/API/:version/TrunkApi/AssignCloudToTrunk/:id/Cloud/:cloudId', 
         }
         else
         {
-            throw new Error("Invalid trunk id or cloud id provided");
+            throw new Error("Invalid trunk id or load balancer id provided");
+        }
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+
+    return next();
+});
+
+server.post('/DVP/API/:version/TrunkApi/AssignTrunkToSipProfile/:id/:profId', function(req, res, next)
+{
+    try
+    {
+        var trunkId = parseInt(req.params.id);
+        var profId = parseInt(req.params.profId);
+
+        if(trunkId && profId)
+        {
+            gwBackendHandler.AssignTrunkToProfile(trunkId, profId, function(err, result){
+
+                try
+                {
+                    if(err)
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
+                        res.end(jsonString);
+                    }
+                    else
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added successfully", result, null);
+                        res.end(jsonString);
+                    }
+                }
+                catch(ex)
+                {
+                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                    res.end(jsonString);
+                }
+            })
+        }
+        else
+        {
+            throw new Error("Invalid trunk id or profile id provided");
         }
     }
     catch(ex)
