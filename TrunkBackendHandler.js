@@ -204,6 +204,51 @@ var AssignTrunkToLoadBalancer = function(gwId, lbId, callback)
 
 };
 
+var AssignTrunkTranslation = function(gwId, transId, callback)
+{
+    try
+    {
+        dbModel.Translation.find({where: [{id: transId}]}).complete(function (err, transRec)
+        {
+            if (!err && transRec)
+            {
+                dbModel.Trunk.find({where: [{id: gwId}]}).complete(function (err, gwRec)
+                {
+                    if (!err && gwRec)
+                    {
+                        transRec.addTrunk(gwRec).complete(function (err, result)
+                        {
+                            if(!err)
+                            {
+                                callback(undefined, true);
+                            }
+                            else
+                            {
+                                callback(err, true);
+                            }
+
+                        })
+                    }
+                    else
+                    {
+                        callback(undefined, false);
+                    }
+
+                })
+
+            }
+            else
+            {
+                callback(undefined, false);
+            }})
+    }
+    catch(ex)
+    {
+        callback(ex, false);
+    }
+
+};
+
 var addTrunkConfiguration = function(gwInfo, callback)
 {
     try {
@@ -477,3 +522,4 @@ module.exports.switchPhoneNumberCompany = switchPhoneNumberCompany;
 module.exports.removePhoneNumber = removePhoneNumber;
 module.exports.addPhoneNumbersToTrunk = addPhoneNumbersToTrunk;
 module.exports.AssignTrunkToProfile = AssignTrunkToProfile;
+module.exports.AssignTrunkTranslation = AssignTrunkTranslation;

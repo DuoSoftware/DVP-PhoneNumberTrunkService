@@ -290,6 +290,51 @@ server.post('/DVP/API/:version/TrunkApi/AssignTrunkToSipProfile/:id/:profId', fu
     return next();
 });
 
+server.post('/DVP/API/:version/TrunkApi/AssignTrunkTranslation/:id/:transId', function(req, res, next)
+{
+    try
+    {
+        var trunkId = parseInt(req.params.id);
+        var transId = parseInt(req.params.transId);
+
+        if(trunkId && transId)
+        {
+            gwBackendHandler.AssignTrunkTranslation(trunkId, transId, function(err, result){
+
+                try
+                {
+                    if(err)
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
+                        res.end(jsonString);
+                    }
+                    else
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "Translation assigned to trunk successfully", result, null);
+                        res.end(jsonString);
+                    }
+                }
+                catch(ex)
+                {
+                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                    res.end(jsonString);
+                }
+            })
+        }
+        else
+        {
+            throw new Error("Invalid trunk id or profile id provided");
+        }
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+
+    return next();
+});
+
 server.post('/DVP/API/:version/TrunkApi/SetTrunkAvailability/:id/Enable/:status', function(req, res, next)
 {
     try
