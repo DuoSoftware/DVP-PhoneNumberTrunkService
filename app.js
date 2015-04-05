@@ -161,6 +161,44 @@ server.post('/DVP/API/:version/TrunkApi/CreateTrunk', function(req, res, next)
 
 });
 
+server.post('/DVP/API/:version/TrunkApi/AddOperator', function(req, res, next)
+{
+    try
+    {
+        var opInfo = req.body;
+
+        if(opInfo)
+        {
+            gwBackendHandler.AddTrunkOperator(opInfo, function(err, recordId, result){
+
+                if(err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, recordId);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Trunk Operator Added Successfully", result, recordId);
+                    res.end(jsonString);
+                }
+            })
+        }
+        else
+        {
+            throw new Error("Empty Body");
+        }
+        return next();
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
 server.post('/DVP/API/:version/TrunkApi/UpdateTrunk/:id', function(req, res, next)
 {
     try
@@ -324,6 +362,51 @@ server.post('/DVP/API/:version/TrunkApi/AssignTrunkTranslation/:id/:transId', fu
         else
         {
             throw new Error("Invalid trunk id or profile id provided");
+        }
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+
+    return next();
+});
+
+server.post('/DVP/API/:version/TrunkApi/AssignOperatorToTrunk/:id/:opId', function(req, res, next)
+{
+    try
+    {
+        var trunkId = parseInt(req.params.id);
+        var opId = parseInt(req.params.opId);
+
+        if(trunkId && opId)
+        {
+            gwBackendHandler.AssignOperatorToTrunk(trunkId, opId, function(err, result){
+
+                try
+                {
+                    if(err)
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
+                        res.end(jsonString);
+                    }
+                    else
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "Operator assigned to trunk successfully", result, null);
+                        res.end(jsonString);
+                    }
+                }
+                catch(ex)
+                {
+                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                    res.end(jsonString);
+                }
+            })
+        }
+        else
+        {
+            throw new Error("Invalid trunk id or operator id provided");
         }
     }
     catch(ex)

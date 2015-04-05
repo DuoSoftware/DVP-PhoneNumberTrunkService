@@ -249,6 +249,51 @@ var AssignTrunkTranslation = function(gwId, transId, callback)
 
 };
 
+var AssignOperatorToTrunk = function(gwId, opId, callback)
+{
+    try
+    {
+        dbModel.TrunkOperator.find({where: [{id: opId}]}).complete(function (err, opRec)
+        {
+            if (!err && opRec)
+            {
+                dbModel.Trunk.find({where: [{id: gwId}]}).complete(function (err, gwRec)
+                {
+                    if (!err && gwRec)
+                    {
+                        opRec.addTrunk(gwRec).complete(function (err, result)
+                        {
+                            if(!err)
+                            {
+                                callback(undefined, true);
+                            }
+                            else
+                            {
+                                callback(err, true);
+                            }
+
+                        })
+                    }
+                    else
+                    {
+                        callback(undefined, false);
+                    }
+
+                })
+
+            }
+            else
+            {
+                callback(undefined, false);
+            }})
+    }
+    catch(ex)
+    {
+        callback(ex, false);
+    }
+
+};
+
 var addTrunkConfiguration = function(gwInfo, callback)
 {
     try {
@@ -262,8 +307,7 @@ var addTrunkConfiguration = function(gwInfo, callback)
             IpUrl: gwInfo.IpUrl,
             Enable: gwInfo.Enable,
             CompanyId: gwInfo.CompanyId,
-            TenantId: gwInfo.TenantId,
-            Operator: gwInfo.Operator
+            TenantId: gwInfo.TenantId
         });
 
         gw
@@ -276,6 +320,45 @@ var addTrunkConfiguration = function(gwInfo, callback)
                     else {
                         var gwId = gw.id;
                         callback(undefined, gwId, true);
+                    }
+                }
+                catch (ex) {
+                    callback(ex,-1, false);
+                }
+
+            })
+
+    }
+    catch(ex)
+    {
+        callback(ex, -1, false);
+    }
+}
+
+var AddTrunkOperator = function(opInfo, callback)
+{
+    try {
+
+        var op = dbModel.TrunkOperator.build({
+            OperatorName: opInfo.OperatorName,
+            OperatorCode: opInfo.OperatorCode,
+            ObjClass: opInfo.ObjClass,
+            ObjType: opInfo.ObjType,
+            ObjCategory: opInfo.ObjCategory,
+            CompanyId: opInfo.CompanyId,
+            TenantId: opInfo.TenantId
+        });
+
+        gw
+            .save()
+            .complete(function (err) {
+                try {
+                    if (!!err) {
+                        callback(err, -1, false);
+                    }
+                    else {
+                        var opId = op.id;
+                        callback(undefined, opId, true);
                     }
                 }
                 catch (ex) {
@@ -304,7 +387,7 @@ var updateTrunkConfiguration = function(trunkId, trunkInfo, callback)
             else if(gwObj)
             {
                 //update
-                gwObj.updateAttributes({TrunkName: trunkInfo.TrunkName, Enable: trunkInfo.Enable, ObjClass: trunkInfo.ObjClass, IpUrl: trunkInfo.IpUrl, ObjType: trunkInfo.ObjType, ObjCategory: trunkInfo.ObjCategory, Operator: trunkInfo.Operator}).complete(function (err) {
+                gwObj.updateAttributes({TrunkName: trunkInfo.TrunkName, Enable: trunkInfo.Enable, ObjClass: trunkInfo.ObjClass, IpUrl: trunkInfo.IpUrl, ObjType: trunkInfo.ObjType, ObjCategory: trunkInfo.ObjCategory}).complete(function (err) {
                     if (err) {
                         callback(err, false);
                     }
@@ -523,3 +606,5 @@ module.exports.removePhoneNumber = removePhoneNumber;
 module.exports.addPhoneNumbersToTrunk = addPhoneNumbersToTrunk;
 module.exports.AssignTrunkToProfile = AssignTrunkToProfile;
 module.exports.AssignTrunkTranslation = AssignTrunkTranslation;
+module.exports.AddTrunkOperator = AddTrunkOperator;
+module.exports.AssignOperatorToTrunk = AssignOperatorToTrunk;
