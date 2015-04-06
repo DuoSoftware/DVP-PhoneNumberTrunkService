@@ -1,0 +1,30 @@
+{
+  "name": "DVP-PhoneNumberTrunkService",
+  "version": "1.0.0",
+  "description": "DVP-PhoneNumberTrunkService\r ===========================",
+  "main": "app.js",
+  "dependencies": {
+    "config": "^1.10.0",
+    "underscore": "^1.8.2",
+    "pg-hstore": "^2.3.1",
+    "sequelize": "^2.0.0-rc8",
+    "restify": "^2.8.5",
+    "stringify": "^3.1.0",
+    "winston": "^0.9.0",
+    "pg": "^4.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DuoSoftware/DVP-PhoneNumberTrunkService.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DuoSoftware/DVP-PhoneNumberTrunkService/issues"
+  },
+  "homepage": "https://github.com/DuoSoftware/DVP-PhoneNumberTrunkService"
+}
