@@ -6,17 +6,30 @@ var DbConn = require('./DVP-DBModels');
 
 var stringify=require('stringify');
 var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var log4js=require('log4js');
+
+
+log4js.configure('./config/log4js_config.json', { cwd: './logs' });
+var log = log4js.getLogger("pnum");
+
 
 
 //MF and TC done
+
+log.info("Phone number management starts........");
 function ChangeNumberAvailability(req,res) {
+
+    log.info(" Change Number Availability starts.");
 
     try
     {
+        log.info("Inputs :- "+JSON.stringify(req));
         DbConn.TrunkPhoneNumber.find({where: [{PhoneNumber: req.params.phonenumber}, {CompanyId: req.params.companyid}]}).complete(function (err, PhnObject) {
             //logger.info( 'Requested RefID: '+reqz.params.ref);
             // console.log(ExtObject);
             if (!PhnObject) {
+
+                log.error("No record found.......");
                 console.log("No record found for the Phone Number : " + req.params.phonenumber);
 
                 var jsonString = messageFormatter.FormatMessage(err, "null object found searching : "+req.params.CompanyId, false, PhnObject);
