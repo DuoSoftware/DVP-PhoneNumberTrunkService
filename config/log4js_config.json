@@ -1,0 +1,29 @@
+{
+  "appenders": [
+    {
+      "type": "fileSync",
+      "filename": "./PnumMgmt.log",
+      "level":"DEBUG",
+      "category": "pnum"
+    },
+    {
+      "type": "fileSync",
+      "filename": "./RedisPublish.log",
+      "level":"DEBUG",
+      "category": "redis"
+    },
+    {
+      "type": "fileSync",
+      "filename": "./CallServerPicker.log",
+      "level":"DEBUG",
+      "category": "cspicker"
+    },
+    {
+      "type": "fileSync",
+      "filename": "./FileHandler.log",
+      "level":"DEBUG",
+      "category": "fhandler"
+    }
+
+  ]
+}
