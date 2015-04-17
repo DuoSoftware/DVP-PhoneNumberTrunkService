@@ -80,6 +80,91 @@ var getTrunkById = function(trunkId, callback)
     }
 };
 
+var GetCallServerByProfileId = function(profileId, callback)
+{
+    try
+    {
+        dbModel.SipNetworkProfile.find({where :[{id: profileId}], include: [{model: dbModel.CallServer, as: "CallServer"}]}).complete(function(err, csObj)
+        {
+            callback(err, csObj);
+        })
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+};
+
+var GetCallServersRelatedToLoadBalancer = function(lbId, callback)
+{
+    try
+    {
+        var CallServerList = [];
+        dbModel.LoadBalancer.find({where :[{id: lbId}], include: [{model: dbModel.Cloud, as: "Cloud", include: [{model: dbModel.CallServer, as: "CallServer"}]}]}).complete(function(err, resultInfo)
+        {
+            if(err)
+            {
+                callback(err, CallServerList);
+            }
+            else
+            {
+                if(resultInfo.Cloud)
+                {
+                    if(resultInfo.Cloud.CallServer && resultInfo.Cloud.CallServer.length > 0)
+                    {
+                        CallServerList.push.apply(CallServerList, resultInfo.Cloud.CallServer);
+                        //get all clouds where parentcloudId equals cloud id
+
+                        var clusterId = resultInfo.Cloud.id;
+
+                        dbModel.Cloud.findAll({where :[{ParentCloudId: clusterId}], include: [{model: dbModel.CallServer, as: "CallServer"}]}).complete(function(err, childCloudInfo)
+                        {
+                            if(err)
+                            {
+                                //give other call servers only
+                                callback(err, CallServerList);
+                            }
+                            else if(childCloudInfo)
+                            {
+                                childCloudInfo.forEach(function(cld)
+                                {
+                                    if(cld.CallServer)
+                                    {
+                                        //add callserver details to array
+                                        CallServerList.push(cld.CallServer);
+                                    }
+                                })
+
+                                callback(err, CallServerList);
+                            }
+                            else
+                            {
+                                callback(err, CallServerList);
+                            }
+
+                        });
+                    }
+                    else
+                    {
+                        callback(err, CallServerList);
+                    }
+                }
+                else
+                {
+                    callback(err, CallServerList);
+                }
+            }
+
+        })
+    }
+    catch(ex)
+    {
+        callback(err, undefined);
+    }
+
+}
+
+
 var setTrunkEnabledStatus = function(gwId, status, callback)
 {
     try
@@ -596,6 +681,40 @@ var addPhoneNumbersToTrunk = function(trunkId, phoneNumberInfo, callback)
     }
 };
 
+var GetUnallocatedPhoneNumbersForOperator = function(operatorId, companyId, tenantId, callback)
+{
+    try
+    {
+
+        dbModel.TrunkOperator.find({where: [{id: operatorId}, {CompanyId: companyId}, {TenantId: tenantId}], include : [{model: dbModel.Trunk, as : "Trunk", include : [{model: dbModel.TrunkPhoneNumber, as: "TrunkPhoneNumber", where : [{CompanyId : companyId}, {TenantId: tenantId}]}]}]}).complete(function (err, result)
+        {
+            callback(err, result);
+        })
+
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+};
+
+var GetAllocatedPhoneNumbersForOperator = function(operatorId, companyId, tenantId, callback)
+{
+    try
+    {
+
+        dbModel.TrunkOperator.find({where: [{id: operatorId}, {CompanyId: companyId}, {TenantId: tenantId}], include : [{model: dbModel.Trunk, as : "Trunk", include : [{model: dbModel.TrunkPhoneNumber, as: "TrunkPhoneNumber", where : [dbModel.SequelizeConn.or({CompanyId : {not: companyId }}, {TenantId: {not: tenantId }})]}]}]}).complete(function (err, result)
+        {
+            callback(err, result);
+        })
+
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+};
+
 module.exports.addTrunkConfiguration = addTrunkConfiguration;
 module.exports.AssignTrunkToLoadBalancer = AssignTrunkToLoadBalancer;
 module.exports.setTrunkEnabledStatus = setTrunkEnabledStatus;
@@ -608,3 +727,7 @@ module.exports.AssignTrunkToProfile = AssignTrunkToProfile;
 module.exports.AssignTrunkTranslation = AssignTrunkTranslation;
 module.exports.AddTrunkOperator = AddTrunkOperator;
 module.exports.AssignOperatorToTrunk = AssignOperatorToTrunk;
+module.exports.GetCallServerByProfileId = GetCallServerByProfileId;
+module.exports.GetCallServersRelatedToLoadBalancer = GetCallServersRelatedToLoadBalancer;
+module.exports.GetUnallocatedPhoneNumbersForOperator = GetUnallocatedPhoneNumbersForOperator;
+module.exports.GetAllocatedPhoneNumbersForOperator = GetAllocatedPhoneNumbersForOperator;

@@ -3,6 +3,7 @@ var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessag
 var logHandler = require('./DVP-Common/LogHandler/CommonLogHandler.js');
 var gwBackendHandler = require('./TrunkBackendHandler.js');
 var number=require('./PhoneNumberManagement.js');
+var redisHandler = require('./RedisHandler.js');
 //var xmlGen = require('./XmlResponseGenerator.js');
 
 var server = restify.createServer({
@@ -121,7 +122,7 @@ server.post('/DVP/API/:version/TrunkApi/BuyNumber/',function(req, res, next)
 });
 
 /*
- {"TrunkCode":"TestTrunk","TrunkName":"Test1","ObjClass":"DVP","ObjType":"Trunk","ObjCategory":"SIP","IpUrl":"192.168.1.198","Enable":"True","CompanyId":"1","TenantId":"3","Operator":"Dialog"}
+ {"TrunkCode":"TestTrunk","TrunkName":"Test1","ObjClass":"DVP","ObjType":"Trunk","ObjCategory":"SIP","IpUrl":"192.168.1.198","Enable":"True","CompanyId":"1","TenantId":"3"}
  */
 server.post('/DVP/API/:version/TrunkApi/CreateTrunk', function(req, res, next)
 {
@@ -258,8 +259,32 @@ server.post('/DVP/API/:version/TrunkApi/AssignTrunkToLoadBalancer/:id/:lbId', fu
                     }
                     else
                     {
-                        var jsonString = messageFormatter.FormatMessage(err, "Load Balancer added successfully", result, null);
-                        res.end(jsonString);
+                        gwBackendHandler.GetCallServersRelatedToLoadBalancer(lbId, function(err, csRes)
+                        {
+                            if(err)
+                            {
+                                var jsonString = messageFormatter.FormatMessage(err, "Load Balancer added successfully", true, null);
+                                res.end(jsonString);
+                            }
+                            else
+                            {
+                                //Publish to Redis
+                                csRes.forEach(function(cs)
+                                {
+                                    var pattern = "CSCOMMAND:" + cs.id + "rescangateway";
+                                    var message = '{"profile": "external"}';
+
+                                    redisHandler.PublishToRedis(pattern, message, function(err, redisResult)
+                                    {
+
+                                    })
+
+                                });
+                                var jsonString = messageFormatter.FormatMessage(err, "Load Balancer added successfully", true, null);
+                                res.end(jsonString);
+                            }
+                        })
+
                     }
                 }
                 catch(ex)
@@ -303,8 +328,35 @@ server.post('/DVP/API/:version/TrunkApi/AssignTrunkToSipProfile/:id/:profId', fu
                     }
                     else
                     {
-                        var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added successfully", result, null);
-                        res.end(jsonString);
+                        gwBackendHandler.GetCallServerByProfileId(profId, function(err, csRes)
+                        {
+                            if(err)
+                            {
+                                var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added successfully", true, null);
+                                res.end(jsonString);
+                            }
+                            else if(csRes)
+                            {
+                                if(csRes.CallServer)
+                                {
+                                    var pattern = "CSCOMMAND:" + csRes.CallServer.id + "rescangateway";
+                                    var message = '{"profile":"' + csRes.ProfileName + '"}';
+
+                                    redisHandler.PublishToRedis(pattern, message, function(err, redisResult)
+                                    {
+
+                                    })
+                                }
+
+                                var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added successfully", true, null);
+                                res.end(jsonString);
+                            }
+                            else
+                            {
+                                var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added successfully", true, null);
+                                res.end(jsonString);
+                            }
+                        });
                     }
                 }
                 catch(ex)
@@ -490,6 +542,133 @@ server.post('/DVP/API/:version/TrunkApi/GetTrunk/:id', function(req, res, next)
     catch(ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
+server.get('/DVP/API/:version/TrunkApi/GetUnAllocatedNumbers/:operatorId/:companyId/:tenantId', function(req, res, next)
+{
+    var numberDetails = [];
+    try
+    {
+        var operatorId = parseInt(req.params.operatorId);
+        var companyId = parseInt(req.params.companyId);
+        var tenantId = parseInt(req.params.tenantId);
+
+        if(operatorId && companyId && tenantId)
+        {
+            gwBackendHandler.GetUnallocatedPhoneNumbersForOperator(operatorId, companyId, tenantId, function(err, result)
+            {
+
+                if(err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                    res.end(jsonString);
+                }
+                else
+                {
+
+                    if(result && result.Trunk && result.Trunk.length > 0)
+                    {
+                        result.Trunk.forEach(function(tr)
+                        {
+                            if(tr.TrunkPhoneNumber && tr.TrunkPhoneNumber.length > 0)
+                            {
+                                tr.TrunkPhoneNumber.forEach(function(trNum)
+                                {
+                                    numberDetails.push(trNum);
+                                })
+                            }
+
+                        });
+
+                        var jsonString = messageFormatter.FormatMessage(err, "Success", true, numberDetails);
+                        res.end(jsonString);
+                    }
+                    else
+                    {
+                        var jsonString = messageFormatter.FormatMessage(new Error('No trunks found'), "ERROR", false, numberDetails);
+                        res.end(jsonString);
+                    }
+
+                }
+            })
+        }
+        else
+        {
+            throw new Error("Empty Body");
+        }
+        return next();
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, numberDetails);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
+server.get('/DVP/API/:version/TrunkApi/GetAllocatedNumbers/:operatorId/:companyId/:tenantId', function(req, res, next)
+{
+    var numberDetails = [];
+    try
+    {
+        var operatorId = parseInt(req.params.operatorId);
+        var companyId = parseInt(req.params.companyId);
+        var tenantId = parseInt(req.params.tenantId);
+
+        if(operatorId && companyId && tenantId)
+        {
+            gwBackendHandler.GetAllocatedPhoneNumbersForOperator(operatorId, companyId, tenantId, function(err, result)
+            {
+                if(err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                    res.end(jsonString);
+                }
+                else
+                {
+
+                    if(result && result.Trunk && result.Trunk.length > 0)
+                    {
+                        result.Trunk.forEach(function(tr)
+                        {
+                            if(tr.TrunkPhoneNumber && tr.TrunkPhoneNumber.length > 0)
+                            {
+                                tr.TrunkPhoneNumber.forEach(function(trNum)
+                                {
+                                    numberDetails.push(trNum);
+                                })
+                            }
+
+                        });
+
+                        var jsonString = messageFormatter.FormatMessage(err, "Success", true, numberDetails);
+                        res.end(jsonString);
+                    }
+                    else
+                    {
+                        var jsonString = messageFormatter.FormatMessage(new Error('No trunks found'), "ERROR", false, numberDetails);
+                        res.end(jsonString);
+                    }
+
+                }
+            })
+        }
+        else
+        {
+            throw new Error("Empty Body");
+        }
+        return next();
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, numberDetails);
         res.end(jsonString);
     }
 
