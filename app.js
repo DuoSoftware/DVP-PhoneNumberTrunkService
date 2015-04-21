@@ -56,7 +56,7 @@ server.post('/DVP/API/:version/TrunkApi/AddNumber/:id', function(req, res, next)
 
 });
 
-server.post('/DVP/API/:version/TrunkApi/DeleteNumber/:PhoneNumber/:CompanyId/',function(req, res, next)
+server.post('/DVP/API/:version/TrunkApi/DeleteNumber/:PhoneNumber/:CompanyId',function(req, res, next)
 {
 
     try
@@ -91,7 +91,7 @@ server.post('/DVP/API/:version/TrunkApi/DeleteNumber/:PhoneNumber/:CompanyId/',f
     return next();
 });
 
-server.post('/DVP/API/:version/TrunkApi/BuyNumber/',function(req, res, next)
+server.post('/DVP/API/:version/TrunkApi/BuyNumber',function(req, res, next)
 {
 
     logHandler.WriteLog('dsddd');
@@ -510,7 +510,7 @@ server.post('/DVP/API/:version/TrunkApi/SetTrunkAvailability/:id/Enable/:status'
 
 });
 
-server.post('/DVP/API/:version/TrunkApi/GetTrunk/:id', function(req, res, next)
+server.get('/DVP/API/:version/TrunkApi/GetTrunk/:id', function(req, res, next)
 {
 
     try
@@ -718,7 +718,7 @@ server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/update_p
 
 //.......................................post............................................................................
 
-server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/Update_category',function(req,res,next)
+server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/Update_category/:PhoneNumber',function(req,res,next)
 {
     try {
 
