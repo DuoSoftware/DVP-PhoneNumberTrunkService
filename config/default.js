@@ -14,6 +14,7 @@ module.exports = {
   "Host":{
     "Ip":"127.0.0.1",
     "Port":"9898",
-    "Version":"1.0.0.0"
+    "Version":"1.0.0.0",
+    "logfilepath": ""
   }
 };

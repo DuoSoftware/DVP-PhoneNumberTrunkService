@@ -23,6 +23,7 @@ module.exports = {
     "Host":{
         "Ip":"HOST_IP",
         "Port":"HOST_PORT",
-        "Version":"HOST_VERSION"
+        "Version":"HOST_VERSION",
+        "logfilepath": "LOG4JS_CONFIG"
     }
 };

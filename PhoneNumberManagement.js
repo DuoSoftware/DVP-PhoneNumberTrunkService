@@ -7,9 +7,10 @@ var DbConn = require('DVP-DBModels');
 var stringify=require('stringify');
 var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var log4js=require('log4js');
+var config=require('config');
 
 
-log4js.configure('./config/log4js_config.json', { cwd: './logs' });
+log4js.configure(config.Host.logfilepath, { cwd: hpath });
 var log = log4js.getLogger("pnum");
 
 
