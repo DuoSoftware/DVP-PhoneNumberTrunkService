@@ -61,11 +61,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AddNumber/:id', function(req,
 
 });
 
-<<<<<<< HEAD
 server.post('/DVP/API/' + hostVersion + '/TrunkApi/DeleteNumber/:PhoneNumber/:CompanyId/',function(req, res, next)
-=======
-server.post('/DVP/API/:version/TrunkApi/DeleteNumber/:PhoneNumber/:CompanyId',function(req, res, next)
->>>>>>> 63c1a0fc21205692da32135335ee780e8b87648e
 {
 
     try
@@ -100,11 +96,8 @@ server.post('/DVP/API/:version/TrunkApi/DeleteNumber/:PhoneNumber/:CompanyId',fu
     return next();
 });
 
-<<<<<<< HEAD
+
 server.post('/DVP/API/' + hostVersion + '/TrunkApi/BuyNumber/',function(req, res, next)
-=======
-server.post('/DVP/API/:version/TrunkApi/BuyNumber',function(req, res, next)
->>>>>>> 63c1a0fc21205692da32135335ee780e8b87648e
 {
 
     logHandler.WriteLog('dsddd');
@@ -523,11 +516,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/SetTrunkAvailability/:id/Enab
 
 });
 
-<<<<<<< HEAD
 server.post('/DVP/API/' + hostVersion + '/TrunkApi/GetTrunk/:id', function(req, res, next)
-=======
-server.get('/DVP/API/:version/TrunkApi/GetTrunk/:id', function(req, res, next)
->>>>>>> 63c1a0fc21205692da32135335ee780e8b87648e
 {
 
     try
@@ -735,11 +724,8 @@ server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_numbe
 
 //.......................................post............................................................................
 
-<<<<<<< HEAD
+
 server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/Update_category',function(req,res,next)
-=======
-server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/Update_category/:PhoneNumber',function(req,res,next)
->>>>>>> 63c1a0fc21205692da32135335ee780e8b87648e
 {
     try {
 
