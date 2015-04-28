@@ -4,6 +4,8 @@
   "description": "DVP-PhoneNumberTrunkService\r ===========================",
   "main": "app.js",
   "dependencies": {
+    "DVP-Common": "DuoSoftware/DVP-Common",
+    "DVP-DBModels": "DuoSoftware/DVP-DBModels",
     "config": "^1.10.0",
     "underscore": "^1.8.2",
     "pg-hstore": "^2.3.1",

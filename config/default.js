@@ -9,7 +9,11 @@ module.exports = {
   },
   "Redis": {
     "IpAddress":"192.168.3.200",
-    "Port":"6379",
-    "Database":0
+    "Port":"6379"
+  },
+  "Host":{
+    "Ip":"127.0.0.1",
+    "Port":"9898",
+    "Version":"1.0.0.0"
   }
 };

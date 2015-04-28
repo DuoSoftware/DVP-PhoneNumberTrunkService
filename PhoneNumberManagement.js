@@ -2,10 +2,10 @@
  * Created by pawan on 3/6/2015.
  */
 
-var DbConn = require('./DVP-DBModels');
+var DbConn = require('DVP-DBModels');
 
 var stringify=require('stringify');
-var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var log4js=require('log4js');
 
 

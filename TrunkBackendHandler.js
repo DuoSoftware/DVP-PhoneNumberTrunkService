@@ -1,4 +1,4 @@
-var dbModel = require('./DVP-DBModels');
+var dbModel = require('DVP-DBModels');
 var underscore = require('underscore');
 //var getGrpUsersById = function(grpId, callback)
 //{

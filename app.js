@@ -1,10 +1,15 @@
 var restify = require('restify');
-var messageFormatter = require('./DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-var logHandler = require('./DVP-Common/LogHandler/CommonLogHandler.js');
+var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var logHandler = require('DVP-Common/LogHandler/CommonLogHandler.js');
 var gwBackendHandler = require('./TrunkBackendHandler.js');
 var number=require('./PhoneNumberManagement.js');
 var redisHandler = require('./RedisHandler.js');
+var config = require('config');
 //var xmlGen = require('./XmlResponseGenerator.js');
+
+var hostIp = config.Host.Ip;
+var hostPort = config.Host.Port;
+var hostVersion = config.Host.Version;
 
 var server = restify.createServer({
     name: 'localhost',
@@ -17,7 +22,7 @@ server.use(restify.bodyParser());
 
 
 //{"PhoneNumber":"12000", "ObjClass":"CallServer", "ObjType":"TrunkNumber", "ObjCategory":"Inbound", "Enable":true, "CompanyId":1, "TenantId":3}
-server.post('/DVP/API/:version/TrunkApi/AddNumber/:id', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/TrunkApi/AddNumber/:id', function(req, res, next)
 {
     try
     {
@@ -56,7 +61,7 @@ server.post('/DVP/API/:version/TrunkApi/AddNumber/:id', function(req, res, next)
 
 });
 
-server.post('/DVP/API/:version/TrunkApi/DeleteNumber/:PhoneNumber/:CompanyId/',function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/TrunkApi/DeleteNumber/:PhoneNumber/:CompanyId/',function(req, res, next)
 {
 
     try
@@ -91,7 +96,7 @@ server.post('/DVP/API/:version/TrunkApi/DeleteNumber/:PhoneNumber/:CompanyId/',f
     return next();
 });
 
-server.post('/DVP/API/:version/TrunkApi/BuyNumber/',function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/TrunkApi/BuyNumber/',function(req, res, next)
 {
 
     logHandler.WriteLog('dsddd');
@@ -124,7 +129,7 @@ server.post('/DVP/API/:version/TrunkApi/BuyNumber/',function(req, res, next)
 /*
  {"TrunkCode":"TestTrunk","TrunkName":"Test1","ObjClass":"DVP","ObjType":"Trunk","ObjCategory":"SIP","IpUrl":"192.168.1.198","Enable":"True","CompanyId":"1","TenantId":"3"}
  */
-server.post('/DVP/API/:version/TrunkApi/CreateTrunk', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/TrunkApi/CreateTrunk', function(req, res, next)
 {
     try
     {
@@ -162,7 +167,7 @@ server.post('/DVP/API/:version/TrunkApi/CreateTrunk', function(req, res, next)
 
 });
 
-server.post('/DVP/API/:version/TrunkApi/AddOperator', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/TrunkApi/AddOperator', function(req, res, next)
 {
     try
     {
@@ -200,7 +205,7 @@ server.post('/DVP/API/:version/TrunkApi/AddOperator', function(req, res, next)
 
 });
 
-server.post('/DVP/API/:version/TrunkApi/UpdateTrunk/:id', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/TrunkApi/UpdateTrunk/:id', function(req, res, next)
 {
     try
     {
@@ -239,7 +244,7 @@ server.post('/DVP/API/:version/TrunkApi/UpdateTrunk/:id', function(req, res, nex
 
 });
 
-server.post('/DVP/API/:version/TrunkApi/AssignTrunkToLoadBalancer/:id/:lbId', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkToLoadBalancer/:id/:lbId', function(req, res, next)
 {
     try
     {
@@ -308,7 +313,7 @@ server.post('/DVP/API/:version/TrunkApi/AssignTrunkToLoadBalancer/:id/:lbId', fu
     return next();
 });
 
-server.post('/DVP/API/:version/TrunkApi/AssignTrunkToSipProfile/:id/:profId', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkToSipProfile/:id/:profId', function(req, res, next)
 {
     try
     {
@@ -380,7 +385,7 @@ server.post('/DVP/API/:version/TrunkApi/AssignTrunkToSipProfile/:id/:profId', fu
     return next();
 });
 
-server.post('/DVP/API/:version/TrunkApi/AssignTrunkTranslation/:id/:transId', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkTranslation/:id/:transId', function(req, res, next)
 {
     try
     {
@@ -425,7 +430,7 @@ server.post('/DVP/API/:version/TrunkApi/AssignTrunkTranslation/:id/:transId', fu
     return next();
 });
 
-server.post('/DVP/API/:version/TrunkApi/AssignOperatorToTrunk/:id/:opId', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignOperatorToTrunk/:id/:opId', function(req, res, next)
 {
     try
     {
@@ -470,7 +475,7 @@ server.post('/DVP/API/:version/TrunkApi/AssignOperatorToTrunk/:id/:opId', functi
     return next();
 });
 
-server.post('/DVP/API/:version/TrunkApi/SetTrunkAvailability/:id/Enable/:status', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/TrunkApi/SetTrunkAvailability/:id/Enable/:status', function(req, res, next)
 {
     try
     {
@@ -510,7 +515,7 @@ server.post('/DVP/API/:version/TrunkApi/SetTrunkAvailability/:id/Enable/:status'
 
 });
 
-server.post('/DVP/API/:version/TrunkApi/GetTrunk/:id', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/TrunkApi/GetTrunk/:id', function(req, res, next)
 {
 
     try
@@ -549,7 +554,7 @@ server.post('/DVP/API/:version/TrunkApi/GetTrunk/:id', function(req, res, next)
 
 });
 
-server.get('/DVP/API/:version/TrunkApi/GetUnAllocatedNumbers/:operatorId/:companyId/:tenantId', function(req, res, next)
+server.get('/DVP/API/' + hostVersion + '/TrunkApi/GetUnAllocatedNumbers/:operatorId/:companyId/:tenantId', function(req, res, next)
 {
     var numberDetails = [];
     try
@@ -613,7 +618,7 @@ server.get('/DVP/API/:version/TrunkApi/GetUnAllocatedNumbers/:operatorId/:compan
 
 });
 
-server.get('/DVP/API/:version/TrunkApi/GetAllocatedNumbers/:operatorId/:companyId/:tenantId', function(req, res, next)
+server.get('/DVP/API/' + hostVersion + '/TrunkApi/GetAllocatedNumbers/:operatorId/:companyId/:tenantId', function(req, res, next)
 {
     var numberDetails = [];
     try
@@ -683,7 +688,7 @@ server.get('/DVP/API/:version/TrunkApi/GetAllocatedNumbers/:operatorId/:companyI
 
 //.......................................post............................................................................
 
-server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/chng_availability/:phonenumber/:companyid/:enable',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/chng_availability/:phonenumber/:companyid/:enable',function(req,res,next)
 {
     try {
 
@@ -700,7 +705,7 @@ server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/chng_ava
 
 //.......................................post............................................................................
 
-server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/update_phone_schedule/:companyid/:phonenumber',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/update_phone_schedule/:companyid/:phonenumber',function(req,res,next)
 {
     try {
         number.UpdatePhoneDetails(req, res);
@@ -718,7 +723,7 @@ server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/update_p
 
 //.......................................post............................................................................
 
-server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/Update_category',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/Update_category',function(req,res,next)
 {
     try {
 
@@ -734,7 +739,7 @@ server.post('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/Update_c
 });
 //.......................................get............................................................................
 
-server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_all/:CompanyId/:PhoneNumber',function(req,res,next)
+server.get('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/get_all/:CompanyId/:PhoneNumber',function(req,res,next)
 {
 
 
@@ -752,7 +757,7 @@ return next();
 });
 //.......................................get............................................................................
 
-server.get('/dvp/:version/phone_number_trunk_service/phone_number_mgmt/get_phone/:CompanyId',function(req,res,next)
+server.get('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/get_phone/:CompanyId',function(req,res,next)
 {
 
     try {
@@ -772,6 +777,6 @@ return next();
 
 
 
-server.listen(9093, 'localhost', function () {
+server.listen(hostPort, hostIp, function () {
     console.log('%s listening at %s', server.name, server.url);
 });
