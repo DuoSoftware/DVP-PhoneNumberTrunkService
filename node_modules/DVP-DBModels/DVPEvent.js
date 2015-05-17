@@ -1,5 +1,6 @@
 module.exports = function(sequelize, DataTypes) {
     var DVPEvent = sequelize.define('CSDB_DVPEvent', {
+            SessionId: DataTypes.STRING,
             EventName: DataTypes.STRING,
             CompanyId: DataTypes.INTEGER,
             TenantId: DataTypes.INTEGER,
@@ -28,15 +29,18 @@ EVENT CLASS
 EVENT TYPES
 -------------
 
-CALL -> CHANNEL
-APP -> ARDS, HTTAPI_API, DEV_API
-RULE -> CALL_RULE
+EVENT, COMMAND
 
 EVENT CATEGORIES
 -----------------
 
-DEV_API -> PLAY, GET_DIGITS,
-CALL_RULE -> INBOUND, OUTBOUND
+SYSTEM, DEVELOPER
+
+
+EVENT NAME
+-----------------
+
+PLAYFILE, ANSWER, DATAERROR
 
 
  */

@@ -5,6 +5,7 @@ var gwBackendHandler = require('./TrunkBackendHandler.js');
 var number=require('./PhoneNumberManagement.js');
 var redisHandler = require('./RedisHandler.js');
 var config = require('config');
+var nodeUuid = require('node-uuid');
 //var xmlGen = require('./XmlResponseGenerator.js');
 
 var hostIp = config.Host.Ip;
@@ -24,14 +25,17 @@ server.use(restify.bodyParser());
 //{"PhoneNumber":"12000", "ObjClass":"CallServer", "ObjType":"TrunkNumber", "ObjCategory":"Inbound", "Enable":true, "CompanyId":1, "TenantId":3}
 server.post('/DVP/API/' + hostVersion + '/TrunkApi/AddNumber/:id', function(req, res, next)
 {
+    var reqId = nodeUuid.v1();
     try
     {
         var id = req.params.id;
         var phnInfo = req.body;
 
+        logger.debug('[DVP-PhoneNumberTrunkService.AddNumber] - [%s] - HTTP Request Received - Params - Id : %s - Req Body : %s', reqId, id, phnInfo);
+
         if(phnInfo)
         {
-            gwBackendHandler.addPhoneNumbersToTrunk(id, phnInfo, function(err, recordId, result){
+            gwBackendHandler.addPhoneNumbersToTrunk(reqId, id, phnInfo, function(err, recordId, result){
 
                 if(err)
                 {
@@ -49,7 +53,6 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AddNumber/:id', function(req,
         {
             throw new Error("Empty Body");
         }
-        return next();
     }
     catch(ex)
     {
@@ -61,17 +64,21 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AddNumber/:id', function(req,
 
 });
 
-server.post('/DVP/API/' + hostVersion + '/TrunkApi/DeleteNumber/:PhoneNumber/:CompanyId/',function(req, res, next)
+//server.post('/DVP/API/' + hostVersion + '/TrunkApi/DeleteNumber/:PhoneNumber/:CompanyId/',function(req, res, next)
+server.del('/DVP/API/' + hostVersion + '/TrunkApi/DeleteNumber/:PhoneNumber/:CompanyId/',function(req, res, next)
 {
+    var reqId = nodeUuid.v1();
 
     try
     {
         var phoneNum = req.params.PhoneNumber;
         var companyId = req.params.CompanyId;
 
+        logger.debug('[DVP-PhoneNumberTrunkService.DeleteNumber] - [%s] - HTTP Request Received - Params - PhoneNumber : %s, CompanyId : %s', reqId, phoneNum, companyId);
+
         if (phoneNum && companyId)
         {
-            gwBackendHandler.removePhoneNumber(phoneNum, companyId, 0, function (err, result) {
+            gwBackendHandler.removePhoneNumber(reqId, phoneNum, companyId, 0, function (err, result) {
 
                 if (err) {
                     var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, -1);
@@ -96,16 +103,17 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/DeleteNumber/:PhoneNumber/:Co
     return next();
 });
 
-
 server.post('/DVP/API/' + hostVersion + '/TrunkApi/BuyNumber/',function(req, res, next)
 {
+    var reqId = nodeUuid.v1();
 
-    logHandler.WriteLog('dsddd');
     var phnInfo = req.body;
+
+    logger.debug('[DVP-PhoneNumberTrunkService.BuyNumber] - [%s] - HTTP Request Received - Req Body : %s', reqId, phnInfo);
 
     if(phnInfo)
     {
-        gwBackendHandler.switchPhoneNumberCompany(phnInfo.PhoneNumber, phnInfo.CompanyId, phnInfo.TenantId, phnInfo.companyToChange, phnInfo.tenantToChange, function(err, result){
+        gwBackendHandler.switchPhoneNumberCompany(reqId, phnInfo.PhoneNumber, phnInfo.CompanyId, phnInfo.TenantId, phnInfo.companyToChange, phnInfo.tenantToChange, function(err, result){
 
             if(err)
             {
@@ -134,11 +142,14 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/CreateTrunk', function(req, r
 {
     try
     {
+        var reqId = nodeUuid.v1();
         var gwInfo = req.body;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.CreateTrunk] - [%s] - HTTP Request Received - Req Body : %s', reqId, gwInfo);
 
         if(gwInfo)
         {
-            gwBackendHandler.addTrunkConfiguration(gwInfo, function(err, recordId, result){
+            gwBackendHandler.addTrunkConfiguration(reqId, gwInfo, function(err, recordId, result){
 
                 if(err)
                 {
@@ -172,11 +183,14 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AddOperator', function(req, r
 {
     try
     {
+        var reqId = nodeUuid.v1();
         var opInfo = req.body;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.AddOperator] - [%s] - HTTP Request Received - Req Body : %s', reqId, opInfo);
 
         if(opInfo)
         {
-            gwBackendHandler.AddTrunkOperator(opInfo, function(err, recordId, result){
+            gwBackendHandler.AddTrunkOperator(reqId, opInfo, function(err, recordId, result){
 
                 if(err)
                 {
@@ -210,12 +224,15 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/UpdateTrunk/:id', function(re
 {
     try
     {
+        var reqId = nodeUuid.v1();
         var id = req.params.id;
         var gwInfo = req.body;
 
+        logger.debug('[DVP-PhoneNumberTrunkService.AddOperator] - [%s] - HTTP Request Received Req Params - Id : %s, - Req Body : %s', reqId, id, gwInfo);
+
         if(id && gwInfo)
         {
-            gwBackendHandler.updateTrunkConfiguration(id, gwInfo, function(err, result){
+            gwBackendHandler.updateTrunkConfiguration(reqId, id, gwInfo, function(err, result){
 
                 if(err)
                 {
@@ -249,12 +266,15 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkToLoadBalancer/:id
 {
     try
     {
+        var reqId = nodeUuid.v1();
         var trunkId = parseInt(req.params.id);
         var lbId = parseInt(req.params.lbId);
 
+        logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - HTTP Request Received Req Params - Id : %s, LbId : %s', reqId, trunkId, lbId);
+
         if(trunkId && lbId)
         {
-            gwBackendHandler.AssignTrunkToLoadBalancer(trunkId, lbId, function(err, result){
+            gwBackendHandler.AssignTrunkToLoadBalancer(reqId, trunkId, lbId, function(err, result){
 
                 try
                 {
@@ -265,7 +285,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkToLoadBalancer/:id
                     }
                     else
                     {
-                        gwBackendHandler.GetCallServersRelatedToLoadBalancer(lbId, function(err, csRes)
+                        gwBackendHandler.GetCallServersRelatedToLoadBalancer(reqId, lbId, function(err, csRes)
                         {
                             if(err)
                             {
@@ -318,12 +338,15 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkToSipProfile/:id/:
 {
     try
     {
+        var reqId = nodeUuid.v1();
         var trunkId = parseInt(req.params.id);
         var profId = parseInt(req.params.profId);
 
+        logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToSipProfile] - [%s] - HTTP Request Received Req Params - Id : %s, profId : %s', reqId, trunkId, profId);
+
         if(trunkId && profId)
         {
-            gwBackendHandler.AssignTrunkToProfile(trunkId, profId, function(err, result){
+            gwBackendHandler.AssignTrunkToProfile(reqId, trunkId, profId, function(err, result){
 
                 try
                 {
@@ -334,7 +357,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkToSipProfile/:id/:
                     }
                     else
                     {
-                        gwBackendHandler.GetCallServerByProfileId(profId, function(err, csRes)
+                        gwBackendHandler.GetCallServerByProfileId(reqId, profId, function(err, csRes)
                         {
                             if(err)
                             {
@@ -390,12 +413,15 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkTranslation/:id/:t
 {
     try
     {
+        var reqId = nodeUuid.v1();
         var trunkId = parseInt(req.params.id);
         var transId = parseInt(req.params.transId);
 
+        logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkTranslation] - [%s] - HTTP Request Received Req Params - trunkId : %s, transId : %s', reqId, trunkId, transId);
+
         if(trunkId && transId)
         {
-            gwBackendHandler.AssignTrunkTranslation(trunkId, transId, function(err, result){
+            gwBackendHandler.AssignTrunkTranslation(reqId, trunkId, transId, function(err, result){
 
                 try
                 {
@@ -435,12 +461,15 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignOperatorToTrunk/:id/:op
 {
     try
     {
+        var reqId = nodeUuid.v1();
         var trunkId = parseInt(req.params.id);
         var opId = parseInt(req.params.opId);
 
+        logger.debug('[DVP-PhoneNumberTrunkService.AssignOperatorToTrunk] - [%s] - HTTP Request Received Req Params - trunkId : %s, opId : %s', reqId, trunkId, opId);
+
         if(trunkId && opId)
         {
-            gwBackendHandler.AssignOperatorToTrunk(trunkId, opId, function(err, result){
+            gwBackendHandler.AssignOperatorToTrunk(reqId, trunkId, opId, function(err, result){
 
                 try
                 {
@@ -480,13 +509,16 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/SetTrunkAvailability/:id/Enab
 {
     try
     {
+        var reqId = nodeUuid.v1();
 
         var gwId = parseInt(req.params.id);
         var enable = Boolean(req.params.status);
 
+        logger.debug('[DVP-PhoneNumberTrunkService.SetTrunkAvailability] - [%s] - HTTP Request Received Req Params - id : %s, enable : %s', reqId, gwId, enable);
+
         if(gwId)
         {
-            gwBackendHandler.setTrunkEnabledStatus(gwId, enable, function(err, result)
+            gwBackendHandler.setTrunkEnabledStatus(reqId, gwId, enable, function(err, result)
             {
                 if(err)
                 {
@@ -516,16 +548,19 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/SetTrunkAvailability/:id/Enab
 
 });
 
-server.post('/DVP/API/' + hostVersion + '/TrunkApi/GetTrunk/:id', function(req, res, next)
+//server.post('/DVP/API/' + hostVersion + '/TrunkApi/GetTrunk/:id', function(req, res, next)
+server.get('/DVP/API/' + hostVersion + '/TrunkApi/GetTrunk/:id', function(req, res, next)
 {
-
+    var reqId = nodeUuid.v1();
     try
     {
         var trunkId = parseInt(req.params.id);
 
+        logger.debug('[DVP-PhoneNumberTrunkService.GetTrunk] - [%s] - HTTP Request Received Req Params - id : %s', reqId, trunkId);
+
         if(trunkId)
         {
-            gwBackendHandler.getTrunkById(trunkId, function(err, result){
+            gwBackendHandler.getTrunkById(reqId, trunkId, function(err, result){
 
                 if(err)
                 {
@@ -543,7 +578,6 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/GetTrunk/:id', function(req, 
         {
             throw new Error("Empty Body");
         }
-        return next();
     }
     catch(ex)
     {
@@ -557,6 +591,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/GetTrunk/:id', function(req, 
 
 server.get('/DVP/API/' + hostVersion + '/TrunkApi/GetUnAllocatedNumbers/:operatorId/:companyId/:tenantId', function(req, res, next)
 {
+    var reqId = nodeUuid.v1();
     var numberDetails = [];
     try
     {
@@ -564,9 +599,11 @@ server.get('/DVP/API/' + hostVersion + '/TrunkApi/GetUnAllocatedNumbers/:operato
         var companyId = parseInt(req.params.companyId);
         var tenantId = parseInt(req.params.tenantId);
 
+        logger.debug('[DVP-PhoneNumberTrunkService.GetUnAllocatedNumbers] - [%s] - HTTP Request Received Req Params - operatorId : %s, companyId : %s, tenantId : %s', reqId, operatorId, companyId, tenantId);
+
         if(operatorId && companyId && tenantId)
         {
-            gwBackendHandler.GetUnallocatedPhoneNumbersForOperator(operatorId, companyId, tenantId, function(err, result)
+            gwBackendHandler.GetUnallocatedPhoneNumbersForOperator(reqId, operatorId, companyId, tenantId, function(err, result)
             {
 
                 if(err)
@@ -621,6 +658,7 @@ server.get('/DVP/API/' + hostVersion + '/TrunkApi/GetUnAllocatedNumbers/:operato
 
 server.get('/DVP/API/' + hostVersion + '/TrunkApi/GetAllocatedNumbers/:operatorId/:companyId/:tenantId', function(req, res, next)
 {
+    var reqId = nodeUuid.v1();
     var numberDetails = [];
     try
     {
@@ -628,9 +666,11 @@ server.get('/DVP/API/' + hostVersion + '/TrunkApi/GetAllocatedNumbers/:operatorI
         var companyId = parseInt(req.params.companyId);
         var tenantId = parseInt(req.params.tenantId);
 
+        logger.debug('[DVP-PhoneNumberTrunkService.GetAllocatedNumbers] - [%s] - HTTP Request Received Req Params - operatorId : %s, companyId : %s, tenantId : %s', reqId, operatorId, companyId, tenantId);
+
         if(operatorId && companyId && tenantId)
         {
-            gwBackendHandler.GetAllocatedPhoneNumbersForOperator(operatorId, companyId, tenantId, function(err, result)
+            gwBackendHandler.GetAllocatedPhoneNumbersForOperator(reqId, operatorId, companyId, tenantId, function(err, result)
             {
                 if(err)
                 {

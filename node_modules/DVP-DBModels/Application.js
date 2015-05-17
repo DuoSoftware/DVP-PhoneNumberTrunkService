@@ -8,7 +8,8 @@ module.exports = function(sequelize, DataTypes) {
             ObjCategory: DataTypes.STRING,
             CompanyId: DataTypes.INTEGER,
             TenantId: DataTypes.INTEGER,
-            Availability:DataTypes.BOOLEAN
+            Availability:DataTypes.BOOLEAN,
+            OtherData:DataTypes.STRING,
         }
     );
 

@@ -1,9 +1,9 @@
 module.exports = function(sequelize, DataTypes) {
-    var SystemService = sequelize.define('CSDB_SystemService', {
-            AppName: DataTypes.STRING,
+    var ExtendedService = sequelize.define('CSDB_ExtendedService', {
+            ServiceName: DataTypes.STRING,
             Description: DataTypes.STRING,
-            AppVersion: DataTypes.STRING,
-            AppVersionStatus: DataTypes.STRING,
+            ServiceVersion: DataTypes.STRING,
+            ServiceVersionStatus: DataTypes.STRING,
             SourceUrl: DataTypes.STRING,
             DockerUrl: DataTypes.STRING,
             ObjClass: DataTypes.STRING,
@@ -20,5 +20,5 @@ module.exports = function(sequelize, DataTypes) {
     );
 
 
-    return SystemService;
+    return ExtendedService;
 };
