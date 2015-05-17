@@ -98,17 +98,15 @@
       <file leaf-file-name="app.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6836461" vertical-offset="306" max-vertical-offset="11254">
-              <caret line="106" column="0" selection-start-line="106" selection-start-column="0" selection-end-line="106" selection-end-column="0" />
+            <state vertical-scroll-proportion="-0.92" vertical-offset="11528" max-vertical-offset="12495">
+              <caret line="676" column="102" selection-start-line="676" selection-start-column="102" selection-end-line="676" selection-end-column="102" />
               <folding>
-                <element signature="e#1034#2119#0" expanded="false" />
-                <element signature="e#2354#3479#0" expanded="false" />
                 <element signature="e#3571#4431#0" expanded="false" />
-                <element signature="e#24411#24666#0" expanded="false" />
-                <element signature="e#24950#25325#0" expanded="false" />
-                <element signature="e#25580#25843#0" expanded="false" />
-                <element signature="e#26110#26349#0" expanded="false" />
-                <element signature="e#26605#26840#0" expanded="false" />
+                <element signature="e#24646#24901#0" expanded="false" />
+                <element signature="e#25185#25560#0" expanded="false" />
+                <element signature="e#25815#26078#0" expanded="false" />
+                <element signature="e#26345#26584#0" expanded="false" />
+                <element signature="e#26840#27075#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -137,7 +135,7 @@
       <file leaf-file-name="ClientMessageJsonFormatter.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="51" max-vertical-offset="493">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="493">
               <caret line="20" column="25" selection-start-line="20" selection-start-column="16" selection-end-line="20" selection-end-column="25" />
               <folding />
             </state>
@@ -161,8 +159,8 @@
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/PhoneNumberManagement.js" />
         <option value="$PROJECT_DIR$/config/default.js" />
-        <option value="$PROJECT_DIR$/app.js" />
         <option value="$PROJECT_DIR$/TrunkBackendHandler.js" />
+        <option value="$PROJECT_DIR$/app.js" />
       </list>
     </option>
   </component>
@@ -344,7 +342,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1382" height="744" extended-state="1" />
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -354,7 +352,7 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17918216" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31758958" sideWeight="0.49962825" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32899022" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32899022" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4136808" sideWeight="0.50037175" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -946,14 +944,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="493">
-          <caret line="20" column="25" selection-start-line="20" selection-start-column="16" selection-end-line="20" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/DVP-Common/LogHandler/CommonLogHandler.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="272">
@@ -1036,19 +1026,25 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="493">
+          <caret line="20" column="25" selection-start-line="20" selection-start-column="16" selection-end-line="20" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6836461" vertical-offset="306" max-vertical-offset="11254">
-          <caret line="106" column="0" selection-start-line="106" selection-start-column="0" selection-end-line="106" selection-end-column="0" />
+        <state vertical-scroll-proportion="-0.92" vertical-offset="11528" max-vertical-offset="12495">
+          <caret line="676" column="102" selection-start-line="676" selection-start-column="102" selection-end-line="676" selection-end-column="102" />
           <folding>
-            <element signature="e#1034#2119#0" expanded="false" />
-            <element signature="e#2354#3479#0" expanded="false" />
             <element signature="e#3571#4431#0" expanded="false" />
-            <element signature="e#24411#24666#0" expanded="false" />
-            <element signature="e#24950#25325#0" expanded="false" />
-            <element signature="e#25580#25843#0" expanded="false" />
-            <element signature="e#26110#26349#0" expanded="false" />
-            <element signature="e#26605#26840#0" expanded="false" />
+            <element signature="e#24646#24901#0" expanded="false" />
+            <element signature="e#25185#25560#0" expanded="false" />
+            <element signature="e#25815#26078#0" expanded="false" />
+            <element signature="e#26345#26584#0" expanded="false" />
+            <element signature="e#26840#27075#0" expanded="false" />
           </folding>
         </state>
       </provider>

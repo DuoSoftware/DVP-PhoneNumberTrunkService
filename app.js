@@ -254,7 +254,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/UpdateTrunk/:id', function(re
     }
     catch(ex)
     {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
         res.end(jsonString);
     }
 
@@ -280,7 +280,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkToLoadBalancer/:id
                 {
                     if(err)
                     {
-                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
+                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
                         res.end(jsonString);
                     }
                     else
@@ -289,7 +289,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkToLoadBalancer/:id
                         {
                             if(err)
                             {
-                                var jsonString = messageFormatter.FormatMessage(err, "Load Balancer added successfully", true, null);
+                                var jsonString = messageFormatter.FormatMessage(err, "Load Balancer added but error occurred while notifying call servers", false, undefined);
                                 res.end(jsonString);
                             }
                             else
@@ -306,7 +306,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkToLoadBalancer/:id
                                     })
 
                                 });
-                                var jsonString = messageFormatter.FormatMessage(err, "Load Balancer added successfully", true, null);
+                                var jsonString = messageFormatter.FormatMessage(undefined, "Load Balancer added successfully", true, undefined);
                                 res.end(jsonString);
                             }
                         })
@@ -361,7 +361,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkToSipProfile/:id/:
                         {
                             if(err)
                             {
-                                var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added successfully", true, null);
+                                var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added to trunk but error occurred while notifying call servers", false, undefined);
                                 res.end(jsonString);
                             }
                             else if(csRes)
@@ -377,12 +377,12 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkToSipProfile/:id/:
                                     })
                                 }
 
-                                var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added successfully", true, null);
+                                var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added successfully", true, undefined);
                                 res.end(jsonString);
                             }
                             else
                             {
-                                var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added successfully", true, null);
+                                var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added successfully - call servers not notfied", true, undefined);
                                 res.end(jsonString);
                             }
                         });
@@ -390,7 +390,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkToSipProfile/:id/:
                 }
                 catch(ex)
                 {
-                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
                     res.end(jsonString);
                 }
             })
@@ -402,7 +402,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkToSipProfile/:id/:
     }
     catch(ex)
     {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
         res.end(jsonString);
     }
 
@@ -427,18 +427,18 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkTranslation/:id/:t
                 {
                     if(err)
                     {
-                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
+                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
                         res.end(jsonString);
                     }
                     else
                     {
-                        var jsonString = messageFormatter.FormatMessage(err, "Translation assigned to trunk successfully", result, null);
+                        var jsonString = messageFormatter.FormatMessage(err, "Translation assigned to trunk successfully", result, undefined);
                         res.end(jsonString);
                     }
                 }
                 catch(ex)
                 {
-                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
                     res.end(jsonString);
                 }
             })
@@ -450,7 +450,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignTrunkTranslation/:id/:t
     }
     catch(ex)
     {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
         res.end(jsonString);
     }
 
@@ -475,18 +475,18 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignOperatorToTrunk/:id/:op
                 {
                     if(err)
                     {
-                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
+                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
                         res.end(jsonString);
                     }
                     else
                     {
-                        var jsonString = messageFormatter.FormatMessage(err, "Operator assigned to trunk successfully", result, null);
+                        var jsonString = messageFormatter.FormatMessage(err, "Operator assigned to trunk successfully", result, undefined);
                         res.end(jsonString);
                     }
                 }
                 catch(ex)
                 {
-                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
                     res.end(jsonString);
                 }
             })
@@ -498,7 +498,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/AssignOperatorToTrunk/:id/:op
     }
     catch(ex)
     {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
         res.end(jsonString);
     }
 
@@ -540,7 +540,7 @@ server.post('/DVP/API/' + hostVersion + '/TrunkApi/SetTrunkAvailability/:id/Enab
     }
     catch(ex)
     {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
         res.end(jsonString);
     }
 
@@ -581,7 +581,7 @@ server.get('/DVP/API/' + hostVersion + '/TrunkApi/GetTrunk/:id', function(req, r
     }
     catch(ex)
     {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
         res.end(jsonString);
     }
 
@@ -608,7 +608,7 @@ server.get('/DVP/API/' + hostVersion + '/TrunkApi/GetUnAllocatedNumbers/:operato
 
                 if(err)
                 {
-                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, numberDetails);
                     res.end(jsonString);
                 }
                 else
@@ -674,7 +674,7 @@ server.get('/DVP/API/' + hostVersion + '/TrunkApi/GetAllocatedNumbers/:operatorI
             {
                 if(err)
                 {
-                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, numberDetails);
                     res.end(jsonString);
                 }
                 else
