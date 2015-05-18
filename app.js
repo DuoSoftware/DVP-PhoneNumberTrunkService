@@ -1,6 +1,6 @@
 var restify = require('restify');
 var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-var logHandler = require('DVP-Common/LogHandler/CommonLogHandler.js');
+var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 var gwBackendHandler = require('./TrunkBackendHandler.js');
 var number=require('./PhoneNumberManagement.js');
 var redisHandler = require('./RedisHandler.js');
@@ -731,13 +731,30 @@ server.get('/DVP/API/' + hostVersion + '/TrunkApi/GetAllocatedNumbers/:operatorI
 
 server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/chng_availability/:phonenumber/:companyid/:enable',function(req,res,next)
 {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+
+
     try {
 
-        number.ChangeNumberAvailability(req, res);
+        logger.debug('[DVP-PhoneNumberTrunkService.AvailabilityUpdate] - [%s] - [HTTP]  - Request received -  Data - Phone %s Company %s Status %s',reqId,req.params.phonenumber,req.params.companyid,req.params.enable);
+
+
+        number.ChangeNumberAvailability(req,reqId,res);
 
     }
     catch(ex)
     {
+        logger.debug('[DVP-PhoneNumberTrunkService.AvailabilityUpdate] - [%s] - [HTTP]  - Exception on Request  -  Data - Phone %s Company %s Status %s',reqId,req.params.phonenumber,req.params.companyid,req.params.enable,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "ChangeNumberAvailability failed", false, null);
         res.end(jsonString);
     }
@@ -748,14 +765,31 @@ server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_numbe
 
 server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/update_phone_schedule/:companyid/:phonenumber',function(req,res,next)
 {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+
+
     try {
-        number.UpdatePhoneDetails(req, res);
+
+        logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneSchedule] - [%s] - [HTTP]  - Request received -  Data - Phone %s Company ',reqId,req.params.phonenumber,req.params.companyid);
+
+        number.UpdatePhoneDetails(req.params.phonenumber,req.params.companyid,reqId,res);
         //var jsonString = messageFormatter.FormatMessage(null, "UpdatePhoneDetails Done", true, res);
         //res.end(jsonString);
 
     }
     catch(ex)
     {
+        logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneSchedule] - [%s] - [HTTP]  - Exception on Request -  Data - Phone %s Company ',reqId,req.params.phonenumber,req.params.companyid,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "UpdatePhoneDetails failed", false, res);
         res.end(jsonString);
     }
@@ -767,13 +801,30 @@ server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_numbe
 
 server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/Update_category',function(req,res,next)
 {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+
+
     try {
 
-        number.UpdatePhoneNumberObjCategory(req, res);
+        logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,JSON.stringify(req));
+
+
+        number.UpdatePhoneNumberObjCategory(req,reqId,res);
 
     }
     catch(ex)
     {
+        logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [HTTP]  - Exception in Request  -  Data - %s',reqId,JSON.stringify(req),ex);
         var jsonString = messageFormatter.FormatMessage(ex, "UpdatePhoneNumberObjCategory failed", false, null);
         res.end(jsonString);
     }
@@ -783,15 +834,30 @@ server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_numbe
 
 server.get('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/get_all/:CompanyId/:PhoneNumber',function(req,res,next)
 {
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
 
 
     try {
-        number.GetAllPhoneDetails(req,res);
+
+        logger.debug('[DVP-PhoneNumberTrunkService.AllPhoneDetails] - [%s] - [HTTP]  - Request received -  Data - Company %s Phone %s ',reqId,req.params.CompanyId,req.params.PhoneNumber);
+
+        number.GetAllPhoneDetails(req,reqId,res);
 
 
     }
     catch(ex)
     {
+        logger.error('[DVP-PhoneNumberTrunkService.AllPhoneDetails] - [%s] - [HTTP]  - Exception in Request -  Data - Company %s Phone %s ',reqId,req.params.CompanyId,req.params.PhoneNumber,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "GetAllPhoneDetails failed", false, res);
         res.end(jsonString);
     }
@@ -802,13 +868,30 @@ return next();
 server.get('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/get_phone/:CompanyId',function(req,res,next)
 {
 
+    var reqId='';
+
+    try
+    {
+        reqId = uuid.v1();
+    }
+    catch(ex)
+    {
+
+    }
+
+
+
     try {
-        number.GetCompanyPhones(req,res);
+
+        logger.debug('[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [%s] - [HTTP]  - Request received -  Data - Company %s  ',reqId,req.params.CompanyId);
+
+        number.GetCompanyPhones(req,reqId,res);
 
 
     }
     catch(ex)
     {
+        logger.error('[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [%s] - [HTTP]  - Exception in Request received -  Data - Company %s  ',reqId,req.params.CompanyId,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "GetCompanyPhones failed", false, res);
         res.end(jsonString);
     }
