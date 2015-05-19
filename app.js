@@ -729,7 +729,7 @@ server.get('/DVP/API/' + hostVersion + '/TrunkApi/GetAllocatedNumbers/:operatorI
 
 //.......................................post............................................................................
 
-server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/chng_availability/:phonenumber/:companyid/:enable',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkService/PhoneNumberManagement/ChangeAvailabilityOf/:phonenumber/:companyid/:enable',function(req,res,next)
 {
     var reqId='';
 
@@ -763,7 +763,7 @@ server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_numbe
 
 //.......................................post............................................................................
 
-server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/update_phone_schedule/:companyid/:phonenumber',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkService/PhoneNumberManagement/Phone/:phonenumber/:companyid',function(req,res,next)
 {
     var reqId='';
 
@@ -780,16 +780,16 @@ server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_numbe
 
     try {
 
-        logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneSchedule] - [%s] - [HTTP]  - Request received -  Data - Phone %s Company ',reqId,req.params.phonenumber,req.params.companyid);
+        logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [HTTP]  - Request received -  Data - Phone %s Company ',reqId,req.params.phonenumber,req.params.companyid);
 
-        number.UpdatePhoneDetails(req.params.phonenumber,req.params.companyid,reqId,res);
+        number.UpdatePhoneDetails(req.params.phonenumber,req.params.companyid,req,reqId,res);
         //var jsonString = messageFormatter.FormatMessage(null, "UpdatePhoneDetails Done", true, res);
         //res.end(jsonString);
 
     }
     catch(ex)
     {
-        logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneSchedule] - [%s] - [HTTP]  - Exception on Request -  Data - Phone %s Company ',reqId,req.params.phonenumber,req.params.companyid,ex);
+        logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [HTTP]  - Exception on Request -  Data - Phone %s Company ',reqId,req.params.phonenumber,req.params.companyid,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "UpdatePhoneDetails failed", false, res);
         res.end(jsonString);
     }
@@ -798,8 +798,9 @@ server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_numbe
 
 //.......................................post............................................................................
 
+//check params
 
-server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/Update_category',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkService/PhoneNumberManagement/Category/:phone',function(req,res,next)
 {
     var reqId='';
 
@@ -819,7 +820,7 @@ server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_numbe
         logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,JSON.stringify(req));
 
 
-        number.UpdatePhoneNumberObjCategory(req,reqId,res);
+        number.UpdatePhoneNumberObjCategory(req.params.phone,req,reqId,res);
 
     }
     catch(ex)
@@ -832,7 +833,8 @@ server.post('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_numbe
 });
 //.......................................get............................................................................
 
-server.get('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/get_all/:CompanyId/:PhoneNumber',function(req,res,next)
+//server.get('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/get_all/:CompanyId/:PhoneNumber',function(req,res,next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkService/PhoneNumberManagement/Details/:PhoneNumber/:CompanyId',function(req,res,next)
 {
     var reqId='';
 
@@ -865,7 +867,7 @@ return next();
 });
 //.......................................get............................................................................
 
-server.get('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/get_phone/:CompanyId',function(req,res,next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkService/PhoneNumberManagement/PhonesOfCompany/:CompanyId',function(req,res,next)
 {
 
     var reqId='';
