@@ -755,7 +755,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkService/PhoneNumberMan
     catch(ex)
     {
         logger.debug('[DVP-PhoneNumberTrunkService.AvailabilityUpdate] - [%s] - [HTTP]  - Exception on Request  -  Data - Phone %s Company %s Status %s',reqId,req.params.phonenumber,req.params.companyid,req.params.enable,ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "ChangeNumberAvailability failed", false, null);
+        var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
         res.end(jsonString);
     }
     return next();
@@ -790,7 +790,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkService/PhoneNumberMan
     catch(ex)
     {
         logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [HTTP]  - Exception on Request -  Data - Phone %s Company ',reqId,req.params.phonenumber,req.params.companyid,ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "UpdatePhoneDetails failed", false, res);
+        var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
         res.end(jsonString);
     }
     return next();
@@ -826,7 +826,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkService/PhoneNumberMan
     catch(ex)
     {
         logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [HTTP]  - Exception in Request  -  Data - %s',reqId,JSON.stringify(req),ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "UpdatePhoneNumberObjCategory failed", false, null);
+        var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
         res.end(jsonString);
     }
     return next();
@@ -860,7 +860,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkService/PhoneNumberMana
     catch(ex)
     {
         logger.error('[DVP-PhoneNumberTrunkService.AllPhoneDetails] - [%s] - [HTTP]  - Exception in Request -  Data - Company %s Phone %s ',reqId,req.params.CompanyId,req.params.PhoneNumber,ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "GetAllPhoneDetails failed", false, res);
+        var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
         res.end(jsonString);
     }
 return next();
@@ -894,7 +894,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkService/PhoneNumberMana
     catch(ex)
     {
         logger.error('[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [%s] - [HTTP]  - Exception in Request received -  Data - Company %s  ',reqId,req.params.CompanyId,ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "GetCompanyPhones failed", false, res);
+        var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
         res.end(jsonString);
     }
 
