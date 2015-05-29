@@ -208,7 +208,9 @@ var setTrunkEnabledStatus = function(reqId, gwId, status, callback)
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.setTrunkEnabledStatus] - [%s] - PGSQL query success', reqId);
                 //update
-                gwObj.updateAttributes({Enable: status}).complete(function (err) {
+
+                var statusStr = status.toString();
+                gwObj.updateAttributes({Enable: statusStr}).complete(function (err) {
                     if (err)
                     {
                         logger.error('[DVP-PhoneNumberTrunkService.setTrunkEnabledStatus] - [%s] - PGSQL query failed', reqId, err);
