@@ -9,6 +9,7 @@ var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJ
 var log4js=require('log4js');
 var config=require('config');
 var hpath=config.Host.hostpath;
+var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 
 log4js.configure(config.Host.logfilepath, { cwd: hpath });
