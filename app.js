@@ -36,7 +36,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber', func
         if(phnInfo)
         {
             phnInfo.CompanyId = 1;
-            phnInfo.TenantId = 3;
+            phnInfo.TenantId = 1;
 
             gwBackendHandler.AddPhoneNumbersToTrunkDB(reqId, phnInfo, function(err, recordId, result){
 
@@ -86,7 +86,7 @@ server.del('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/RemoveNumber/:Phone
 
         if (phoneNum)
         {
-            gwBackendHandler.RemovePhoneNumberDB(reqId, phoneNum, 1, 3, function (err, result)
+            gwBackendHandler.RemovePhoneNumberDB(reqId, phoneNum, 1, 1, function (err, result)
             {
 
                 if (err)
@@ -132,7 +132,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/BuyNumber/',functi
 
         if(phnInfo)
         {
-            gwBackendHandler.SwitchPhoneNumberCompanyDB(reqId, phnInfo.PhoneNumber, 1, 3, phnInfo.CompanyToChange, phnInfo.TenantToChange, function(err, result){
+            gwBackendHandler.SwitchPhoneNumberCompanyDB(reqId, phnInfo.PhoneNumber, 1, 1, phnInfo.CompanyToChange, phnInfo.TenantToChange, function(err, result){
 
                 if(err)
                 {
@@ -185,7 +185,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/CreateTrunk', func
         if(gwInfo)
         {
             gwInfo.CompanyId = 1;
-            gwInfo.TenantId = 3;
+            gwInfo.TenantId = 1;
             gwBackendHandler.AddTrunkConfigurationDB(reqId, gwInfo, function(err, recordId, result)
             {
 
@@ -235,7 +235,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/NewOperator', func
         if(opInfo)
         {
             opInfo.CompanyId = 1;
-            opInfo.TenantId = 3;
+            opInfo.TenantId = 1;
             gwBackendHandler.AddTrunkOperator(reqId, opInfo, function(err, recordId, result){
 
                 if(err)
@@ -285,7 +285,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/UpdateTrunk/:id', 
         if(id && gwInfo)
         {
             gwInfo.CompanyId = 1;
-            gwInfo.TenantId = 3;
+            gwInfo.TenantId = 1;
 
             gwBackendHandler.UpdateTrunkConfigurationDB(reqId, id, gwInfo, function(err, result){
 
@@ -334,7 +334,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/AssignTrunk/:id/To
 
         if(trunkId && lbId)
         {
-            gwBackendHandler.AssignTrunkToLoadBalancer(reqId, trunkId, lbId, 1, 3, function(err, result){
+            gwBackendHandler.AssignTrunkToLoadBalancer(reqId, trunkId, lbId, 1, 1, function(err, result){
 
                 try
                 {
@@ -414,7 +414,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/AssignTrunk/:id/To
 
         if(trunkId && profId)
         {
-            gwBackendHandler.AssignTrunkToProfile(reqId, trunkId, profId, 1, 3, function(err, result){
+            gwBackendHandler.AssignTrunkToProfile(reqId, trunkId, profId, 1, 1, function(err, result){
 
                 try
                 {
@@ -499,7 +499,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/AssignTranslation/
 
         if(trunkId && transId)
         {
-            gwBackendHandler.AssignTrunkTranslation(reqId, trunkId, transId, 1, 3, function(err, result){
+            gwBackendHandler.AssignTrunkTranslation(reqId, trunkId, transId, 1, 1, function(err, result){
 
 
                     if(err)
@@ -547,7 +547,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/AssignOperator/:op
 
         if(trunkId && opId)
         {
-            gwBackendHandler.AssignOperatorToTrunk(reqId, trunkId, opId, 1, 3, function(err, result) {
+            gwBackendHandler.AssignOperatorToTrunk(reqId, trunkId, opId, 1, 1, function(err, result) {
 
                 if (err)
                 {
@@ -593,7 +593,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/Availabi
 
         if(gwId)
         {
-            gwBackendHandler.SetTrunkEnabledStatusDB(reqId, gwId, enable, 1, 3, function(err, result)
+            gwBackendHandler.SetTrunkEnabledStatusDB(reqId, gwId, enable, 1, 1, function(err, result)
             {
                 if(err)
                 {
@@ -639,7 +639,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id', functio
 
         if(trunkId)
         {
-            gwBackendHandler.GetTrunkByIdDB(reqId, trunkId, 1, 3, function(err, result){
+            gwBackendHandler.GetTrunkByIdDB(reqId, trunkId, 1, 1, function(err, result){
 
                 if(err)
                 {
@@ -686,7 +686,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/UnAllocatedNumbersF
 
         if(operatorId)
         {
-            gwBackendHandler.GetUnallocatedPhoneNumbersForOperator(reqId, operatorId, 1, 3, function(err, result)
+            gwBackendHandler.GetUnallocatedPhoneNumbersForOperator(reqId, operatorId, 1, 1, function(err, result)
             {
 
                 if(err)
@@ -757,7 +757,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/AllocatedNumbersFor
 
         if(operatorId)
         {
-            gwBackendHandler.GetAllocatedPhoneNumbersForOperator(reqId, operatorId, 1, 3, function(err, result)
+            gwBackendHandler.GetAllocatedPhoneNumbersForOperator(reqId, operatorId, 1, 1, function(err, result)
             {
                 if(err)
                 {
