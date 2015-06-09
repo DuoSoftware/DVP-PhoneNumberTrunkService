@@ -505,7 +505,8 @@ var AddTrunkConfigurationDB = function(reqId, gwInfo, callback)
             IpUrl: gwInfo.IpUrl,
             Enable: gwInfo.Enable,
             CompanyId: gwInfo.CompanyId,
-            TenantId: gwInfo.TenantId
+            TenantId: gwInfo.TenantId,
+            FaxType: gwInfo.FaxType
         });
 
         gw
@@ -590,7 +591,7 @@ var UpdateTrunkConfigurationDB = function(reqId, trunkId, trunkInfo, callback)
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL get trunk query success', reqId);
                 //update
-                gwObj.updateAttributes({TrunkName: trunkInfo.TrunkName, Enable: trunkInfo.Enable, ObjClass: trunkInfo.ObjClass, IpUrl: trunkInfo.IpUrl, ObjType: trunkInfo.ObjType, ObjCategory: trunkInfo.ObjCategory}).complete(function (err)
+                gwObj.updateAttributes({TrunkName: trunkInfo.TrunkName, Enable: trunkInfo.Enable, ObjClass: trunkInfo.ObjClass, IpUrl: trunkInfo.IpUrl, ObjType: trunkInfo.ObjType, ObjCategory: trunkInfo.ObjCategory, FaxType: trunkInfo.FaxType}).complete(function (err)
                 {
                     if (err)
                     {
