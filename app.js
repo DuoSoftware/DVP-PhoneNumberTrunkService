@@ -587,7 +587,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/Availabi
     try
     {
         var gwId = parseInt(req.params.id);
-        var enable = Boolean(req.params.status);
+        var enable = (req.params.status === 'true');
 
         logger.debug('[DVP-PhoneNumberTrunkService.SetTrunkAvailability] - [%s] - HTTP Request Received Req Params - id : %s, enable : %s', reqId, gwId, enable);
 
