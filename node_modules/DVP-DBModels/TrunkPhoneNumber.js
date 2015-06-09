@@ -3,7 +3,7 @@ module.exports = function(sequelize, DataTypes) {
             PhoneNumber: DataTypes.STRING,
             ObjClass: DataTypes.STRING,
             ObjType: DataTypes.STRING,
-            ObjCategory: DataTypes.STRING, //Inbound, Outbound, Both, Fax
+            ObjCategory: DataTypes.STRING, //INBOUND, OUTBOUND, BOTH, FAX
             Enable: DataTypes.BOOLEAN,
             CompanyId: DataTypes.INTEGER,
             TenantId: DataTypes.INTEGER

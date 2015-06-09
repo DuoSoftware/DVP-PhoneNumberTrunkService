@@ -10,6 +10,8 @@ module.exports = function(sequelize, DataTypes) {
             ObjClass: DataTypes.STRING,
             ObjType: DataTypes.STRING,
             ObjCategory: DataTypes.STRING, //USER, GROUP
+            DodNumber: DataTypes.STRING,
+            DodActive: DataTypes.BOOLEAN,
             AddUser: DataTypes.STRING,
             UpdateUser: DataTypes.STRING
         }

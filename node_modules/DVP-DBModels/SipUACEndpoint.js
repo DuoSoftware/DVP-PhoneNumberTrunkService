@@ -1,5 +1,6 @@
 module.exports = function(sequelize, DataTypes) {
     var SipUACEndpoint = sequelize.define('CSDB_SipUACEndpoint', {
+            SipUserUuid: DataTypes.STRING,
             SipUsername: DataTypes.STRING,
             Password: DataTypes.STRING,
             Enabled: DataTypes.BOOLEAN,

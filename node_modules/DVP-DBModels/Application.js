@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
             CompanyId: DataTypes.INTEGER,
             TenantId: DataTypes.INTEGER,
             Availability:DataTypes.BOOLEAN,
-            OtherData:DataTypes.STRING,
+            OtherData:DataTypes.STRING
         }
     );
 
