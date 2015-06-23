@@ -627,6 +627,144 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/Availabi
 
 });
 
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkPhoneNumberInboundLimit', function(req, res, next)
+{
+    var reqId = nodeUuid.v1();
+    try
+    {
+        var phnNum = req.body.PhoneNumber;
+        var inboundLim = req.body.InboundLimit;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.TrunkPhoneNumberInboundLimit] - [%s] - HTTP Request Received Req Body - ', reqId, req.body);
+
+        if(phnNum && inboundLim)
+        {
+            gwBackendHandler.AssignInboundLimitToTrunkNumberDB(reqId, phnNum, inboundLim, 1, 1, function(err, result)
+            {
+                if(err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                    logger.debug('[DVP-PBXService.TrunkPhoneNumberInboundLimit] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(undefined, "Limit Added Successfully", result, undefined);
+                    logger.debug('[DVP-PBXService.TrunkPhoneNumberInboundLimit] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+            })
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error("Phone number or limit not provided"), "ERROR", false, undefined);
+            logger.debug('[DVP-PBXService.TrunkPhoneNumberInboundLimit] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+        }
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-PBXService.TrunkPhoneNumberInboundLimit] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkPhoneNumberOutboundLimit', function(req, res, next)
+{
+    var reqId = nodeUuid.v1();
+    try
+    {
+        var phnNum = req.body.PhoneNumber;
+        var outboundLim = req.body.OutboundLimit;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.TrunkPhoneNumberOutboundLimit] - [%s] - HTTP Request Received Req Body - ', reqId, req.body);
+
+        if(phnNum && outboundLim)
+        {
+            gwBackendHandler.AssignOutboundLimitToTrunkNumberDB(reqId, phnNum, outboundLim, 1, 1, function(err, result)
+            {
+                if(err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                    logger.debug('[DVP-PBXService.TrunkPhoneNumberOutboundLimit] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(undefined, "Limit Added Successfully", result, undefined);
+                    logger.debug('[DVP-PBXService.TrunkPhoneNumberOutboundLimit] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+            })
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error("Phone number or limit not provided"), "ERROR", false, undefined);
+            logger.debug('[DVP-PBXService.TrunkPhoneNumberOutboundLimit] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+        }
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-PBXService.TrunkPhoneNumberOutboundLimit] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkPhoneNumberBothLimit', function(req, res, next)
+{
+    var reqId = nodeUuid.v1();
+    try
+    {
+        var phnNum = req.body.PhoneNumber;
+        var bothLim = req.body.BothLimit;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.TrunkPhoneNumberBothLimit] - [%s] - HTTP Request Received Req Body - ', reqId, req.body);
+
+        if(phnNum && bothLim)
+        {
+            gwBackendHandler.AssignBothLimitToTrunkNumberDB(reqId, phnNum, bothLim, 1, 1, function(err, result)
+            {
+                if(err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                    logger.debug('[DVP-PBXService.TrunkPhoneNumberBothLimit] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(undefined, "Limit Added Successfully", result, undefined);
+                    logger.debug('[DVP-PBXService.TrunkPhoneNumberBothLimit] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+            })
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error("Phone number or limit not provided"), "ERROR", false, undefined);
+            logger.debug('[DVP-PBXService.TrunkPhoneNumberBothLimit] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+        }
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-PBXService.TrunkPhoneNumberBothLimit] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
 
 
 //DONE

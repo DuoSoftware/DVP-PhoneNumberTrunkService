@@ -491,6 +491,195 @@ var AssignOperatorToTrunk = function(reqId, gwId, opId, companyId, tenantId, cal
 
 };
 
+var AssignInboundLimitToTrunkNumberDB = function(reqId, trunkNumber, inboundLimitId, companyId, tenantId, callback)
+{
+    try
+    {
+        dbModel.TrunkPhoneNumber.find({where: [{PhoneNumber: trunkNumber},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, phnNumRec)
+        {
+            if(err)
+            {
+                logger.error('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query failed', reqId, err);
+                callback(err, false);
+            }
+            else if(phnNumRec)
+            {
+                logger.debug('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query success', reqId);
+
+                dbModel.LimitInfo.find({where: [{LimitId: inboundLimitId},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, limRec)
+                {
+                    if(err)
+                    {
+                        logger.error('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query failed', reqId, err);
+                        callback(err, false);
+                    }
+                    else if(limRec)
+                    {
+                        logger.debug('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query success', reqId);
+
+                        phnNumRec.setLimitInfoInbound(limRec).complete(function (err, result)
+                        {
+                            if(err)
+                            {
+                                logger.error('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Update phone number with inbound limit Id PGSQL query failed', reqId, err);
+                                callback(err, false);
+                            }
+                            else
+                            {
+                                logger.debug('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Update phone number with inbound limit Id PGSQL query success', reqId);
+                                callback(undefined, true);
+                            }
+
+                        })
+                    }
+                    else
+                    {
+                        logger.debug('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query success', reqId);
+                        callback(new Error('Trunk Not found'), false);
+                    }
+
+                })
+            }
+            else
+            {
+                logger.debug('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query success', reqId);
+                callback(new Error('Operator Not found'), false);
+            }})
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, false);
+    }
+
+};
+
+var AssignOutboundLimitToTrunkNumberDB = function(reqId, trunkNumber, outboundLimitId, companyId, tenantId, callback)
+{
+    try
+    {
+        dbModel.TrunkPhoneNumber.find({where: [{PhoneNumber: trunkNumber},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, phnNumRec)
+        {
+            if(err)
+            {
+                logger.error('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query failed', reqId, err);
+                callback(err, false);
+            }
+            else if(phnNumRec)
+            {
+                logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query success', reqId);
+
+                dbModel.LimitInfo.find({where: [{LimitId: outboundLimitId},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, limRec)
+                {
+                    if(err)
+                    {
+                        logger.error('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query failed', reqId, err);
+                        callback(err, false);
+                    }
+                    else if(limRec)
+                    {
+                        logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query success', reqId);
+
+                        phnNumRec.setLimitInfoOutbound(limRec).complete(function (err, result)
+                        {
+                            if(err)
+                            {
+                                logger.error('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Update phone number with outbound limit Id PGSQL query failed', reqId, err);
+                                callback(err, false);
+                            }
+                            else
+                            {
+                                logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Update phone number with outbound limit Id PGSQL query success', reqId);
+                                callback(undefined, true);
+                            }
+
+                        })
+                    }
+                    else
+                    {
+                        logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query success', reqId);
+                        callback(new Error('Trunk Not found'), false);
+                    }
+
+                })
+            }
+            else
+            {
+                logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query success', reqId);
+                callback(new Error('Operator Not found'), false);
+            }})
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, false);
+    }
+
+};
+
+var AssignBothLimitToTrunkNumberDB = function(reqId, trunkNumber, bothLimitId, companyId, tenantId, callback)
+{
+    try
+    {
+        dbModel.TrunkPhoneNumber.find({where: [{PhoneNumber: trunkNumber},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, phnNumRec)
+        {
+            if(err)
+            {
+                logger.error('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query failed', reqId, err);
+                callback(err, false);
+            }
+            else if(phnNumRec)
+            {
+                logger.debug('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query success', reqId);
+
+                dbModel.LimitInfo.find({where: [{LimitId: bothLimitId},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, limRec)
+                {
+                    if(err)
+                    {
+                        logger.error('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query failed', reqId, err);
+                        callback(err, false);
+                    }
+                    else if(limRec)
+                    {
+                        logger.debug('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query success', reqId);
+
+                        phnNumRec.setLimitInfoBoth(limRec).complete(function (err, result)
+                        {
+                            if(err)
+                            {
+                                logger.error('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Update phone number with both limit Id PGSQL query failed', reqId, err);
+                                callback(err, false);
+                            }
+                            else
+                            {
+                                logger.debug('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Update phone number with both limit Id PGSQL query success', reqId);
+                                callback(undefined, true);
+                            }
+
+                        })
+                    }
+                    else
+                    {
+                        logger.debug('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query success', reqId);
+                        callback(new Error('Trunk Not found'), false);
+                    }
+
+                })
+            }
+            else
+            {
+                logger.debug('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query success', reqId);
+                callback(new Error('Operator Not found'), false);
+            }})
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, false);
+    }
+
+};
+
 var AddTrunkConfigurationDB = function(reqId, gwInfo, callback)
 {
     try
@@ -854,3 +1043,7 @@ module.exports.GetCallServerByProfileIdDB = GetCallServerByProfileIdDB;
 module.exports.GetCallServersRelatedToLoadBalancerDB = GetCallServersRelatedToLoadBalancerDB;
 module.exports.GetUnallocatedPhoneNumbersForOperator = GetUnallocatedPhoneNumbersForOperator;
 module.exports.GetAllocatedPhoneNumbersForOperator = GetAllocatedPhoneNumbersForOperator;
+module.exports.AssignInboundLimitToTrunkNumberDB = AssignInboundLimitToTrunkNumberDB;
+module.exports.AssignOutboundLimitToTrunkNumberDB = AssignOutboundLimitToTrunkNumberDB;
+module.exports.AssignBothLimitToTrunkNumberDB = AssignBothLimitToTrunkNumberDB;
+
