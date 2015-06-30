@@ -961,7 +961,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/AllocatedNumbersFor
 
 //.......................................post............................................................................
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumberManagement/ChangeAvailabilityOf/:phonenumber/:enable',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumber/:phonenumber/Availability/:enable',function(req,res,next)
 {
     var reqId='';
 
@@ -997,7 +997,7 @@ var Company=1;
 
 //.......................................post............................................................................
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumberManagement/Phone/:phonenumber',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumber/:phonenumber',function(req,res,next)
 {
     var reqId='';
 
@@ -1033,7 +1033,7 @@ var Company=1;
 
 //check params
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumberManagement/Category/:phone',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumber/Category/:phone',function(req,res,next)
 {
     var reqId='';
 
@@ -1067,7 +1067,7 @@ var Company=1;
 //.......................................get............................................................................
 
 //server.get('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/get_all/:CompanyId/:PhoneNumber',function(req,res,next)
-server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumberManagement/Details/:PhoneNumber',function(req,res,next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumber/:PhoneNumber',function(req,res,next)
 {
     var reqId='';
 
@@ -1100,7 +1100,7 @@ return next();
 });
 //.......................................get............................................................................
 
-server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumberManagement/PhonesOfCompany/:CompanyId',function(req,res,next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumbers/OfCompany/:CompanyId',function(req,res,next)
 {
 
     var reqId='';
