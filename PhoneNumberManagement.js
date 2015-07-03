@@ -31,7 +31,7 @@ function ChangeNumberAvailability(req,Company,reqId,res) {
 
             if(errTPhone)
             {
-                logger.error('[DVP-PhoneNumberTrunkService.AvailabilityUpdate] - [%s] - [PGSQL]  - Error in updating Availability of  %s ',reqId,req.params.phonenumber,errTPhone);
+                logger.error('[DVP-PhoneNumberTrunkService.ChangeNumberAvailability] - [%s] - [PGSQL]  - Error in updating Availability of  %s ',reqId,req.params.phonenumber,errTPhone);
                 var jsonString = messageFormatter.FormatMessage(errTPhone, "ERROR", false, undefined);
                 res.end(jsonString);
             }
@@ -39,7 +39,7 @@ function ChangeNumberAvailability(req,Company,reqId,res) {
             {
                 if(resTPhone)
                 {
-                    logger.debug('[DVP-PhoneNumberTrunkService.AvailabilityUpdate] - [%s] - [PGSQL]  - Record found for Phone Number %s  ',reqId,req.params.phonenumber);
+                    logger.debug('[DVP-PhoneNumberTrunkService.ChangeNumberAvailability] - [%s] - [PGSQL]  - Record found for Phone Number %s  ',reqId,req.params.phonenumber);
                     try {
                         DbConn.TrunkPhoneNumber
                             .update(
@@ -53,13 +53,13 @@ function ChangeNumberAvailability(req,Company,reqId,res) {
                             }
                         ).then(function (resUpdate) {
 
-                                logger.debug('[DVP-PhoneNumberTrunkService.AvailabilityUpdate] - [%s] - [PGSQL]  - Availability updated of Phone Number %s to %s is succeeded ',reqId,req.params.phonenumber,req.params.enable);
+                                logger.debug('[DVP-PhoneNumberTrunkService.ChangeNumberAvailability] - [%s] - [PGSQL]  - Availability updated of Phone Number %s to %s is succeeded ',reqId,req.params.phonenumber,req.params.enable);
                                 var jsonString = messageFormatter.FormatMessage(undefined, "SUCCESS", true, resUpdate);
                                 res.end(jsonString);
 
                             }).error(function (errUpdate) {
 
-                                logger.error('[DVP-PhoneNumberTrunkService.AvailabilityUpdate] - [%s] - [PGSQL]  - Availability updated of Phone Number %s to %s is failed ',reqId,req.params.phonenumber,req.params.enable,errUpdate);
+                                logger.error('[DVP-PhoneNumberTrunkService.ChangeNumberAvailability] - [%s] - [PGSQL]  - Availability updated of Phone Number %s to %s is failed ',reqId,req.params.phonenumber,req.params.enable,errUpdate);
                                 var jsonString = messageFormatter.FormatMessage(errUpdate, "ERROR/EXCEPTION", false, undefined);
                                 res.end(jsonString);
 
@@ -67,14 +67,14 @@ function ChangeNumberAvailability(req,Company,reqId,res) {
                     }
                     catch(ex)
                     {
-                        logger.error('[DVP-PhoneNumberTrunkService.AvailabilityUpdate] - [%s] - [PGSQL]  - Exception in updating Availability of  %s ',reqId,req.params.phonenumber,ex);
+                        logger.error('[DVP-PhoneNumberTrunkService.ChangeNumberAvailability] - [%s] - [PGSQL]  - Exception in updating Availability of  %s ',reqId,req.params.phonenumber,ex);
                         var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
                         res.end(jsonString);
                     }
                 }
                 else
                 {
-                    logger.error('[DVP-PhoneNumberTrunkService.AvailabilityUpdate] - [%s] - [PGSQL]  - No record found for Phone Number %s  ',reqId,req.params.phonenumber,errTPhone);
+                    logger.error('[DVP-PhoneNumberTrunkService.ChangeNumberAvailability] - [%s] - [PGSQL]  - No record found for Phone Number %s  ',reqId,req.params.phonenumber,errTPhone);
 
                     var jsonString = messageFormatter.FormatMessage(new Error("No TrunkPhoneNumber Record found"), "ERROR", false, undefined);
                     res.end(jsonString);
@@ -88,7 +88,7 @@ function ChangeNumberAvailability(req,Company,reqId,res) {
     }
     catch(ex)
     {
-        logger.error('[DVP-PhoneNumberTrunkService.AvailabilityUpdate] - [%s] - [PGSQL]  - Exception in Method starting : ChangeNumberAvailability  %s ',reqId,req.params.phonenumber,ex);
+        logger.error('[DVP-PhoneNumberTrunkService.ChangeNumberAvailability] - [%s] - [PGSQL]  - Exception in Method starting : ChangeNumberAvailability  %s ',reqId,req.params.phonenumber,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
         res.end(jsonString);
     }
@@ -184,7 +184,7 @@ function GetAllPhoneDetails(Company,req,reqId,res)
 
             if(errTPhone)
             {
-                logger.error('[DVP-PhoneNumberTrunkService.AllPhoneDetails] - [%s] - [PGSQL]  - Error in searching Phone %s of company %s',reqId,req.params.PhoneNumber,Company,errTPhone);
+                logger.error('[DVP-PhoneNumberTrunkService.GetAllPhoneDetails] - [%s] - [PGSQL]  - Error in searching Phone %s of company %s',reqId,req.params.PhoneNumber,Company,errTPhone);
                 var jsonString = messageFormatter.FormatMessage(errTPhone, "EXCEPTION/ERROR", false, undefined);
                 res.end(jsonString);
             }
@@ -193,7 +193,7 @@ function GetAllPhoneDetails(Company,req,reqId,res)
                 if(resTPhone.length>0)
                 {
 
-                    logger.debug('[DVP-PhoneNumberTrunkService.AllPhoneDetails] - [%s] - [PGSQL]  - Phone %s is belongs to company %s and Records found ',reqId,req.params.PhoneNumber,Company,resTPhone);
+                    logger.debug('[DVP-PhoneNumberTrunkService.GetAllPhoneDetails] - [%s] - [PGSQL]  - Phone %s is belongs to company %s and Records found ',reqId,req.params.PhoneNumber,Company,resTPhone);
 
 
                     var jsonString = messageFormatter.FormatMessage(undefined, "SUCCESS", true, resTPhone);
@@ -201,7 +201,7 @@ function GetAllPhoneDetails(Company,req,reqId,res)
                 }
                 else
                 {
-                    logger.error('[DVP-PhoneNumberTrunkService.AllPhoneDetails] - [%s] - [PGSQL]  - Phone %s is not belongs to company %s ',reqId,req.params.PhoneNumber,Company);
+                    logger.error('[DVP-PhoneNumberTrunkService.GetAllPhoneDetails] - [%s] - [PGSQL]  - Phone %s is not belongs to company %s ',reqId,req.params.PhoneNumber,Company);
 
                     var jsonString = messageFormatter.FormatMessage("EMPTY", "EXCEPTION/ERROR", false, undefined);
                     res.end(jsonString);
@@ -213,7 +213,7 @@ function GetAllPhoneDetails(Company,req,reqId,res)
     }
     catch(ex)
     {
-        logger.error('[DVP-PhoneNumberTrunkService.AllPhoneDetails] - [%s] - [PGSQL]  - Exception in starting method :GetAllPhoneDetails Data Phone %s Company %s ',reqId,req.params.PhoneNumber,Company,ex);
+        logger.error('[DVP-PhoneNumberTrunkService.GetAllPhoneDetails] - [%s] - [PGSQL]  - Exception in starting method :GetAllPhoneDetails Data Phone %s Company %s ',reqId,req.params.PhoneNumber,Company,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
         res.end(jsonString);
     }
@@ -233,14 +233,14 @@ function GetCompanyPhones(req,reqId,res)
             {
                 if(resTPhone.length>0)
                 {
-                    logger.debug('[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [%s] - [PGSQL]  - Phones found for company %s   ',reqId,req.params.CompanyId);
+                    logger.debug('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [PGSQL]  - Phones found for company %s   ',reqId,req.params.CompanyId);
 
                     var jsonString = messageFormatter.FormatMessage(undefined, "SUCCESS", true, resTPhone);
                     res.end(jsonString);
                 }
                 else
                 {
-                    logger.error('[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [%s] - [PGSQL]  - No Phones found for company %s   ',reqId,req.params.CompanyId);
+                    logger.error('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [PGSQL]  - No Phones found for company %s   ',reqId,req.params.CompanyId);
                     var jsonString = messageFormatter.FormatMessage("EMPTY", "ERROR/EXCEPTION", false, undefined);
                     res.end(jsonString);
                 }
@@ -250,7 +250,7 @@ function GetCompanyPhones(req,reqId,res)
         });
     }catch(ex)
     {
-        logger.error('[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [%s] - [PGSQL]  - Exception in starting method : GetCompanyPhones  - Data  %s   ',reqId,req.params.CompanyId,ex);
+        logger.error('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [PGSQL]  - Exception in starting method : GetCompanyPhones  - Data  %s   ',reqId,req.params.CompanyId,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefineds);
         res.end(jsonString);
     }
