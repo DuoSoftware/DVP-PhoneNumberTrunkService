@@ -74,7 +74,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber', func
 
 
 //DONE
-server.del('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/RemoveNumber/:PhoneNumber',function(req, res, next)
+server.del('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneNumber',function(req, res, next)
 {
     var reqId = nodeUuid.v1();
 
@@ -172,7 +172,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/BuyNumber/',functi
  */
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/CreateTrunk', function(req, res, next)
+server.put('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -223,7 +223,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/CreateTrunk', func
 
 //DONE
 //{"OperatorName": "TestOperator", "OperatorCode":"1234e", "ObjClass": "GGG", "ObjType": "FFF", "ObjCategory":"fff"}
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/NewOperator', function(req, res, next)
+server.put('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -272,7 +272,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/NewOperator', func
 
 //DONE
 //{"Enable":false, "IpUrl":"192.123.32.112", "ObjCategory":"TTT", "ObjClass":"TTT", "ObjType":"TTT", "TrunkName":"TestTrunk"}
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/UpdateTrunk/:id', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -322,7 +322,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/UpdateTrunk/:id', 
 });
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/AssignTrunk/:id/ToLoadBalancer/:lbId', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetLoadBalancer/:lbId', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -402,7 +402,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/AssignTrunk/:id/To
 });
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/AssignTrunk/:id/ToSipProfile/:profId', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetSipProfile/:profId', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -486,7 +486,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/AssignTrunk/:id/To
 });
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/AssignTranslation/:transId/ToTrunk/:id', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetTranslation/:transId', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
 
@@ -535,7 +535,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/AssignTranslation/
 });
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/AssignOperator/:opId/ToTrunk/:id', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetOperator/:opId', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -627,13 +627,13 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/Availabi
 
 });
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkPhoneNumberInboundLimit', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum/SetInboundLimit/:limId', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
     {
-        var phnNum = req.body.PhoneNumber;
-        var inboundLim = req.body.InboundLimit;
+        var phnNum = req.params.trNum;
+        var inboundLim = req.params.limId;
 
         logger.debug('[DVP-PhoneNumberTrunkService.TrunkPhoneNumberInboundLimit] - [%s] - HTTP Request Received Req Body - ', reqId, req.body);
 
@@ -673,13 +673,13 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkPhoneNumberIn
 
 });
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkPhoneNumberOutboundLimit', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum/SetOutboundLimit/:limId', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
     {
-        var phnNum = req.body.PhoneNumber;
-        var outboundLim = req.body.OutboundLimit;
+        var phnNum = req.params.trNum;
+        var outboundLim = req.params.limId;
 
         logger.debug('[DVP-PhoneNumberTrunkService.TrunkPhoneNumberOutboundLimit] - [%s] - HTTP Request Received Req Body - ', reqId, req.body);
 
@@ -719,13 +719,13 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkPhoneNumberOu
 
 });
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkPhoneNumberBothLimit', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum/SetBothLimit/:limId', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
     {
-        var phnNum = req.body.PhoneNumber;
-        var bothLim = req.body.BothLimit;
+        var phnNum = req.params.trNum;
+        var bothLim = req.params.limId;
 
         logger.debug('[DVP-PhoneNumberTrunkService.TrunkPhoneNumberBothLimit] - [%s] - HTTP Request Received Req Body - ', reqId, req.body);
 
@@ -814,7 +814,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id', functio
 });
 
 //DONE
-server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/UnAllocatedNumbersForOperator/:operatorId', function(req, res, next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorId/UnAllocatedNumbers', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     var numberDetails = [];
@@ -885,7 +885,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/UnAllocatedNumbersF
 });
 
 //DONE
-server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/AllocatedNumbersForOperator/:operatorId', function(req, res, next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorId/AllocatedNumbers', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     var numberDetails = [];
