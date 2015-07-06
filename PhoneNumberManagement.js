@@ -220,10 +220,10 @@ function GetAllPhoneDetails(Company,req,reqId,res)
 }
 
 //MF and TC done
-function GetCompanyPhones(req,reqId,res)
+function GetCompanyPhones(Company,reqId,res)
 {
     try {
-        DbConn.TrunkPhoneNumber.findAll({where: {CompanyId: req.params.CompanyId}}).complete(function (errTPhone, resTPhone) {
+        DbConn.TrunkPhoneNumber.findAll({where: {CompanyId: Company}}).complete(function (errTPhone, resTPhone) {
 
             if(errTPhone)
             {
@@ -233,14 +233,14 @@ function GetCompanyPhones(req,reqId,res)
             {
                 if(resTPhone.length>0)
                 {
-                    logger.debug('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [PGSQL]  - Phones found for company %s   ',reqId,req.params.CompanyId);
+                    logger.debug('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [PGSQL]  - Phones found for company %s   ',reqId,Company);
 
                     var jsonString = messageFormatter.FormatMessage(undefined, "SUCCESS", true, resTPhone);
                     res.end(jsonString);
                 }
                 else
                 {
-                    logger.error('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [PGSQL]  - No Phones found for company %s   ',reqId,req.params.CompanyId);
+                    logger.error('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [PGSQL]  - No Phones found for company %s   ',reqId,Company);
                     var jsonString = messageFormatter.FormatMessage("EMPTY", "ERROR/EXCEPTION", false, undefined);
                     res.end(jsonString);
                 }
@@ -250,7 +250,7 @@ function GetCompanyPhones(req,reqId,res)
         });
     }catch(ex)
     {
-        logger.error('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [PGSQL]  - Exception in starting method : GetCompanyPhones  - Data  %s   ',reqId,req.params.CompanyId,ex);
+        logger.error('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [PGSQL]  - Exception in starting method : GetCompanyPhones  - Data  %s   ',reqId,Company,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefineds);
         res.end(jsonString);
     }

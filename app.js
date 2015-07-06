@@ -961,7 +961,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorI
 
 //.......................................post............................................................................
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumber/:phonenumber/Availability/:enable',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:phonenumber/Availability/:enable',function(req,res,next)
 {
     var reqId='';
 
@@ -997,7 +997,7 @@ var Company=1;
 
 //.......................................post............................................................................
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumber/:phonenumber',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneNumber',function(req,res,next)
 {
     var reqId='';
 
@@ -1014,15 +1014,15 @@ var Company=1;
 
     try {
 
-        logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [HTTP]  - Request received -  Data - Phone %s Company ',reqId,req.params.phonenumber,Company);
+        logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [HTTP]  - Request received -  Data - Phone %s Company ',reqId,req.params.PhoneNumber,Company);
 
-        number.UpdatePhoneDetails(Company,req.params.phonenumber,req,reqId,res);
+        number.UpdatePhoneDetails(Company,req.params.PhoneNumber,req,reqId,res);
 
 
     }
     catch(ex)
     {
-        logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [HTTP]  - Exception on Request -  Data - Phone %s Company ',reqId,req.params.phonenumber,Company,ex);
+        logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [HTTP]  - Exception on Request -  Data - Phone %s Company ',reqId,req.params.PhoneNumber,Company,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
         res.end(jsonString);
     }
@@ -1033,7 +1033,7 @@ var Company=1;
 
 //check params
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumber/Category/:phone',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/Category/:phone',function(req,res,next)
 {
     var reqId='';
 
@@ -1067,7 +1067,7 @@ var Company=1;
 //.......................................get............................................................................
 
 //server.get('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/get_all/:CompanyId/:PhoneNumber',function(req,res,next)
-server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumber/:PhoneNumber',function(req,res,next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneNumber',function(req,res,next)
 {
     var reqId='';
 
@@ -1100,7 +1100,7 @@ return next();
 });
 //.......................................get............................................................................
 
-server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumbers/OfCompany/:CompanyId',function(req,res,next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumbers',function(req,res,next)
 {
 
     var reqId='';
@@ -1114,19 +1114,19 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/PhoneNumbers/OfComp
 
     }
 
-
+var Company=1;
 
     try {
 
-        logger.debug('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [HTTP]  - Request received -  Data - Company %s  ',reqId,req.params.CompanyId);
+        logger.debug('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [HTTP]  - Request received -  Data - Company %s  ',reqId,Company);
 
-        number.GetCompanyPhones(req,reqId,res);
+        number.GetCompanyPhones(Company,reqId,res);
 
 
     }
     catch(ex)
     {
-        logger.error('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [HTTP]  - Exception in Request received -  Data - Company %s  ',reqId,req.params.CompanyId,ex);
+        logger.error('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [HTTP]  - Exception in Request received -  Data - Company %s  ',reqId,Company,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
         res.end(jsonString);
     }
