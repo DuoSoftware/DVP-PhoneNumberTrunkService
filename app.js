@@ -172,7 +172,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/BuyNumber/',functi
  */
 
 //DONE
-server.put('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -223,7 +223,7 @@ server.put('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk', function(re
 
 //DONE
 //{"OperatorName": "TestOperator", "OperatorCode":"1234e", "ObjClass": "GGG", "ObjType": "FFF", "ObjCategory":"fff"}
-server.put('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator', function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
