@@ -5,6 +5,7 @@ module.exports = function(sequelize, DataTypes) {
     var Campaign = sequelize.define('CSDB_Campaign', {
             CampaignName: DataTypes.STRING,
             CampaignNumber: DataTypes.STRING,
+            ConcurrentLimit:DataTypes.INTEGER,
             Max:DataTypes.INTEGER,
             Min:DataTypes.INTEGER,
             CompanyId: DataTypes.INTEGER,

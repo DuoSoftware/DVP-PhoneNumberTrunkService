@@ -41,13 +41,13 @@ if (process.env.DEPLOYMENT_ENV == 'docker') {
  }
 
 
-if(process.env.LOG_SERVER && process.env.LOG_PORT){
+if(process.env.SYS_LOG_HOST && process.env.SYS_LOG_PORT){
 
 
     winston.add(winston.transports.LogstashUDP, {
-        port: process.env.LOG_PORT,
+        port: process.env.SYS_LOG_PORT,
         appName: process.env.HOST_NAME,
-        host: LOG_SERVER,
+        host: SYS_LOG_HOST,
         level: level
     });
 
