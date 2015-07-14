@@ -1,0 +1,5 @@
+{"level":"debug","message":"[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [] - [HTTP]  - Request received -  Data - Company 1  ","timestamp":"2015-05-29T10:14:19.198Z"}
+{"level":"debug","message":"[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [] - [HTTP]  - Request received -  Data - Company 1  ","timestamp":"2015-05-29T10:14:31.342Z"}
+{"level":"debug","message":"[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [] - [HTTP]  - Request received -  Data - Company 1  ","timestamp":"2015-05-29T10:14:59.685Z"}
+{"level":"debug","message":"[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [] - [HTTP]  - Request received -  Data - Company 1  ","timestamp":"2015-05-29T10:15:57.031Z"}
+{"level":"debug","message":"[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [] - [PGSQL]  - Phones found for company 1   ","timestamp":"2015-05-29T10:15:57.151Z"}
