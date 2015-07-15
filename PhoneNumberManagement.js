@@ -244,7 +244,7 @@ function GetAllPhoneDetails(Company,req,reqId,res)
 function GetCompanyPhones(Company,reqId,res)
 {
 
-    
+
     try {
         DbConn.TrunkPhoneNumber.findAll({where: {CompanyId: Company}}).complete(function (errTPhone, resTPhone) {
 
