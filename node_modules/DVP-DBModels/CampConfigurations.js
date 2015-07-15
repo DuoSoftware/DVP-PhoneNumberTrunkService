@@ -9,7 +9,7 @@ module.exports = function(sequelize, DataTypes) {
             ChannelConcurrency: DataTypes.INTEGER,
             AllowCallBack:DataTypes.BOOLEAN,
             MaxCallBackCount:DataTypes.INTEGER,
-            ConfigureId:DataTypes.BOOLEAN,
+            //ConfigureId:DataTypes.INTEGER,
             Status:DataTypes.BOOLEAN,
             TenantId:DataTypes.INTEGER,
             CompanyId:DataTypes.INTEGER

@@ -8,10 +8,11 @@ module.exports = function (sequelize, DataTypes) {
             CampaignId: DataTypes.INTEGER,
             ScheduleId: DataTypes.INTEGER,
             ScheduleType: DataTypes.BOOLEAN,
-            CamScheduleId: DataTypes.INTEGER,
+            //CamScheduleId: DataTypes.INTEGER,
             TenantId: DataTypes.INTEGER,
             CompanyId: DataTypes.INTEGER,
             Status: DataTypes.BOOLEAN
+
         }
     );
     return CampScheduleInfo;

@@ -6,7 +6,7 @@
 module.exports = function(sequelize, DataTypes) {
     var CampContactInfo = sequelize.define('DB_CAMP_ContactInfo', {
             ContactId:DataTypes.STRING,
-            CamContactId:DataTypes.STRING,
+            //CamContactId:DataTypes.INTEGER,
             Status:DataTypes.BOOLEAN,
             TenantId:DataTypes.INTEGER,
             CompanyId:DataTypes.INTEGER

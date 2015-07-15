@@ -10,7 +10,7 @@ module.exports = function(sequelize, DataTypes) {
             CampaignId: DataTypes.INTEGER,
             ContactId: DataTypes.STRING,
             CamScheduleId:DataTypes.INTEGER,
-            CallBackId:DataTypes.STRING,
+            //CallBackId:DataTypes.INTEGER,
             Status:DataTypes.BOOLEAN
 
         }
