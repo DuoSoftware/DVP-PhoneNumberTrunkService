@@ -97,131 +97,154 @@ function ChangeNumberAvailability(req,Company,reqId,res) {
 
 //MF and TC done
 function UpdatePhoneDetails(Company,Phone,req,reqId,res) {
-    try{
 
-        DbConn.TrunkPhoneNumber.findAll({where: [{CompanyId: Company}, {PhoneNumber: Phone}]}).complete(function (errTPhone, resTPhone) {
+   if(Phone)
+   {
+       try{
 
-
-            if(errTPhone)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Error in searching Phone number %s of Company %s',reqId,Phone,Company,errTPhone);
-                var jsonString = messageFormatter.FormatMessage(errTPhone, "EXCEPTION/ERROR", false, undefined);
-                res.end(jsonString);
-            }
-            else
-            {
-                if(resTPhone)
-                {
-                    logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Phone % is belongs to Company %s ',reqId,Phone,Company);
-                    try {
-
-                        DbConn.TrunkPhoneNumber
-                            .update(
-                            {
-
-                                ObjClass: req.body.ObjClass,
-                                ObjType: req.body.ObjType,
-                                ObjCategory: req.body.ObjCategory
+           DbConn.TrunkPhoneNumber.findAll({where: [{CompanyId: Company}, {PhoneNumber: Phone}]}).complete(function (errTPhone, resTPhone) {
 
 
-                            },
-                            {
-                                where: [{PhoneNumber: Phone},{CompanyId:Company}]
-                            }
-                        ).success(function (resUpdate) {
+               if(errTPhone)
+               {
+                   logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Error in searching Phone number %s of Company %s',reqId,Phone,Company,errTPhone);
+                   var jsonString = messageFormatter.FormatMessage(errTPhone, "EXCEPTION/ERROR", false, undefined);
+                   res.end(jsonString);
+               }
+               else
+               {
+                   if(resTPhone)
+                   {
+                       logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Phone % is belongs to Company %s ',reqId,Phone,Company);
+                       try {
+
+                           DbConn.TrunkPhoneNumber
+                               .update(
+                               {
+
+                                   ObjClass: req.body.ObjClass,
+                                   ObjType: req.body.ObjType,
+                                   ObjCategory: req.body.ObjCategory
 
 
-                                logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Trunk phone number updated successfully',reqId);
-                                var jsonString = messageFormatter.FormatMessage(undefined, "SUCCESS", true, resUpdate);
-                                res.end(jsonString);
-
-                            }).error(function (errUpdate) {
-
-
-                                logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Trunk phone number updation failed',reqId,errUpdate);
-
-                                var jsonString = messageFormatter.FormatMessage(errUpdate, "EXCEPTION/ERROR", false, undefined);
-                                res.end(jsonString);
-
-                            });
+                               },
+                               {
+                                   where: [{PhoneNumber: Phone},{CompanyId:Company}]
+                               }
+                           ).success(function (resUpdate) {
 
 
-                    }
-                    catch(ex)
-                    {
-                        logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Exception in Trunk phone number updation ',reqId,ex);
-                        var jsonString = messageFormatter.FormatMessage(errTPhone, "EXCEPTION", false, undefined);
-                        res.end(jsonString);
-                    }
-                }
-                else
-                {
-                    logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Phone % is not belongs to Company %s ',reqId,Phone,Company);
+                                   logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Trunk phone number updated successfully',reqId);
+                                   var jsonString = messageFormatter.FormatMessage(undefined, "SUCCESS", true, resUpdate);
+                                   res.end(jsonString);
 
-                    var jsonString = messageFormatter.FormatMessage("EMPTY", "ERROR/EXCEPTION", false, undefined);
-                    res.end(jsonString);
-                }
-            }
+                               }).error(function (errUpdate) {
 
 
-        });
-    }
-    catch(ex)
-    {
-        logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Exception found in searching TrunkPhoneNumber Phone %s Company %s ',reqId,Phone,Company,ex);
-        var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
-        res.end(jsonString);
-    }
+                                   logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Trunk phone number updation failed',reqId,errUpdate);
+
+                                   var jsonString = messageFormatter.FormatMessage(errUpdate, "EXCEPTION/ERROR", false, undefined);
+                                   res.end(jsonString);
+
+                               });
+
+
+                       }
+                       catch(ex)
+                       {
+                           logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Exception in Trunk phone number updation ',reqId,ex);
+                           var jsonString = messageFormatter.FormatMessage(errTPhone, "EXCEPTION", false, undefined);
+                           res.end(jsonString);
+                       }
+                   }
+                   else
+                   {
+                       logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Phone % is not belongs to Company %s ',reqId,Phone,Company);
+
+                       var jsonString = messageFormatter.FormatMessage("EMPTY", "ERROR/EXCEPTION", false, undefined);
+                       res.end(jsonString);
+                   }
+               }
+
+
+           });
+       }
+       catch(ex)
+       {
+           logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Exception found in searching TrunkPhoneNumber Phone %s Company %s ',reqId,Phone,Company,ex);
+           var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
+           res.end(jsonString);
+       }
+   }
+    else
+   {
+       logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - Invalid Number %s ',reqId,Phone);
+       var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
+       res.end(jsonString);
+   }
+
 }
 
 //MF and TC done
 function GetAllPhoneDetails(Company,req,reqId,res)
 {
-    try {
-        DbConn.TrunkPhoneNumber.findAll({where: [{CompanyId: Company}, {PhoneNumber: req.params.PhoneNumber}]}).complete(function (errTPhone, resTPhone) {
-            //logger.info( 'Requested RefID: '+reqz.params.ref);
-            // console.log(ExtObject);
+    if(req.params.PhoneNumber)
+    {
+        try {
+            DbConn.TrunkPhoneNumber.findAll({where: [{CompanyId: Company}, {PhoneNumber: req.params.PhoneNumber}]}).complete(function (errTPhone, resTPhone) {
+                //logger.info( 'Requested RefID: '+reqz.params.ref);
+                // console.log(ExtObject);
 
-            if(errTPhone)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.GetAllPhoneDetails] - [%s] - [PGSQL]  - Error in searching Phone %s of company %s',reqId,req.params.PhoneNumber,Company,errTPhone);
-                var jsonString = messageFormatter.FormatMessage(errTPhone, "EXCEPTION/ERROR", false, undefined);
-                res.end(jsonString);
-            }
-            else
-            {
-                if(resTPhone.length>0)
+                if(errTPhone)
                 {
-
-                    logger.debug('[DVP-PhoneNumberTrunkService.GetAllPhoneDetails] - [%s] - [PGSQL]  - Phone %s is belongs to company %s and Records found ',reqId,req.params.PhoneNumber,Company,resTPhone);
-
-
-                    var jsonString = messageFormatter.FormatMessage(undefined, "SUCCESS", true, resTPhone);
+                    logger.error('[DVP-PhoneNumberTrunkService.GetAllPhoneDetails] - [%s] - [PGSQL]  - Error in searching Phone %s of company %s',reqId,req.params.PhoneNumber,Company,errTPhone);
+                    var jsonString = messageFormatter.FormatMessage(errTPhone, "EXCEPTION/ERROR", false, undefined);
                     res.end(jsonString);
                 }
                 else
                 {
-                    logger.error('[DVP-PhoneNumberTrunkService.GetAllPhoneDetails] - [%s] - [PGSQL]  - Phone %s is not belongs to company %s ',reqId,req.params.PhoneNumber,Company);
+                    if(resTPhone.length>0)
+                    {
 
-                    var jsonString = messageFormatter.FormatMessage("EMPTY", "EXCEPTION/ERROR", false, undefined);
-                    res.end(jsonString);
+                        logger.debug('[DVP-PhoneNumberTrunkService.GetAllPhoneDetails] - [%s] - [PGSQL]  - Phone %s is belongs to company %s and Records found ',reqId,req.params.PhoneNumber,Company,resTPhone);
+
+
+                        var jsonString = messageFormatter.FormatMessage(undefined, "SUCCESS", true, resTPhone);
+                        res.end(jsonString);
+                    }
+                    else
+                    {
+                        logger.error('[DVP-PhoneNumberTrunkService.GetAllPhoneDetails] - [%s] - [PGSQL]  - Phone %s is not belongs to company %s ',reqId,req.params.PhoneNumber,Company);
+
+                        var jsonString = messageFormatter.FormatMessage("EMPTY", "EXCEPTION/ERROR", false, undefined);
+                        res.end(jsonString);
+                    }
                 }
-            }
 
 
-        });
+            });
+        }
+        catch(ex)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.GetAllPhoneDetails] - [%s] - [PGSQL]  - Exception in starting method :GetAllPhoneDetails Data Phone %s Company %s ',reqId,req.params.PhoneNumber,Company,ex);
+            var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
+            res.end(jsonString);
+        }
     }
-    catch(ex)
+    else
     {
-        logger.error('[DVP-PhoneNumberTrunkService.GetAllPhoneDetails] - [%s] - [PGSQL]  - Exception in starting method :GetAllPhoneDetails Data Phone %s Company %s ',reqId,req.params.PhoneNumber,Company,ex);
+        logger.error('[DVP-PhoneNumberTrunkService.GetAllPhoneDetails] - [%s] - Invalid Phone ',reqId,req.params.PhoneNumber);
         var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
         res.end(jsonString);
     }
+
 }
 
 //MF and TC done
 function GetCompanyPhones(Company,reqId,res)
 {
+
+
     try {
         DbConn.TrunkPhoneNumber.findAll({where: {CompanyId: Company}}).complete(function (errTPhone, resTPhone) {
 
@@ -258,75 +281,86 @@ function GetCompanyPhones(Company,reqId,res)
 
 function UpdatePhoneNumberObjCategory(Company,Phone,req,reqId,res)
 {
-    try{
 
-        DbConn.TrunkPhoneNumber.findAll({where: [{CompanyId: Company}, {PhoneNumber: Phone}]}).complete(function (errTPhone, resTPhone) {
+    if(Phone)
+    {
+        try{
 
-            if(errTPhone)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Error in searching Phone number %s of Company %s',reqId,Phone,Company,errTPhone);
-                var jsonString = messageFormatter.FormatMessage(errTPhone, "EXCEPTION", false, undefined);
-                res.end(jsonString);
-            }
-            else
-            {
-                if(resTPhone)
+            DbConn.TrunkPhoneNumber.findAll({where: [{CompanyId: Company}, {PhoneNumber: Phone}]}).complete(function (errTPhone, resTPhone) {
+
+                if(errTPhone)
                 {
-                    try {
-                        logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Phone %s is belongs to Company %s ',reqId,Phone,Company);
-                        DbConn.TrunkPhoneNumber
-                            .update(
-                            {
-
-
-                                ObjCategory: req.body.ObjCategory
-
-
-                            },
-                            {
-                                where: [{PhoneNumber: Phone},{CompanyId:Company}]
-                            }
-                        ).success(function (message) {
-
-                                logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Category is updated to %s of Phone %s  belongs to Company %s is succeeded ',reqId,req.body.ObjCategory,Phone,Company);
-                                var jsonString = messageFormatter.FormatMessage(undefined, "SUCCESS", true, message);
-                                res.end(jsonString);
-
-                            }).error(function (err) {
-
-                                logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Category is updated to %s of Phone %s  belongs to Company %s is failed ',reqId,req.body.ObjCategory,Phone,Company,err);
-                                var jsonString = messageFormatter.FormatMessage(err, "ERROR/EXCEPTION", false, undefined);
-                                res.end(jsonString);
-
-                            });
-
-
-                    }
-                    catch(ex)
-                    {
-                        logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Exception happens in updating Phone number %s of Company %s',reqId,Phone,Company,ex);
-                        var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
-                        res.end(jsonString);
-                    }
+                    logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Error in searching Phone number %s of Company %s',reqId,Phone,Company,errTPhone);
+                    var jsonString = messageFormatter.FormatMessage(errTPhone, "EXCEPTION", false, undefined);
+                    res.end(jsonString);
                 }
                 else
                 {
-                    logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Phone %s is not belongs to Company %s ',reqId,Phone,Company);
+                    if(resTPhone)
+                    {
+                        try {
+                            logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Phone %s is belongs to Company %s ',reqId,Phone,Company);
+                            DbConn.TrunkPhoneNumber
+                                .update(
+                                {
 
-                    var jsonString = messageFormatter.FormatMessage(errTPhone, "EXCEPTION/ERROR", false, undefined);
-                    res.end(jsonString);
+
+                                    ObjCategory: req.body.ObjCategory
+
+
+                                },
+                                {
+                                    where: [{PhoneNumber: Phone},{CompanyId:Company}]
+                                }
+                            ).success(function (message) {
+
+                                    logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Category is updated to %s of Phone %s  belongs to Company %s is succeeded ',reqId,req.body.ObjCategory,Phone,Company);
+                                    var jsonString = messageFormatter.FormatMessage(undefined, "SUCCESS", true, message);
+                                    res.end(jsonString);
+
+                                }).error(function (err) {
+
+                                    logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Category is updated to %s of Phone %s  belongs to Company %s is failed ',reqId,req.body.ObjCategory,Phone,Company,err);
+                                    var jsonString = messageFormatter.FormatMessage(err, "ERROR/EXCEPTION", false, undefined);
+                                    res.end(jsonString);
+
+                                });
+
+
+                        }
+                        catch(ex)
+                        {
+                            logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Exception happens in updating Phone number %s of Company %s',reqId,Phone,Company,ex);
+                            var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
+                            res.end(jsonString);
+                        }
+                    }
+                    else
+                    {
+                        logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Phone %s is not belongs to Company %s ',reqId,Phone,Company);
+
+                        var jsonString = messageFormatter.FormatMessage(errTPhone, "EXCEPTION/ERROR", false, undefined);
+                        res.end(jsonString);
+                    }
                 }
-            }
 
 
-        });
+            });
+        }
+        catch(ex)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Exception in starting method: UpdatePhoneNumberObjCategory - Data  Phone number %s of Company %s',reqId,Phone,Company,ex);
+            var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
+            res.end(jsonString);
+        }
     }
-    catch(ex)
+    else
     {
-        logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Exception in starting method: UpdatePhoneNumberObjCategory - Data  Phone number %s of Company %s',reqId,Phone,Company,ex);
+        logger.error('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - Invalid Phone %s',reqId,Phone);
         var jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
         res.end(jsonString);
     }
+
 }
 
 

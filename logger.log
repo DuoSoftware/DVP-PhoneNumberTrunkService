@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {"PhoneNumber":0,"Enable":true,"ObjClass":"string","ObjType":"string","ObjCategory":"string","TenantId":0,"CompanyId":0,"level":"debug","message":"[DVP-PhoneNumberTrunkService.AddNumber] - [bba09710-0529-11e5-8650-cb21bd8389f0] - HTTP Request Received - Params - Id : 1 - Req Body : %s","timestamp":"2015-05-28T11:07:45.601Z"}
 {"level":"debug","message":"[DVP-PhoneNumberTrunkService.addPhoneNumbersToTrunk] - [bba09710-0529-11e5-8650-cb21bd8389f0] - PGSQL query success","timestamp":"2015-05-28T11:09:10.474Z"}
 {"level":"debug","message":"[DVP-PhoneNumberTrunkService.SetTrunkAvailability] - [e97be910-05f0-11e5-a33d-172d56c06823] - HTTP Request Received Req Params - id : 1, enable : true","timestamp":"2015-05-29T10:53:17.218Z"}
@@ -169,3 +170,10 @@
 {"level":"debug","message":"[DVP-PhoneNumberTrunkService.SetTrunkEnabledStatusDB] - [93146ce0-0e75-11e5-9cb6-83ad22f4a9eb] - PGSQL get trunk query success","timestamp":"2015-06-09T07:03:22.784Z"}
 {"level":"debug","message":"[DVP-PhoneNumberTrunkService.SetTrunkEnabledStatusDB] - [93146ce0-0e75-11e5-9cb6-83ad22f4a9eb] - PGSQL update trunk availability query success","timestamp":"2015-06-09T07:03:22.792Z"}
 {"level":"debug","message":"[DVP-PBXService.SetTrunkAvailability] - [93146ce0-0e75-11e5-9cb6-83ad22f4a9eb] - API RESPONSE : {\"Exception\":null,\"CustomMessage\":\"Trunk Updated Successfully\",\"IsSuccess\":true}","timestamp":"2015-06-09T07:03:22.792Z"}
+=======
+{"level":"debug","message":"[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [] - [HTTP]  - Request received -  Data - Company 1  ","timestamp":"2015-05-29T10:14:19.198Z"}
+{"level":"debug","message":"[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [] - [HTTP]  - Request received -  Data - Company 1  ","timestamp":"2015-05-29T10:14:31.342Z"}
+{"level":"debug","message":"[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [] - [HTTP]  - Request received -  Data - Company 1  ","timestamp":"2015-05-29T10:14:59.685Z"}
+{"level":"debug","message":"[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [] - [HTTP]  - Request received -  Data - Company 1  ","timestamp":"2015-05-29T10:15:57.031Z"}
+{"level":"debug","message":"[DVP-PhoneNumberTrunkService.PhonesOfCompany] - [] - [PGSQL]  - Phones found for company 1   ","timestamp":"2015-05-29T10:15:57.151Z"}
+>>>>>>> 81f6ea1cb12391e0be21f21375b0d010107f1db7
