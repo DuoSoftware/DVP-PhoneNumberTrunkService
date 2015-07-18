@@ -1,5 +1,6 @@
 var winston = require('winston');
 require('winston-logstash-udp');
+require('rolling-file-transport');
 
 /*
 winston.add(winston.transports.File, { filename: 'D:/somefile.log' });
@@ -33,9 +34,9 @@ if (process.env.DEPLOYMENT_ENV == 'docker') {
      logger.add(winston.transports.Console, {colorize: true, level: level});
 
      if(process.env.LOG_PATH) {
-         logger.add(winston.transports.File, {filename: process.env.LOG_PATH + '/logger.log', level: level});
+         logger.add(winston.transports.RollingFile, {filename: process.env.LOG_PATH + '/logger.log', level: level});
      }else{
-         logger.add(winston.transports.File, {filename: 'logger.log', level: level});
+         logger.add(winston.transports.RollingFile, {filename: 'logger.log', level: level});
 
      }
  }
