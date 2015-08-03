@@ -535,7 +535,7 @@ var AssignInboundLimitToTrunkNumberDB = function(reqId, trunkNumber, inboundLimi
                     else
                     {
                         logger.debug('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query success', reqId);
-                        callback(new Error('Trunk Not found'), false);
+                        callback(new Error('Limit not found'), false);
                     }
 
                 })
@@ -543,7 +543,7 @@ var AssignInboundLimitToTrunkNumberDB = function(reqId, trunkNumber, inboundLimi
             else
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query success', reqId);
-                callback(new Error('Operator Not found'), false);
+                callback(new Error('Trunk number not found'), false);
             }})
     }
     catch(ex)
