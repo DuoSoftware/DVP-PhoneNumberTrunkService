@@ -1,6 +1,6 @@
-var dbModel = require('DVP-DBModels');
+var dbModel = require('dvp-dbmodels');
 var underscore = require('underscore');
-var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
+var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 //var getGrpUsersById = function(grpId, callback)
 //{
 //    try
