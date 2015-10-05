@@ -6,9 +6,9 @@
 
 module.exports = function(sequelize, DataTypes) {
     var CampContactSchedule = sequelize.define('DB_CAMP_ContactSchedule', {
-            CampaignId: DataTypes.INTEGER,
-            CamScheduleId: DataTypes.INTEGER,
-            CamContactId:DataTypes.INTEGER,
+            CampaignId: {type:DataTypes.INTEGER,unique: 'CampContactScheduleIndex'},
+            CamScheduleId: {type:DataTypes.INTEGER,unique: 'CampContactScheduleIndex'},
+            CamContactId:{type:DataTypes.INTEGER,unique: 'CampContactScheduleIndex'},
             //ContactScheduleId:DataTypes.INTEGER
             ContactScheduleId:{type:DataTypes.INTEGER, primaryKey:true,autoIncrement: true}
         }

@@ -5,8 +5,8 @@
 
 module.exports = function (sequelize, DataTypes) {
     var CampScheduleInfo = sequelize.define('DB_CAMP_ScheduleInfo', {
-            CampaignId: DataTypes.INTEGER,
-            ScheduleId: DataTypes.INTEGER,
+            CampaignId: {type:DataTypes.INTEGER,unique: 'CampScheduleInfoIndex'},
+            ScheduleId: {type:DataTypes.INTEGER,unique: 'CampScheduleInfoIndex'},
             ScheduleType: DataTypes.STRING,
             //CamScheduleId: DataTypes.INTEGER,
             TenantId: DataTypes.INTEGER,

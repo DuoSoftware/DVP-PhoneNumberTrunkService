@@ -5,7 +5,7 @@
 
 module.exports = function (sequelize, DataTypes) {
     var CampCampaignInfo = sequelize.define('DB_CAMP_CampaignInfo', {
-            CampaignName: DataTypes.STRING,
+            CampaignName: {type: DataTypes.STRING, allowNull: false, unique: true},
             CampaignMode: DataTypes.STRING,
             CampaignChannel: DataTypes.STRING,
             DialoutMechanism: DataTypes.STRING,
@@ -18,7 +18,7 @@ module.exports = function (sequelize, DataTypes) {
             //Concurrent: DataTypes.STRING,
             OperationalStatus: DataTypes.STRING,
             Status: DataTypes.BOOLEAN,
-            CampaignId:{type:DataTypes.INTEGER, primaryKey:true,autoIncrement: true}
+            CampaignId: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true}
         }
     );
 
