@@ -1,6 +1,6 @@
 var restify = require('restify');
-var messageFormatter = require('DVP-Common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
+var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var gwBackendHandler = require('./TrunkBackendHandler.js');
 var number=require('./PhoneNumberManagement.js');
 var redisHandler = require('./RedisHandler.js');

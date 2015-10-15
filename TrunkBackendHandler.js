@@ -1,6 +1,6 @@
-var dbModel = require('DVP-DBModels');
+var dbModel = require('dvp-dbmodels');
 var underscore = require('underscore');
-var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
+var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 //var getGrpUsersById = function(grpId, callback)
 //{
 //    try
@@ -28,32 +28,23 @@ var SwitchPhoneNumberCompanyDB = function(reqId, phoneNumber, companyId, tenantI
     try
     {
 
-        dbModel.TrunkPhoneNumber.find({ where: [{PhoneNumber: phoneNumber }, { CompanyId: companyId}]}).complete(function(err, phnNumInfo)
+        dbModel.TrunkPhoneNumber.find({ where: [{PhoneNumber: phoneNumber }, { CompanyId: companyId}]}).then(function(phnNumInfo)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.SwitchPhoneNumberCompanyDB] - [%s] - Get trunk phone number PGSQL query failed', reqId, err);
-
-                callback(err, false);
-            }
-            else if(phnNumInfo)
+            if(phnNumInfo)
             {
                 //update
                 logger.debug('[DVP-PhoneNumberTrunkService.SwitchPhoneNumberCompanyDB] - [%s] - Get trunk phone number PGSQL query success', reqId);
-                phnNumInfo.updateAttributes({CompanyId: companyToChange, TenantId: tenantToChange}).complete(function (err)
+                phnNumInfo.updateAttributes({CompanyId: companyToChange, TenantId: tenantToChange}).then(function (upRes)
                 {
-                    if (err)
-                    {
-                        logger.error('[DVP-PhoneNumberTrunkService.SwitchPhoneNumberCompanyDB] - [%s] - update phone number company PGSQL query failed', reqId, err);
+                    logger.debug('[DVP-PhoneNumberTrunkService.SwitchPhoneNumberCompanyDB] - [%s] - update phone number company PGSQL query success', reqId);
 
-                        callback(err, false);
-                    }
-                    else
-                    {
-                        logger.debug('[DVP-PhoneNumberTrunkService.SwitchPhoneNumberCompanyDB] - [%s] - update phone number company PGSQL query success', reqId);
+                    callback(undefined, true);
 
-                        callback(undefined, true);
-                    }
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-PhoneNumberTrunkService.SwitchPhoneNumberCompanyDB] - [%s] - update phone number company PGSQL query failed', reqId, err);
+
+                    callback(err, false);
                 })
             }
             else
@@ -61,6 +52,11 @@ var SwitchPhoneNumberCompanyDB = function(reqId, phoneNumber, companyId, tenantI
                 logger.debug('[DVP-PhoneNumberTrunkService.SwitchPhoneNumberCompanyDB] - [%s] - Get trunk phone number PGSQL query success', reqId);
                 callback(new Error("Unable to find a phone number registered to given company"), false);
             }
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.SwitchPhoneNumberCompanyDB] - [%s] - Get trunk phone number PGSQL query failed', reqId, err);
+
+            callback(err, false);
         })
     }
     catch(ex)
@@ -74,18 +70,15 @@ var GetTrunkByIdDB = function(reqId, trunkId, companyId, tenantId, callback)
 {
     try
     {
-        dbModel.Trunk.find({where :[{id: trunkId},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function(err, trunkObj)
+        dbModel.Trunk.find({where :[{id: trunkId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function(trunkObj)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.GetTrunkByIdDB] - [%s] - PGSQL get trunk query failed', reqId, err);
-            }
-            else
-            {
-                logger.debug('[DVP-PhoneNumberTrunkService.GetTrunkByIdDB] - [%s] - PGSQL get trunk query success', reqId);
-            }
+            logger.debug('[DVP-PhoneNumberTrunkService.GetTrunkByIdDB] - [%s] - PGSQL get trunk query success', reqId);
 
-            callback(err, trunkObj);
+            callback(undefined, trunkObj);
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.GetTrunkByIdDB] - [%s] - PGSQL get trunk query failed', reqId, err);
+            callback(err, undefined);
         })
     }
     catch(ex)
@@ -99,18 +92,15 @@ var GetCallServerByProfileIdDB = function(reqId, profileId, callback)
 {
     try
     {
-        dbModel.SipNetworkProfile.find({where :[{id: profileId}], include: [{model: dbModel.CallServer, as: "CallServer"}]}).complete(function(err, csObj)
+        dbModel.SipNetworkProfile.find({where :[{id: profileId}], include: [{model: dbModel.CallServer, as: "CallServer"}]}).then(function(csObj)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.GetCallServerByProfileIdDB] - [%s] - PGSQL query failed', reqId, err);
-            }
-            else
-            {
-                logger.debug('[DVP-PhoneNumberTrunkService.GetCallServerByProfileIdDB] - [%s] - PGSQL query success', reqId);
-            }
+            logger.debug('[DVP-PhoneNumberTrunkService.GetCallServerByProfileIdDB] - [%s] - PGSQL query success', reqId);
 
-            callback(err, csObj);
+            callback(undefined, csObj);
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.GetCallServerByProfileIdDB] - [%s] - PGSQL query failed', reqId, err);
+            callback(err, undefined);
         })
     }
     catch(ex)
@@ -125,16 +115,9 @@ var GetCallServersRelatedToLoadBalancerDB = function(reqId, lbId, callback)
     var CallServerList = [];
     try
     {
-        dbModel.LoadBalancer.find({where :[{id: lbId}], include: [{model: dbModel.Cloud, as: "Cloud", include: [{model: dbModel.CallServer, as: "CallServer"}]}]}).complete(function(err, resultInfo)
+        dbModel.LoadBalancer.find({where :[{id: lbId}], include: [{model: dbModel.Cloud, as: "Cloud", include: [{model: dbModel.CallServer, as: "CallServer"}]}]}).then(function(resultInfo)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.GetCallServersRelatedToLoadBalancerDB] - [%s] - Get callservers related to load balancer PGSQL query failed', reqId, err);
 
-                callback(err, CallServerList);
-            }
-            else
-            {
                 logger.debug('[DVP-PhoneNumberTrunkService.GetCallServersRelatedToLoadBalancerDB] - [%s] - Get callservers related to load balancer PGSQL query success', reqId);
                 if(resultInfo.Cloud)
                 {
@@ -145,15 +128,9 @@ var GetCallServersRelatedToLoadBalancerDB = function(reqId, lbId, callback)
 
                         var clusterId = resultInfo.Cloud.id;
 
-                        dbModel.Cloud.findAll({where :[{ParentCloudId: clusterId}], include: [{model: dbModel.CallServer, as: "CallServer"}]}).complete(function(err, childCloudInfo)
+                        dbModel.Cloud.findAll({where :[{ParentCloudId: clusterId}], include: [{model: dbModel.CallServer, as: "CallServer"}]}).then(function(childCloudInfo)
                         {
-                            if(err)
-                            {
-                                logger.error('[DVP-PhoneNumberTrunkService.GetCallServersRelatedToLoadBalancerDB] - [%s] - PGSQL query failed', reqId, err);
-                                //give other call servers only
-                                callback(err, CallServerList);
-                            }
-                            else if(childCloudInfo)
+                            if(childCloudInfo)
                             {
                                 logger.debug('[DVP-PhoneNumberTrunkService.GetCallServersRelatedToLoadBalancerDB] - [%s] - PGSQL query success', reqId);
                                 childCloudInfo.forEach(function(cld)
@@ -163,29 +140,39 @@ var GetCallServersRelatedToLoadBalancerDB = function(reqId, lbId, callback)
                                         //add callserver details to array
                                         CallServerList.push(cld.CallServer);
                                     }
-                                })
+                                });
 
-                                callback(err, CallServerList);
+                                callback(undefined, CallServerList);
                             }
                             else
                             {
                                 logger.debug('[DVP-PhoneNumberTrunkService.GetCallServersRelatedToLoadBalancerDB] - [%s] - PGSQL query success', reqId);
-                                callback(err, CallServerList);
+                                callback(undefined, CallServerList);
                             }
 
+                        }).catch(function(err)
+                        {
+                            logger.error('[DVP-PhoneNumberTrunkService.GetCallServersRelatedToLoadBalancerDB] - [%s] - PGSQL query failed', reqId, err);
+                            //give other call servers only
+                            callback(err, CallServerList);
                         });
                     }
                     else
                     {
-                        callback(err, CallServerList);
+                        callback(undefined, CallServerList);
                     }
                 }
                 else
                 {
-                    callback(err, CallServerList);
+                    callback(undefined, CallServerList);
                 }
-            }
 
+
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.GetCallServersRelatedToLoadBalancerDB] - [%s] - Get callservers related to load balancer PGSQL query failed', reqId, err);
+
+            callback(err, CallServerList);
         })
     }
     catch(ex)
@@ -200,33 +187,25 @@ var SetTrunkEnabledStatusDB = function(reqId, gwId, status, companyId, tenantId,
 {
     try
     {
-        dbModel.Trunk.find({where :[{id: gwId},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function(err, gwObj)
+        dbModel.Trunk.find({where :[{id: gwId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function(gwObj)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.SetTrunkEnabledStatusDB] - [%s] - PGSQL get trunk query failed', reqId, err);
-
-                callback(err, false);
-            }
-            else if(gwObj)
+            if(gwObj)
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.SetTrunkEnabledStatusDB] - [%s] - PGSQL get trunk query success', reqId);
                 //update
 
 
-                gwObj.updateAttributes({Enable: status}).complete(function (err)
+                gwObj.updateAttributes({Enable: status}).then(function (upRes)
                 {
-                    if (err)
-                    {
-                        logger.error('[DVP-PhoneNumberTrunkService.SetTrunkEnabledStatusDB] - [%s] - PGSQL update trunk availability query failed', reqId, err);
 
-                        callback(err, false);
-                    }
-                    else
-                    {
                         logger.debug('[DVP-PhoneNumberTrunkService.SetTrunkEnabledStatusDB] - [%s] - PGSQL update trunk availability query success', reqId);
                         callback(undefined, true);
-                    }
+
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-PhoneNumberTrunkService.SetTrunkEnabledStatusDB] - [%s] - PGSQL update trunk availability query failed', reqId, err);
+
+                    callback(err, false);
                 })
             }
             else
@@ -234,6 +213,11 @@ var SetTrunkEnabledStatusDB = function(reqId, gwId, status, companyId, tenantId,
                 logger.debug('[DVP-PhoneNumberTrunkService.SetTrunkEnabledStatusDB] - [%s] - PGSQL get trunk query success', reqId);
                 callback(new Error("Trunk Not Found for Given Id"), false);
             }
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.SetTrunkEnabledStatusDB] - [%s] - PGSQL get trunk query failed', reqId, err);
+
+            callback(err, false);
         })
     }
     catch(ex)
@@ -247,40 +231,26 @@ var AssignTrunkToProfile = function(reqId, gwId, profileId, companyId, tenantId,
 {
     try
     {
-        dbModel.SipNetworkProfile.find({where: [{id: profileId},{CompanyId: companyId},{TenantId: tenantId},{ObjType: "EXTERNAL"}]}).complete(function (err, profRec)
+        dbModel.SipNetworkProfile.find({where: [{id: profileId},{CompanyId: companyId},{TenantId: tenantId},{ObjType: "EXTERNAL"}]}).then(function (profRec)
         {
 
-            if (err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkToProfile] - [%s] - get sip profile PGSQL query failed', reqId, err);
-                callback(err, false);
-            }
-            else if (profRec)
+            if (profRec)
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToProfile] - [%s] - get sip profile PGSQL query success', reqId);
-                dbModel.Trunk.find({where: [{id: gwId},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, gwRec)
+                dbModel.Trunk.find({where: [{id: gwId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function (gwRec)
                 {
-                    if(err)
-                    {
-                        logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkToProfile] - [%s] - get trunk PGSQL query failed', reqId, err);
-                        callback(err, false);
-                    }
-                    else if(gwRec)
+                    if(gwRec)
                     {
                         logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToProfile] - [%s] - get trunk PGSQL query success', reqId);
-                        profRec.addTrunk(gwRec).complete(function (err, result)
+                        profRec.addTrunk(gwRec).then(function (result)
                         {
-                            if (err)
-                            {
-                                logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkToProfile] - [%s] - update trunk with profile PGSQL query failed', reqId, err);
-                                callback(err, false);
-                            }
-                            else
-                            {
-                                logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToProfile] - [%s] - update trunk with profile PGSQL query success', reqId);
-                                callback(err, true);
-                            }
+                            logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToProfile] - [%s] - update trunk with profile PGSQL query success', reqId);
+                            callback(undefined, true);
 
+                        }).catch(function(err)
+                        {
+                            logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkToProfile] - [%s] - update trunk with profile PGSQL query failed', reqId, err);
+                            callback(err, false);
                         })
                     }
                     else
@@ -289,6 +259,10 @@ var AssignTrunkToProfile = function(reqId, gwId, profileId, companyId, tenantId,
                         callback(new Error('Trunk not found'), false);
                     }
 
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkToProfile] - [%s] - get trunk PGSQL query failed', reqId, err);
+                    callback(err, false);
                 })
             }
             else
@@ -296,7 +270,11 @@ var AssignTrunkToProfile = function(reqId, gwId, profileId, companyId, tenantId,
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToProfile] - [%s] - get sip profile PGSQL query success', reqId);
                 callback(new Error('Sip network profile not found'), false);
             }
-         });
+         }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkToProfile] - [%s] - get sip profile PGSQL query failed', reqId, err);
+            callback(err, false);
+        });
     }
     catch(ex)
     {
@@ -310,40 +288,26 @@ var AssignTrunkToLoadBalancer = function(reqId, gwId, lbId, companyId, tenantId,
 {
     try
     {
-        dbModel.LoadBalancer.find({where: [{id: lbId}]}).complete(function (err, lbRec)
+        dbModel.LoadBalancer.find({where: [{id: lbId}]}).then(function (lbRec)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - PGSQL get load balancer query failed', reqId, err);
-                callback(err, false);
-            }
-            else if(lbRec)
+            if(lbRec)
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - PGSQL get load balancer query success', reqId);
-                dbModel.Trunk.find({where: [{id: gwId},{CompanyId : companyId},{TenantId : tenantId}]}).complete(function (err, gwRec)
+                dbModel.Trunk.find({where: [{id: gwId},{CompanyId : companyId},{TenantId : tenantId}]}).then(function (gwRec)
                 {
-                    if(err)
-                    {
-                        logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - PGSQL get trunk query failed', reqId, err);
-                        callback(err, false);
-                    }
-                    else if(gwRec)
+                    if(gwRec)
                     {
                         logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - PGSQL get trunk query success', reqId);
 
-                        lbRec.addTrunk(gwRec).complete(function (err, result)
+                        lbRec.addTrunk(gwRec).then(function (result)
                         {
-                            if(!err)
-                            {
-                                logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - PGSQL update trunk with loadbalancer id query success', reqId);
-                                callback(undefined, true);
-                            }
-                            else
-                            {
-                                logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - PGSQL update trunk with loadbalancer id query failed', reqId, err);
-                                callback(err, false);
-                            }
+                            logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - PGSQL update trunk with loadbalancer id query success', reqId);
+                            callback(undefined, true);
 
+                        }).catch(function(err)
+                        {
+                            logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - PGSQL update trunk with loadbalancer id query failed', reqId, err);
+                            callback(err, false);
                         })
                     }
                     else
@@ -352,6 +316,10 @@ var AssignTrunkToLoadBalancer = function(reqId, gwId, lbId, companyId, tenantId,
                         callback(new Error('Trunk Not Found'), false);
                     }
 
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - PGSQL get trunk query failed', reqId, err);
+                    callback(err, false);
                 })
             }
             else
@@ -359,6 +327,10 @@ var AssignTrunkToLoadBalancer = function(reqId, gwId, lbId, companyId, tenantId,
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - PGSQL get load balancer query success', reqId);
                 callback(new Error('Load balancer not found'), false);
             }
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - PGSQL get load balancer query failed', reqId, err);
+            callback(err, false);
         })
     }
     catch(ex)
@@ -373,39 +345,27 @@ var AssignTrunkTranslation = function(reqId, gwId, transId, companyId, tenantId,
 {
     try
     {
-        dbModel.Translation.find({where: [{id: transId},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, transRec)
+        dbModel.Translation.find({where: [{id: transId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function (transRec)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkTranslation] - [%s] - get translation PGSQL query failed', reqId, err);
-            }
-            else if(transRec)
+            if(transRec)
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkTranslation] - [%s] - get translation PGSQL query success', reqId);
 
-                dbModel.Trunk.find({where: [{id: gwId}]}).complete(function (err, gwRec)
+                dbModel.Trunk.find({where: [{id: gwId}]}).then(function (gwRec)
                 {
-                    if(err)
-                    {
-                        logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkTranslation] - [%s] - get trunk PGSQL query failed', reqId, err);
-                    }
-                    else if(gwRec)
+                    if(gwRec)
                     {
                         logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkTranslation] - [%s] - get trunk PGSQL query success', reqId);
 
-                        transRec.addTrunk(gwRec).complete(function (err, result)
+                        transRec.addTrunk(gwRec).then(function (result)
                         {
-                            if(!err)
-                            {
-                                logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkTranslation] - [%s] - Update trunk with translation id PGSQL query success', reqId);
-                                callback(undefined, true);
-                            }
-                            else
-                            {
-                                logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkTranslation] - [%s] - Update trunk with translation id PGSQL query failed', reqId, err);
-                                callback(err, false);
-                            }
+                            logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkTranslation] - [%s] - Update trunk with translation id PGSQL query success', reqId);
+                            callback(undefined, true);
 
+                        }).catch(function(err)
+                        {
+                            logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkTranslation] - [%s] - Update trunk with translation id PGSQL query failed', reqId, err);
+                            callback(err, false);
                         })
                     }
                     else
@@ -414,13 +374,22 @@ var AssignTrunkTranslation = function(reqId, gwId, transId, companyId, tenantId,
                         callback(new Error('No trunk found'), false);
                     }
 
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkTranslation] - [%s] - get trunk PGSQL query failed', reqId, err);
+                    callback(err, false);
                 })
             }
             else
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkTranslation] - [%s] - get translation PGSQL query success', reqId);
                 callback(new Error('Translation not found'), false);
-            }})
+
+            }}).catch(function(err)
+            {
+                logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkTranslation] - [%s] - get translation PGSQL query failed', reqId, err);
+                callback(err, false);
+            })
     }
     catch(ex)
     {
@@ -434,39 +403,27 @@ var AssignOperatorToTrunk = function(reqId, gwId, opId, companyId, tenantId, cal
 {
     try
     {
-        dbModel.TrunkOperator.find({where: [{id: opId}]}).complete(function (err, opRec)
+        dbModel.TrunkOperator.find({where: [{id: opId}]}).then(function (opRec)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.AssignOperatorToTrunk] - [%s] - Get operator PGSQL query failed', reqId, err);
-            }
-            else if(opRec)
+            if(opRec)
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignOperatorToTrunk] - [%s] - Get operator PGSQL query success', reqId);
 
-                dbModel.Trunk.find({where: [{id: gwId},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, gwRec)
+                dbModel.Trunk.find({where: [{id: gwId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function (gwRec)
                 {
-                    if(err)
-                    {
-                        logger.error('[DVP-PhoneNumberTrunkService.AssignOperatorToTrunk] - [%s] - Get trunk PGSQL query failed', reqId, err);
-                    }
-                    else if(gwRec)
+                    if(gwRec)
                     {
                         logger.debug('[DVP-PhoneNumberTrunkService.AssignOperatorToTrunk] - [%s] - Get trunk PGSQL query success', reqId);
 
-                        opRec.addTrunk(gwRec).complete(function (err, result)
+                        opRec.addTrunk(gwRec).then(function (result)
                         {
-                            if(err)
-                            {
-                                logger.error('[DVP-PhoneNumberTrunkService.AssignOperatorToTrunk] - [%s] - Update trunk with operator Id PGSQL query failed', reqId, err);
-                                callback(err, false);
-                            }
-                            else
-                            {
-                                logger.debug('[DVP-PhoneNumberTrunkService.AssignOperatorToTrunk] - [%s] - Update trunk with operator Id PGSQL query success', reqId);
-                                callback(undefined, true);
-                            }
+                            logger.debug('[DVP-PhoneNumberTrunkService.AssignOperatorToTrunk] - [%s] - Update trunk with operator Id PGSQL query success', reqId);
+                            callback(undefined, true);
 
+                        }).catch(function(err)
+                        {
+                            logger.error('[DVP-PhoneNumberTrunkService.AssignOperatorToTrunk] - [%s] - Update trunk with operator Id PGSQL query failed', reqId, err);
+                            callback(err, false);
                         })
                     }
                     else
@@ -475,13 +432,22 @@ var AssignOperatorToTrunk = function(reqId, gwId, opId, companyId, tenantId, cal
                         callback(new Error('Trunk Not found'), false);
                     }
 
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-PhoneNumberTrunkService.AssignOperatorToTrunk] - [%s] - Get trunk PGSQL query failed', reqId, err);
+                    callback(err, false);
                 })
             }
             else
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignOperatorToTrunk] - [%s] - Get operator PGSQL query success', reqId);
                 callback(new Error('Operator Not found'), false);
-            }})
+
+            }}).catch(function(err)
+            {
+                logger.error('[DVP-PhoneNumberTrunkService.AssignOperatorToTrunk] - [%s] - Get operator PGSQL query failed', reqId, err);
+                callback(err, false);
+            })
     }
     catch(ex)
     {
@@ -495,41 +461,27 @@ var AssignInboundLimitToTrunkNumberDB = function(reqId, trunkNumber, inboundLimi
 {
     try
     {
-        dbModel.TrunkPhoneNumber.find({where: [{PhoneNumber: trunkNumber},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, phnNumRec)
+        dbModel.TrunkPhoneNumber.find({where: [{PhoneNumber: trunkNumber},{CompanyId: companyId},{TenantId: tenantId}]}).then(function (phnNumRec)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query failed', reqId, err);
-                callback(err, false);
-            }
-            else if(phnNumRec)
+            if(phnNumRec)
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query success', reqId);
 
-                dbModel.LimitInfo.find({where: [{LimitId: inboundLimitId},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, limRec)
+                dbModel.LimitInfo.find({where: [{LimitId: inboundLimitId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function (limRec)
                 {
-                    if(err)
-                    {
-                        logger.error('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query failed', reqId, err);
-                        callback(err, false);
-                    }
-                    else if(limRec)
+                    if(limRec)
                     {
                         logger.debug('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query success', reqId);
 
-                        phnNumRec.setLimitInfoInbound(limRec).complete(function (err, result)
+                        phnNumRec.setLimitInfoInbound(limRec).then(function (result)
                         {
-                            if(err)
-                            {
-                                logger.error('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Update phone number with inbound limit Id PGSQL query failed', reqId, err);
-                                callback(err, false);
-                            }
-                            else
-                            {
-                                logger.debug('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Update phone number with inbound limit Id PGSQL query success', reqId);
-                                callback(undefined, true);
-                            }
+                            logger.debug('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Update phone number with inbound limit Id PGSQL query success', reqId);
+                            callback(undefined, true);
 
+                        }).catch(function(err)
+                        {
+                            logger.error('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Update phone number with inbound limit Id PGSQL query failed', reqId, err);
+                            callback(err, false);
                         })
                     }
                     else
@@ -538,13 +490,22 @@ var AssignInboundLimitToTrunkNumberDB = function(reqId, trunkNumber, inboundLimi
                         callback(new Error('Limit not found'), false);
                     }
 
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query failed', reqId, err);
+                    callback(err, false);
                 })
             }
             else
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query success', reqId);
                 callback(new Error('Trunk number not found'), false);
-            }})
+
+            }}).catch(function(err)
+            {
+                logger.error('[DVP-PhoneNumberTrunkService.AssignInboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query failed', reqId, err);
+                callback(err, false);
+            })
     }
     catch(ex)
     {
@@ -558,14 +519,9 @@ var AssignOutboundLimitToTrunkNumberDB = function(reqId, trunkNumber, outboundLi
 {
     try
     {
-        dbModel.TrunkPhoneNumber.find({where: [{PhoneNumber: trunkNumber},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, phnNumRec)
+        dbModel.TrunkPhoneNumber.find({where: [{PhoneNumber: trunkNumber},{CompanyId: companyId},{TenantId: tenantId}]}).then(function (phnNumRec)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query failed', reqId, err);
-                callback(err, false);
-            }
-            else if(phnNumRec)
+            if(phnNumRec)
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query success', reqId);
 
@@ -580,19 +536,15 @@ var AssignOutboundLimitToTrunkNumberDB = function(reqId, trunkNumber, outboundLi
                     {
                         logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query success', reqId);
 
-                        phnNumRec.setLimitInfoOutbound(limRec).complete(function (err, result)
+                        phnNumRec.setLimitInfoOutbound(limRec).then(function (result)
                         {
-                            if(err)
-                            {
-                                logger.error('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Update phone number with outbound limit Id PGSQL query failed', reqId, err);
-                                callback(err, false);
-                            }
-                            else
-                            {
-                                logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Update phone number with outbound limit Id PGSQL query success', reqId);
-                                callback(undefined, true);
-                            }
+                            logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Update phone number with outbound limit Id PGSQL query success', reqId);
+                            callback(undefined, true);
 
+                        }).catch(function(err)
+                        {
+                            logger.error('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Update phone number with outbound limit Id PGSQL query failed', reqId, err);
+                            callback(err, false);
                         })
                     }
                     else
@@ -607,7 +559,12 @@ var AssignOutboundLimitToTrunkNumberDB = function(reqId, trunkNumber, outboundLi
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query success', reqId);
                 callback(new Error('Operator Not found'), false);
-            }})
+
+            }}).catch(function(err)
+            {
+                logger.error('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query failed', reqId, err);
+                callback(err, false);
+            })
     }
     catch(ex)
     {
@@ -621,41 +578,27 @@ var AssignBothLimitToTrunkNumberDB = function(reqId, trunkNumber, bothLimitId, c
 {
     try
     {
-        dbModel.TrunkPhoneNumber.find({where: [{PhoneNumber: trunkNumber},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, phnNumRec)
+        dbModel.TrunkPhoneNumber.find({where: [{PhoneNumber: trunkNumber},{CompanyId: companyId},{TenantId: tenantId}]}).then(function (phnNumRec)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query failed', reqId, err);
-                callback(err, false);
-            }
-            else if(phnNumRec)
+            if(phnNumRec)
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query success', reqId);
 
-                dbModel.LimitInfo.find({where: [{LimitId: bothLimitId},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, limRec)
+                dbModel.LimitInfo.find({where: [{LimitId: bothLimitId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function (limRec)
                 {
-                    if(err)
-                    {
-                        logger.error('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query failed', reqId, err);
-                        callback(err, false);
-                    }
-                    else if(limRec)
+                    if(limRec)
                     {
                         logger.debug('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query success', reqId);
 
-                        phnNumRec.setLimitInfoBoth(limRec).complete(function (err, result)
+                        phnNumRec.setLimitInfoBoth(limRec).then(function (result)
                         {
-                            if(err)
-                            {
-                                logger.error('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Update phone number with both limit Id PGSQL query failed', reqId, err);
-                                callback(err, false);
-                            }
-                            else
-                            {
-                                logger.debug('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Update phone number with both limit Id PGSQL query success', reqId);
-                                callback(undefined, true);
-                            }
+                            logger.debug('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Update phone number with both limit Id PGSQL query success', reqId);
+                            callback(undefined, true);
 
+                        }).catch(function(err)
+                        {
+                            logger.error('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Update phone number with both limit Id PGSQL query failed', reqId, err);
+                            callback(err, false);
                         })
                     }
                     else
@@ -664,13 +607,22 @@ var AssignBothLimitToTrunkNumberDB = function(reqId, trunkNumber, bothLimitId, c
                         callback(new Error('Trunk Not found'), false);
                     }
 
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query failed', reqId, err);
+                    callback(err, false);
                 })
             }
             else
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query success', reqId);
                 callback(new Error('Operator Not found'), false);
-            }})
+
+            }}).catch(function(err)
+            {
+                logger.error('[DVP-PhoneNumberTrunkService.AssignBothLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query failed', reqId, err);
+                callback(err, false);
+            })
     }
     catch(ex)
     {
@@ -700,20 +652,16 @@ var AddTrunkConfigurationDB = function(reqId, gwInfo, callback)
 
         gw
             .save()
-            .complete(function (err) {
+            .then(function (rslt)
+            {
+                logger.debug('[DVP-PhoneNumberTrunkService.AddTrunkConfigurationDB] - [%s] - Insert Trunk PGSQL query success', reqId);
+                var gwId = gw.id;
+                callback(undefined, gwId, true);
 
-                if (err)
-                {
-                    logger.error('[DVP-PhoneNumberTrunkService.AddTrunkConfigurationDB] - [%s] - Insert Trunk PGSQL query failed', reqId, err);
-                    callback(err, -1, false);
-                }
-                else {
-                    logger.debug('[DVP-PhoneNumberTrunkService.AddTrunkConfigurationDB] - [%s] - Insert Trunk PGSQL query success', reqId);
-                    var gwId = gw.id;
-                    callback(undefined, gwId, true);
-                }
-
-
+            }).catch(function(err)
+            {
+                logger.error('[DVP-PhoneNumberTrunkService.AddTrunkConfigurationDB] - [%s] - Exception occurred', reqId, err);
+                callback(err, -1, false);
             })
 
     }
@@ -740,21 +688,16 @@ var AddTrunkOperator = function(reqId, opInfo, callback)
 
         op
             .save()
-            .complete(function (err) {
+            .then(function (rslt)
+            {
+                    logger.debug('[DVP-PhoneNumberTrunkService.AddTrunkOperator] - [%s] - insert trunk operator PGSQL query success', reqId);
+                    var opId = op.id;
+                    callback(undefined, opId, true);
 
-                    if (err)
-                    {
-                        logger.error('[DVP-PhoneNumberTrunkService.AddTrunkOperator] - [%s] - insert trunk operator PGSQL query failed', reqId, err);
-                        callback(err, -1, false);
-                    }
-                    else
-                    {
-                        logger.debug('[DVP-PhoneNumberTrunkService.AddTrunkOperator] - [%s] - insert trunk operator PGSQL query success', reqId);
-                        var opId = op.id;
-                        callback(undefined, opId, true);
-                    }
-
-
+            }).catch(function(err)
+            {
+                logger.error('[DVP-PhoneNumberTrunkService.AddTrunkOperator] - [%s] - insert trunk operator PGSQL query failed', reqId, err);
+                callback(err, -1, false);
             })
 
     }
@@ -769,35 +712,31 @@ var UpdateTrunkConfigurationDB = function(reqId, trunkId, trunkInfo, callback)
 {
     try
     {
-        dbModel.Trunk.find({where:[{ id: trunkId },{ CompanyId: trunkInfo.CompanyId },{ TenantId: trunkInfo.TenantId }]}).complete(function(err, gwObj)
+        dbModel.Trunk.find({where:[{ id: trunkId },{ CompanyId: trunkInfo.CompanyId },{ TenantId: trunkInfo.TenantId }]}).then(function(gwObj)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL get trunk query failed', reqId, err);
-                callback(err, false);
-            }
-            else if(gwObj)
+            if(gwObj)
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL get trunk query success', reqId);
                 //update
-                gwObj.updateAttributes({TrunkName: trunkInfo.TrunkName, Enable: trunkInfo.Enable, ObjClass: trunkInfo.ObjClass, IpUrl: trunkInfo.IpUrl, ObjType: trunkInfo.ObjType, ObjCategory: trunkInfo.ObjCategory, FaxType: trunkInfo.FaxType}).complete(function (err)
+                gwObj.updateAttributes({TrunkName: trunkInfo.TrunkName, Enable: trunkInfo.Enable, ObjClass: trunkInfo.ObjClass, IpUrl: trunkInfo.IpUrl, ObjType: trunkInfo.ObjType, ObjCategory: trunkInfo.ObjCategory, FaxType: trunkInfo.FaxType}).then(function (upRes)
                 {
-                    if (err)
-                    {
-                        logger.error('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL update trunk query failed', reqId, err);
-                        callback(err, false);
-                    }
-                    else
-                    {
-                        logger.debug('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL update trunk query success', reqId);
-                        callback(undefined, true);
-                    }
+                    logger.debug('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL update trunk query success', reqId);
+                    callback(undefined, true);
+
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL update trunk query failed', reqId, err);
+                    callback(err, false);
                 })
             }
             else
             {
                 callback(new Error("Trunk Not Found for Given Id"), false);
             }
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL get trunk query failed', reqId, err);
+            callback(err, false);
         })
     }
     catch(ex)
@@ -811,30 +750,21 @@ var RemovePhoneNumberDB = function(reqId, phoneNumber, companyId, tenantId, call
 {
     try
     {
-        dbModel.TrunkPhoneNumber.find({where: [{PhoneNumber: phoneNumber}, {CompanyId: companyId}, {TenantId: tenantId}]}).complete(function (err, phnNum)
+        dbModel.TrunkPhoneNumber.find({where: [{PhoneNumber: phoneNumber}, {CompanyId: companyId}, {TenantId: tenantId}]}).then(function (phnNum)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.RemovePhoneNumberDB] - [%s] - get phone number PGSQL query failed', reqId, err);
-                callback(err, false);
-            }
-            else
-            {
+
                 logger.debug('[DVP-PhoneNumberTrunkService.RemovePhoneNumberDB] - [%s] - get phone number PGSQL query success', reqId);
                 if(phnNum)
                 {
-                    phnNum.destroy().complete(function (err1, rslt)
+                    phnNum.destroy().then(function (rslt)
                     {
-                        if(!err1)
-                        {
-                            logger.debug('[DVP-PhoneNumberTrunkService.RemovePhoneNumberDB] - [%s] - delete phone number PGSQL query success', reqId);
-                            callback(undefined, true);
-                        }
-                        else
-                        {
-                            logger.error('[DVP-PhoneNumberTrunkService.RemovePhoneNumberDB] - [%s] - delete phone number PGSQL query failed', reqId, err);
-                            callback(err1, false);
-                        }
+                        logger.debug('[DVP-PhoneNumberTrunkService.RemovePhoneNumberDB] - [%s] - delete phone number PGSQL query success', reqId);
+                        callback(undefined, true);
+
+                    }).catch(function(err)
+                    {
+                        logger.error('[DVP-PhoneNumberTrunkService.RemovePhoneNumberDB] - [%s] - delete phone number PGSQL query failed', reqId, err);
+                        callback(err, false);
                     });
                 }
                 else
@@ -842,7 +772,11 @@ var RemovePhoneNumberDB = function(reqId, phoneNumber, companyId, tenantId, call
                     callback(new Error('Cannot find a phone number for the company'), false);
                 }
 
-            }
+
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.RemovePhoneNumberDB] - [%s] - get phone number PGSQL query failed', reqId, err);
+            callback(err, false);
         });
 
     }
@@ -859,27 +793,17 @@ var AddPhoneNumbersToTrunkDB = function(reqId, phoneNumberInfo, callback)
     {
         if(phoneNumberInfo)
         {
-            dbModel.Trunk.find({where: [{id: phoneNumberInfo.TrunkId}, {TenantId: phoneNumberInfo.TenantId}]}).complete(function (err, gwObj)
+            dbModel.Trunk.find({where: [{id: phoneNumberInfo.TrunkId}, {TenantId: phoneNumberInfo.TenantId}]}).then(function (gwObj)
             {
                 try
                 {
-                    if (err)
-                    {
-                        logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Get Trunk PGSQL query failed', reqId, err);
-                        callback(err, -1, false);
-                    }
-                    else if (gwObj)
+                    if (gwObj)
                     {
                         logger.debug('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Get Trunk PGSQL query success', reqId);
 
-                        dbModel.TrunkPhoneNumber.find({where: [{PhoneNumber: phoneNumberInfo.PhoneNumber}]}).complete(function (error, phnNum)
+                        dbModel.TrunkPhoneNumber.find({where: [{PhoneNumber: phoneNumberInfo.PhoneNumber}]}).then(function (phnNum)
                         {
-                            if(err)
-                            {
-                                logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Get Trunk number PGSQL query failed', reqId, err);
-                                callback(err, -1, false);
-                            }
-                            else if(phnNum)
+                            if(phnNum)
                             {
                                 logger.debug('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Get Trunk number PGSQL query success', reqId);
 
@@ -907,32 +831,22 @@ var AddPhoneNumbersToTrunkDB = function(reqId, phoneNumberInfo, callback)
 
                                 phoneNum
                                     .save()
-                                    .complete(function (err)
+                                    .then(function (rsltd)
                                     {
 
-                                            if (err)
-                                            {
-                                                logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Insert phone number PGSQL query failed', reqId, err);
-                                                callback(err, -1, false);
-                                            }
-                                            else
-                                            {
+
                                                 logger.debug('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Insert phone number PGSQL query success', reqId);
                                                 try
                                                 {
-                                                    gwObj.addTrunkPhoneNumber(phoneNum).complete(function (err, rslt)
+                                                    gwObj.addTrunkPhoneNumber(phoneNum).then(function (rslt)
                                                     {
-                                                        if (err)
-                                                        {
-                                                            logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Update phone number with trunk id PGSQL query failed', reqId, err);
-                                                            callback(err, phoneNum.id, false);
-                                                        }
-                                                        else
-                                                        {
-                                                            logger.debug('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Update phone number with trunk id PGSQL query success', reqId);
-                                                            callback(undefined, phoneNum.id, true);
-                                                        }
+                                                        logger.debug('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Update phone number with trunk id PGSQL query success', reqId);
+                                                        callback(undefined, phoneNum.id, true);
 
+                                                    }).catch(function(err)
+                                                    {
+                                                        logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Update phone number with trunk id PGSQL query failed', reqId, err);
+                                                        callback(err, phoneNum.id, false);
                                                     });
                                                 }
                                                 catch(ex)
@@ -940,12 +854,20 @@ var AddPhoneNumbersToTrunkDB = function(reqId, phoneNumberInfo, callback)
                                                     callback(err, phoneNum.id, false);
                                                 }
 
-                                            }
 
+
+                                    }).catch(function(err)
+                                    {
+                                        logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Insert phone number PGSQL query failed', reqId, err);
+                                        callback(err, -1, false);
                                     })
 
                             }
 
+                        }).catch(function(err)
+                        {
+                            logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Get Trunk number PGSQL query failed', reqId, err);
+                            callback(err, -1, false);
                         });
 
 
@@ -961,6 +883,10 @@ var AddPhoneNumbersToTrunkDB = function(reqId, phoneNumberInfo, callback)
                     callback(ex, -1, false);
                 }
 
+            }).catch(function(err)
+            {
+                logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Get Trunk PGSQL query failed', reqId, err);
+                callback(err, -1, false);
             })
         }
         else
@@ -980,17 +906,16 @@ var GetUnallocatedPhoneNumbersForOperator = function(reqId, operatorId, companyI
     try
     {
 
-        dbModel.TrunkOperator.find({where: [{id: operatorId}, {CompanyId: companyId}, {TenantId: tenantId}], include : [{model: dbModel.Trunk, as : "Trunk", include : [{model: dbModel.TrunkPhoneNumber, as: "TrunkPhoneNumber", where : [{CompanyId : companyId}, {TenantId: tenantId}]}]}]}).complete(function (err, result)
+        dbModel.TrunkOperator.find({where: [{id: operatorId}, {CompanyId: companyId}, {TenantId: tenantId}], include : [{model: dbModel.Trunk, as : "Trunk", include : [{model: dbModel.TrunkPhoneNumber, as: "TrunkPhoneNumber", where : [{CompanyId : companyId}, {TenantId: tenantId}]}]}]}).then(function (result)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.GetUnallocatedPhoneNumbersForOperator] - [%s] - PGSQL query failed', reqId, err);
-            }
-            else
-            {
-                logger.debug('[DVP-PhoneNumberTrunkService.GetUnallocatedPhoneNumbersForOperator] - [%s] - PGSQL query success', reqId);
-            }
-            callback(err, result);
+            logger.debug('[DVP-PhoneNumberTrunkService.GetUnallocatedPhoneNumbersForOperator] - [%s] - PGSQL query success', reqId);
+
+            callback(undefined, result);
+
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.GetUnallocatedPhoneNumbersForOperator] - [%s] - PGSQL query failed', reqId, err);
+            callback(err, undefined);
         })
 
     }
@@ -1006,17 +931,17 @@ var GetAllocatedPhoneNumbersForOperator = function(reqId, operatorId, companyId,
     try
     {
 
-        dbModel.TrunkOperator.find({where: [{id: operatorId}, {CompanyId: companyId}, {TenantId: tenantId}], include : [{model: dbModel.Trunk, as : "Trunk", include : [{model: dbModel.TrunkPhoneNumber, as: "TrunkPhoneNumber", where : [dbModel.SequelizeConn.or({CompanyId : {not: companyId }}, {TenantId: {not: tenantId }})]}]}]}).complete(function (err, result)
+        dbModel.TrunkOperator.find({where: [{id: operatorId}, {CompanyId: companyId}, {TenantId: tenantId}], include : [{model: dbModel.Trunk, as : "Trunk", include : [{model: dbModel.TrunkPhoneNumber, as: "TrunkPhoneNumber", where : [dbModel.SequelizeConn.or({CompanyId : {not: companyId }}, {TenantId: {not: tenantId }})]}]}]}).then(function (result)
         {
-            if(err)
-            {
-                logger.error('[DVP-PhoneNumberTrunkService.GetAllocatedPhoneNumbersForOperator] - [%s] - PGSQL query failed', reqId, err);
-            }
-            else
-            {
-                logger.debug('[DVP-PhoneNumberTrunkService.GetAllocatedPhoneNumbersForOperator] - [%s] - PGSQL query success', reqId);
-            }
-            callback(err, result);
+
+            logger.debug('[DVP-PhoneNumberTrunkService.GetAllocatedPhoneNumbersForOperator] - [%s] - PGSQL query success', reqId);
+
+            callback(undefined, result);
+
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.GetAllocatedPhoneNumbersForOperator] - [%s] - PGSQL query failed', reqId, err);
+            callback(err, undefined);
         })
 
     }
