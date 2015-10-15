@@ -14,7 +14,7 @@ module.exports = {
     },
 
     "Host":{
-        "Port":"HOST_PHONENUMBERTRUNK_PORT",
+        "Port":"HOST_PHONENUMBERTRUNKSERVICE_PORT",
         "Version":"HOST_VERSION"
     },
 
