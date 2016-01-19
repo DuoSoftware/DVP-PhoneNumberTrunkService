@@ -124,7 +124,7 @@ server.del('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneN
 });
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/BuyNumber/',function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/BuyNumber',function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
