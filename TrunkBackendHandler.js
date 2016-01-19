@@ -88,6 +88,29 @@ var GetTrunkByIdDB = function(reqId, trunkId, companyId, tenantId, callback)
     }
 };
 
+var GetTrunkListDB = function(reqId, companyId, tenantId, callback)
+{
+    var emptyList = [];
+    try
+    {
+        dbModel.Trunk.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]}).then(function(trunkList)
+        {
+            logger.debug('[DVP-PhoneNumberTrunkService.GetTrunkByIdDB] - [%s] - PGSQL get trunk query success', reqId);
+
+            callback(undefined, trunkList);
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.GetTrunkByIdDB] - [%s] - PGSQL get trunk query failed', reqId, err);
+            callback(err, emptyList);
+        })
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.GetTrunkByIdDB] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, false);
+    }
+};
+
 var GetCallServerByProfileIdDB = function(reqId, profileId, callback)
 {
     try
@@ -971,4 +994,5 @@ module.exports.GetAllocatedPhoneNumbersForOperator = GetAllocatedPhoneNumbersFor
 module.exports.AssignInboundLimitToTrunkNumberDB = AssignInboundLimitToTrunkNumberDB;
 module.exports.AssignOutboundLimitToTrunkNumberDB = AssignOutboundLimitToTrunkNumberDB;
 module.exports.AssignBothLimitToTrunkNumberDB = AssignBothLimitToTrunkNumberDB;
+module.exports.GetTrunkListDB = GetTrunkListDB;
 
