@@ -70,7 +70,7 @@ var GetTrunkByIdDB = function(reqId, trunkId, companyId, tenantId, callback)
 {
     try
     {
-        dbModel.Trunk.find({where :[{id: trunkId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function(trunkObj)
+        dbModel.Trunk.find({where :[{id: trunkId},{CompanyId: companyId},{TenantId: tenantId}], include:[{model: dbModel.LoadBalancer, as: "LoadBalancer"}]}).then(function(trunkObj)
         {
             logger.debug('[DVP-PhoneNumberTrunkService.GetTrunkByIdDB] - [%s] - PGSQL get trunk query success', reqId);
 
@@ -949,6 +949,33 @@ var GetUnallocatedPhoneNumbersForOperator = function(reqId, operatorId, companyI
     }
 };
 
+var GetLoadbalancerForCloud = function(reqId, cloudId, companyId, tenantId, callback)
+{
+    try
+    {
+
+        dbModel.Cloud.find({where: [{id: cloudId}, {CompanyId: companyId}, {TenantId: tenantId}], include : [{model: dbModel.LoadBalancer, as : "LoadBalancer", include : [{model: dbModel.TrunkPhoneNumber, as: "TrunkPhoneNumber"}]}]}).then(function (result)
+        {
+            logger.debug('[DVP-PhoneNumberTrunkService.GetUnallocatedPhoneNumbersForOperator] - [%s] - PGSQL query success', reqId);
+
+            callback(undefined, result);
+
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.GetUnallocatedPhoneNumbersForOperator] - [%s] - PGSQL query failed', reqId, err);
+            callback(err, undefined);
+        })
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.GetUnallocatedPhoneNumbersForOperator] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, undefined);
+    }
+};
+
+
+
 var GetAllocatedPhoneNumbersForOperator = function(reqId, operatorId, companyId, tenantId, callback)
 {
     try
@@ -995,4 +1022,5 @@ module.exports.AssignInboundLimitToTrunkNumberDB = AssignInboundLimitToTrunkNumb
 module.exports.AssignOutboundLimitToTrunkNumberDB = AssignOutboundLimitToTrunkNumberDB;
 module.exports.AssignBothLimitToTrunkNumberDB = AssignBothLimitToTrunkNumberDB;
 module.exports.GetTrunkListDB = GetTrunkListDB;
+module.exports.GetLoadbalancerForCloud = GetLoadbalancerForCloud;
 
