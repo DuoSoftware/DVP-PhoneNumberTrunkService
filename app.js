@@ -124,7 +124,7 @@ server.del('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneN
 });
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/BuyNumber/',function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/BuyNumber',function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -808,6 +808,41 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id', functio
     catch(ex)
     {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-PBXService.GetTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunks', function(req, res, next)
+{
+    var reqId = nodeUuid.v1();
+    var emptyArr = [];
+    try
+    {
+        logger.debug('[DVP-PhoneNumberTrunkService.GetTrunks] - [%s] - HTTP Request Received', reqId);
+
+            gwBackendHandler.GetTrunkListDB(reqId, 1, 1, function(err, result){
+
+                if(err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, emptyArr);
+                    logger.debug('[DVP-PBXService.GetTrunks] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(undefined, "Trunk Found", true, result);
+                    logger.debug('[DVP-PBXService.GetTrunks] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+            })
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, emptyArr);
         logger.debug('[DVP-PBXService.GetTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
         res.end(jsonString);
     }
