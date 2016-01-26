@@ -954,7 +954,7 @@ var GetLoadbalancerForCloud = function(reqId, cloudId, companyId, tenantId, call
     try
     {
 
-        dbModel.Cloud.find({where: [{id: cloudId}, {CompanyId: companyId}, {TenantId: tenantId}], include : [{model: dbModel.LoadBalancer, as : "LoadBalancer", include : [{model: dbModel.TrunkPhoneNumber, as: "TrunkPhoneNumber"}]}]}).then(function (result)
+        dbModel.Cloud.find({where: [{id: cloudId}, {CompanyId: companyId}, {TenantId: tenantId}], include : [{model: dbModel.LoadBalancer, as : "LoadBalancer"}]}).then(function (result)
         {
             logger.debug('[DVP-PhoneNumberTrunkService.GetUnallocatedPhoneNumbersForOperator] - [%s] - PGSQL query success', reqId);
 
