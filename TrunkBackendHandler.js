@@ -70,7 +70,7 @@ var GetTrunkByIdDB = function(reqId, trunkId, companyId, tenantId, callback)
 {
     try
     {
-        dbModel.Trunk.find({where :[{id: trunkId},{CompanyId: companyId},{TenantId: tenantId}], include:[{model: dbModel.LoadBalancer, as: "LoadBalancer"}]}).then(function(trunkObj)
+        dbModel.Trunk.find({where :[{id: trunkId},{CompanyId: companyId},{TenantId: tenantId}], include:[{model: dbModel.LoadBalancer, as: "LoadBalancer", include:[{model: dbModel.Cloud, as: "Cloud"}]}]}).then(function(trunkObj)
         {
             logger.debug('[DVP-PhoneNumberTrunkService.GetTrunkByIdDB] - [%s] - PGSQL get trunk query success', reqId);
 
