@@ -1002,6 +1002,30 @@ var GetAllocatedPhoneNumbersForOperator = function(reqId, operatorId, companyId,
     }
 };
 
+
+var GetPhoneNumbersOfTrunk = function(reqId, trunkId, companyId, tenantId, callback)
+{
+    try
+    {
+        dbModel.TrunkPhoneNumber.findAll({where :[{TrunkId: trunkId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function(trunkObj)
+        {
+            logger.debug('[DVP-PhoneNumberTrunkService.GetPhoneNumbersOfTrunk] - [%s] - PGSQL get Phonenumbers of trunk query success', reqId);
+
+            callback(undefined, trunkObj);
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.GetPhoneNumbersOfTrunk] - [%s] - PGSQL get Phonenumbers of trunk query failed', reqId, err);
+            callback(err, undefined);
+        })
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.GetPhoneNumbersOfTrunk] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, false);
+    }
+};
+
+
 module.exports.AddTrunkConfigurationDB = AddTrunkConfigurationDB;
 module.exports.AssignTrunkToLoadBalancer = AssignTrunkToLoadBalancer;
 module.exports.SetTrunkEnabledStatusDB = SetTrunkEnabledStatusDB;
@@ -1023,4 +1047,5 @@ module.exports.AssignOutboundLimitToTrunkNumberDB = AssignOutboundLimitToTrunkNu
 module.exports.AssignBothLimitToTrunkNumberDB = AssignBothLimitToTrunkNumberDB;
 module.exports.GetTrunkListDB = GetTrunkListDB;
 module.exports.GetLoadbalancerForCloud = GetLoadbalancerForCloud;
+module.exports.GetPhoneNumbersOfTrunk = GetPhoneNumbersOfTrunk;
 

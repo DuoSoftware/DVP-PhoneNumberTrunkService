@@ -4,7 +4,7 @@
   "description": "DVP-PhoneNumberTrunkService\r ===========================",
   "main": "app.js",
   "dependencies": {
-    "dvp-dbmodels": "^0.0.14",
+    "dvp-dbmodels": "^0.0.29",
     "config": "^1.12.0",
     "log4js": "^0.6.22",
     "node-uuid": "^1.4.3",
