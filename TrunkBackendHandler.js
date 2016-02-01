@@ -1,27 +1,7 @@
 var dbModel = require('dvp-dbmodels');
 var underscore = require('underscore');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
-//var getGrpUsersById = function(grpId, callback)
-//{
-//    try
-//    {
-//        dbModel.UserGroup.find({ where: {id:grpId}, attributes: ['id'], include: [{model : dbModel.SipUACEndpoint, attributes:['id'], joinTableAttributes : ['createdAt']}]}).complete(function(err, trunkObj)
-//        {
-//            try
-//            {
-//                callback(err, trunkObj);
-//            }
-//            catch(ex)
-//            {
-//                callback(ex, undefined);
-//            }
-//        })
-//    }
-//    catch(ex)
-//    {
-//        callback(ex, false);
-//    }
-//};
+
 
 var SwitchPhoneNumberCompanyDB = function(reqId, phoneNumber, companyId, tenantId, companyToChange, tenantToChange, callback)
 {
@@ -548,35 +528,35 @@ var AssignOutboundLimitToTrunkNumberDB = function(reqId, trunkNumber, outboundLi
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get trunk number PGSQL query success', reqId);
 
-                dbModel.LimitInfo.find({where: [{LimitId: outboundLimitId},{CompanyId: companyId},{TenantId: tenantId}]}).complete(function (err, limRec)
-                {
-                    if(err)
-                    {
+                dbModel.LimitInfo.find({where: [{LimitId: outboundLimitId},{CompanyId: companyId},{TenantId: tenantId}]})
+                    .then(function (limRec) {
+
+                        if(limRec)
+                        {
+                            logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query success', reqId);
+
+                            phnNumRec.setLimitInfoOutbound(limRec).then(function (result)
+                            {
+                                logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Update phone number with outbound limit Id PGSQL query success', reqId);
+                                callback(undefined, true);
+
+                            }).catch(function(err)
+                            {
+                                logger.error('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Update phone number with outbound limit Id PGSQL query failed', reqId, err);
+                                callback(err, false);
+                            })
+                        }
+                        else
+                        {
+                            logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query success', reqId);
+                            callback(new Error('Trunk Not found'), false);
+                        }
+
+                    }).catch(function (err) {
                         logger.error('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query failed', reqId, err);
                         callback(err, false);
-                    }
-                    else if(limRec)
-                    {
-                        logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query success', reqId);
+                        });
 
-                        phnNumRec.setLimitInfoOutbound(limRec).then(function (result)
-                        {
-                            logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Update phone number with outbound limit Id PGSQL query success', reqId);
-                            callback(undefined, true);
-
-                        }).catch(function(err)
-                        {
-                            logger.error('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Update phone number with outbound limit Id PGSQL query failed', reqId, err);
-                            callback(err, false);
-                        })
-                    }
-                    else
-                    {
-                        logger.debug('[DVP-PhoneNumberTrunkService.AssignOutboundLimitToTrunkNumberDB] - [%s] - Get limit PGSQL query success', reqId);
-                        callback(new Error('Trunk Not found'), false);
-                    }
-
-                })
             }
             else
             {
