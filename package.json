@@ -13,7 +13,7 @@
     "stringify": "^3.1.0",
     "underscore": "^1.8.3",
     "winston": "^0.9.0",
-    "dvp-common": "^0.0.2"
+    "dvp-common": "^0.0.16"
   },
   "devDependencies": {},
   "scripts": {
