@@ -20,8 +20,8 @@ module.exports = {
 
     "Redis":
     {
-        "IpAddress": "SYS_REDIS_HOST",
-        "Port": "SYS_REDIS_PORT"
+        "ip": "SYS_REDIS_HOST",
+        "port": "SYS_REDIS_PORT"
 
     }
 };

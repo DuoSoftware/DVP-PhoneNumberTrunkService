@@ -655,7 +655,7 @@ var AssignBothLimitToTrunkNumberDB = function(reqId, trunkNumber, bothLimitId, c
 
 };
 
-var AddTrunkConfigurationDB = function(reqId, gwInfo, callback)
+var AddTrunkConfigurationDB = function(reqId, gwInfo, companyId, tenantId, callback)
 {
     try
     {
@@ -668,8 +668,8 @@ var AddTrunkConfigurationDB = function(reqId, gwInfo, callback)
             ObjCategory: gwInfo.ObjCategory,
             IpUrl: gwInfo.IpUrl,
             Enable: gwInfo.Enable,
-            CompanyId: gwInfo.CompanyId,
-            TenantId: gwInfo.TenantId,
+            CompanyId: companyId,
+            TenantId: tenantId,
             FaxType: gwInfo.FaxType
         });
 
@@ -695,7 +695,7 @@ var AddTrunkConfigurationDB = function(reqId, gwInfo, callback)
     }
 };
 
-var AddTrunkOperator = function(reqId, opInfo, callback)
+var AddTrunkOperator = function(reqId, opInfo, companyId, tenantId, callback)
 {
     try {
 
@@ -705,8 +705,8 @@ var AddTrunkOperator = function(reqId, opInfo, callback)
             ObjClass: opInfo.ObjClass,
             ObjType: opInfo.ObjType,
             ObjCategory: opInfo.ObjCategory,
-            CompanyId: opInfo.CompanyId,
-            TenantId: opInfo.TenantId
+            CompanyId: companyId,
+            TenantId: tenantId
         });
 
         op
@@ -731,11 +731,11 @@ var AddTrunkOperator = function(reqId, opInfo, callback)
     }
 };
 
-var UpdateTrunkConfigurationDB = function(reqId, trunkId, trunkInfo, callback)
+var UpdateTrunkConfigurationDB = function(reqId, trunkId, trunkInfo, companyId, tenantId, callback)
 {
     try
     {
-        dbModel.Trunk.find({where:[{ id: trunkId },{ CompanyId: trunkInfo.CompanyId },{ TenantId: trunkInfo.TenantId }]}).then(function(gwObj)
+        dbModel.Trunk.find({where:[{ id: trunkId },{ CompanyId: companyId },{ TenantId: tenantId }]}).then(function(gwObj)
         {
             if(gwObj)
             {
@@ -810,13 +810,13 @@ var RemovePhoneNumberDB = function(reqId, phoneNumber, companyId, tenantId, call
     }
 };
 
-var AddPhoneNumbersToTrunkDB = function(reqId, phoneNumberInfo, callback)
+var AddPhoneNumbersToTrunkDB = function(reqId, phoneNumberInfo, companyId, tenantId, callback)
 {
     try
     {
         if(phoneNumberInfo)
         {
-            dbModel.Trunk.find({where: [{id: phoneNumberInfo.TrunkId}, {TenantId: phoneNumberInfo.TenantId}]}).then(function (gwObj)
+            dbModel.Trunk.find({where: [{id: phoneNumberInfo.TrunkId}, {TenantId: tenantId}]}).then(function (gwObj)
             {
                 try
                 {
@@ -830,7 +830,7 @@ var AddPhoneNumbersToTrunkDB = function(reqId, phoneNumberInfo, callback)
                             {
                                 logger.debug('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Get Trunk number PGSQL query success', reqId);
 
-                                if(phnNum.CompanyId == phoneNumberInfo.CompanyId)
+                                if(phnNum.CompanyId == companyId)
                                 {
                                     callback(new Error("Number already in use", -1, false));
                                 }
@@ -848,8 +848,8 @@ var AddPhoneNumbersToTrunkDB = function(reqId, phoneNumberInfo, callback)
                                     ObjType: phoneNumberInfo.ObjType,
                                     ObjCategory: phoneNumberInfo.ObjCategory,
                                     Enable: phoneNumberInfo.Enable,
-                                    CompanyId: phoneNumberInfo.CompanyId,
-                                    TenantId: phoneNumberInfo.TenantId
+                                    CompanyId: companyId,
+                                    TenantId: tenantId
                                 });
 
                                 phoneNum

@@ -7,6 +7,9 @@ var redisHandler = require('./RedisHandler.js');
 var config = require('config');
 var nodeUuid = require('node-uuid');
 //var xmlGen = require('./XmlResponseGenerator.js');
+var jwt = require('restify-jwt');
+var secret = require('dvp-common/Authentication/Secret.js');
+var authorization = require('dvp-common/Authentication/Authorization.js');
 
 var hostIp = config.Host.Ip;
 var hostPort = config.Host.Port;
@@ -23,11 +26,12 @@ server.use(restify.fullResponse());
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
+server.use(jwt({secret: secret.Secret}));
 
 
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber', authorization({resource:"number", action:"write"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -38,10 +42,15 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber', func
 
         if(phnInfo)
         {
-            phnInfo.CompanyId = 1;
-            phnInfo.TenantId = 1;
+            var companyId = req.user.company;
+            var tenantId = req.user.tenant;
 
-            gwBackendHandler.AddPhoneNumbersToTrunkDB(reqId, phnInfo, function(err, recordId, result){
+            if (!companyId || !tenantId)
+            {
+                throw new Error("Invalid company or tenant");
+            }
+
+            gwBackendHandler.AddPhoneNumbersToTrunkDB(reqId, phnInfo, companyId, tenantId, function(err, recordId, result){
 
                 if(err)
                 {
@@ -77,7 +86,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber', func
 
 
 //DONE
-server.del('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneNumber',function(req, res, next)
+server.del('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneNumber', authorization({resource:"number", action:"delete"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
 
@@ -87,9 +96,17 @@ server.del('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneN
 
         logger.debug('[DVP-PhoneNumberTrunkService.DeleteNumber] - [%s] - HTTP Request Received - Params - PhoneNumber : %s', reqId, phoneNum);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if (phoneNum)
         {
-            gwBackendHandler.RemovePhoneNumberDB(reqId, phoneNum, 1, 1, function (err, result)
+            gwBackendHandler.RemovePhoneNumberDB(reqId, phoneNum, companyId, tenantId, function (err, result)
             {
 
                 if (err)
@@ -124,7 +141,7 @@ server.del('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneN
 });
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/BuyNumber',function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/BuyNumber', authorization({resource:"number", action:"write"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -133,9 +150,17 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/BuyNumber',functio
 
         logger.debug('[DVP-PhoneNumberTrunkService.BuyNumber] - [%s] - HTTP Request Received - Req Body : %s', reqId, phnInfo);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(phnInfo)
         {
-            gwBackendHandler.SwitchPhoneNumberCompanyDB(reqId, phnInfo.PhoneNumber, 1, 1, phnInfo.CompanyToChange, phnInfo.TenantToChange, function(err, result){
+            gwBackendHandler.SwitchPhoneNumberCompanyDB(reqId, phnInfo.PhoneNumber, companyId, tenantId, phnInfo.CompanyToChange, phnInfo.TenantToChange, function(err, result){
 
                 if(err)
                 {
@@ -175,7 +200,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/BuyNumber',functio
  */
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk', authorization({resource:"trunk", action:"write"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -187,9 +212,15 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk', function(r
 
         if(gwInfo)
         {
-            gwInfo.CompanyId = 1;
-            gwInfo.TenantId = 1;
-            gwBackendHandler.AddTrunkConfigurationDB(reqId, gwInfo, function(err, recordId, result)
+            var companyId = req.user.company;
+            var tenantId = req.user.tenant;
+
+            if (!companyId || !tenantId)
+            {
+                throw new Error("Invalid company or tenant");
+            }
+
+            gwBackendHandler.AddTrunkConfigurationDB(reqId, gwInfo, companyId, tenantId, function(err, recordId, result)
             {
 
                 if(err)
@@ -226,7 +257,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk', function(r
 
 //DONE
 //{"OperatorName": "TestOperator", "OperatorCode":"1234e", "ObjClass": "GGG", "ObjType": "FFF", "ObjCategory":"fff"}
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator', authorization({resource:"trunk", action:"write"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -237,9 +268,15 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator', functio
 
         if(opInfo)
         {
-            opInfo.CompanyId = 1;
-            opInfo.TenantId = 1;
-            gwBackendHandler.AddTrunkOperator(reqId, opInfo, function(err, recordId, result){
+            var companyId = req.user.company;
+            var tenantId = req.user.tenant;
+
+            if (!companyId || !tenantId)
+            {
+                throw new Error("Invalid company or tenant");
+            }
+
+            gwBackendHandler.AddTrunkOperator(reqId, opInfo, companyId, tenantId, function(err, recordId, result){
 
                 if(err)
                 {
@@ -275,7 +312,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator', functio
 
 //DONE
 //{"Enable":false, "IpUrl":"192.123.32.112", "ObjCategory":"TTT", "ObjClass":"TTT", "ObjType":"TTT", "TrunkName":"TestTrunk"}
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id', authorization({resource:"trunk", action:"write"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -287,10 +324,15 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id', functi
 
         if(id && gwInfo)
         {
-            gwInfo.CompanyId = 1;
-            gwInfo.TenantId = 1;
+            var companyId = req.user.company;
+            var tenantId = req.user.tenant;
 
-            gwBackendHandler.UpdateTrunkConfigurationDB(reqId, id, gwInfo, function(err, result){
+            if (!companyId || !tenantId)
+            {
+                throw new Error("Invalid company or tenant");
+            }
+
+            gwBackendHandler.UpdateTrunkConfigurationDB(reqId, id, gwInfo, companyId, tenantId, function(err, result){
 
                 if(err)
                 {
@@ -325,7 +367,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id', functi
 });
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetCloud/:cloudId', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetCloud/:cloudId', authorization({resource:"trunk", action:"write"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -335,9 +377,17 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetCloud
 
         logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToCloud] - [%s] - HTTP Request Received Req Params - Id : %s, cloudId : %s', reqId, trunkId, cloudId);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(trunkId && cloudId)
         {
-            gwBackendHandler.GetLoadbalancerForCloud(reqId, cloudId, 1, 1, function(err, result)
+            gwBackendHandler.GetLoadbalancerForCloud(reqId, cloudId, companyId, tenantId, function(err, result)
             {
                 if(err)
                 {
@@ -350,7 +400,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetCloud
                 {
                     if(result && result.LoadBalancer)
                     {
-                        gwBackendHandler.AssignTrunkToLoadBalancer(reqId, trunkId, result.LoadBalancer.id, 1, 1, function(err, result2){
+                        gwBackendHandler.AssignTrunkToLoadBalancer(reqId, trunkId, result.LoadBalancer.id, companyId, tenantId, function(err, result2){
 
                             try
                             {
@@ -432,7 +482,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetCloud
 });
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetSipProfile/:profId', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetSipProfile/:profId', authorization({resource:"trunk", action:"write"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -442,9 +492,17 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetSipPr
 
         logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToSipProfile] - [%s] - HTTP Request Received Req Params - Id : %s, profId : %s', reqId, trunkId, profId);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(trunkId && profId)
         {
-            gwBackendHandler.AssignTrunkToProfile(reqId, trunkId, profId, 1, 1, function(err, result){
+            gwBackendHandler.AssignTrunkToProfile(reqId, trunkId, profId, companyId, tenantId, function(err, result){
 
                 try
                 {
@@ -516,7 +574,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetSipPr
 });
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetTranslation/:transId', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetTranslation/:transId', authorization({resource:"trunk", action:"write"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
 
@@ -527,9 +585,17 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetTrans
 
         logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkTranslation] - [%s] - HTTP Request Received Req Params - trunkId : %s, transId : %s', reqId, trunkId, transId);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(trunkId && transId)
         {
-            gwBackendHandler.AssignTrunkTranslation(reqId, trunkId, transId, 1, 1, function(err, result){
+            gwBackendHandler.AssignTrunkTranslation(reqId, trunkId, transId, companyId, tenantId, function(err, result){
 
 
                     if(err)
@@ -565,7 +631,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetTrans
 });
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetOperator/:opId', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetOperator/:opId', authorization({resource:"trunk", action:"write"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -575,9 +641,17 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetOpera
 
         logger.debug('[DVP-PhoneNumberTrunkService.AssignOperatorToTrunk] - [%s] - HTTP Request Received Req Params - trunkId : %s, opId : %s', reqId, trunkId, opId);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(trunkId && opId)
         {
-            gwBackendHandler.AssignOperatorToTrunk(reqId, trunkId, opId, 1, 1, function(err, result) {
+            gwBackendHandler.AssignOperatorToTrunk(reqId, trunkId, opId, companyId, tenantId, function(err, result) {
 
                 if (err)
                 {
@@ -611,7 +685,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetOpera
 });
 
 //DONE
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/Availability/:status', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/Availability/:status', authorization({resource:"trunk", action:"write"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -621,9 +695,17 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/Availabi
 
         logger.debug('[DVP-PhoneNumberTrunkService.SetTrunkAvailability] - [%s] - HTTP Request Received Req Params - id : %s, enable : %s', reqId, gwId, enable);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(gwId)
         {
-            gwBackendHandler.SetTrunkEnabledStatusDB(reqId, gwId, enable, 1, 1, function(err, result)
+            gwBackendHandler.SetTrunkEnabledStatusDB(reqId, gwId, enable, companyId, tenantId, function(err, result)
             {
                 if(err)
                 {
@@ -657,7 +739,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/Availabi
 
 });
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum/SetInboundLimit/:limId', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum/SetInboundLimit/:limId', authorization({resource:"number", action:"write"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -667,9 +749,17 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum
 
         logger.debug('[DVP-PhoneNumberTrunkService.TrunkPhoneNumberInboundLimit] - [%s] - HTTP Request Received Req Body - ', reqId, req.body);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(phnNum && inboundLim)
         {
-            gwBackendHandler.AssignInboundLimitToTrunkNumberDB(reqId, phnNum, inboundLim, 1, 1, function(err, result)
+            gwBackendHandler.AssignInboundLimitToTrunkNumberDB(reqId, phnNum, inboundLim, companyId, tenantId, function(err, result)
             {
                 if(err)
                 {
@@ -703,7 +793,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum
 
 });
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum/SetOutboundLimit/:limId', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum/SetOutboundLimit/:limId', authorization({resource:"number", action:"write"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -713,9 +803,17 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum
 
         logger.debug('[DVP-PhoneNumberTrunkService.TrunkPhoneNumberOutboundLimit] - [%s] - HTTP Request Received Req Body - ', reqId, req.body);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(phnNum && outboundLim)
         {
-            gwBackendHandler.AssignOutboundLimitToTrunkNumberDB(reqId, phnNum, outboundLim, 1, 1, function(err, result)
+            gwBackendHandler.AssignOutboundLimitToTrunkNumberDB(reqId, phnNum, outboundLim, companyId, tenantId, function(err, result)
             {
                 if(err)
                 {
@@ -749,7 +847,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum
 
 });
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum/SetBothLimit/:limId', function(req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum/SetBothLimit/:limId', authorization({resource:"number", action:"write"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -759,9 +857,17 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum
 
         logger.debug('[DVP-PhoneNumberTrunkService.TrunkPhoneNumberBothLimit] - [%s] - HTTP Request Received Req Body - ', reqId, req.body);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(phnNum && bothLim)
         {
-            gwBackendHandler.AssignBothLimitToTrunkNumberDB(reqId, phnNum, bothLim, 1, 1, function(err, result)
+            gwBackendHandler.AssignBothLimitToTrunkNumberDB(reqId, phnNum, bothLim, companyId, tenantId, function(err, result)
             {
                 if(err)
                 {
@@ -798,7 +904,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:trNum
 
 
 //DONE
-server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id', function(req, res, next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id', authorization({resource:"trunk", action:"read"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
@@ -807,9 +913,17 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id', functio
 
         logger.debug('[DVP-PhoneNumberTrunkService.GetTrunk] - [%s] - HTTP Request Received Req Params - id : %s', reqId, trunkId);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(trunkId)
         {
-            gwBackendHandler.GetTrunkByIdDB(reqId, trunkId, 1, 1, function(err, result){
+            gwBackendHandler.GetTrunkByIdDB(reqId, trunkId, companyId, tenantId, function(err, result){
 
                 if(err)
                 {
@@ -843,7 +957,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id', functio
 
 });
 
-server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunks', function(req, res, next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunks', authorization({resource:"trunk", action:"read"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     var emptyArr = [];
@@ -851,7 +965,15 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunks', function(r
     {
         logger.debug('[DVP-PhoneNumberTrunkService.GetTrunks] - [%s] - HTTP Request Received', reqId);
 
-            gwBackendHandler.GetTrunkListDB(reqId, 1, 1, function(err, result){
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+            gwBackendHandler.GetTrunkListDB(reqId, companyId, tenantId, function(err, result){
 
                 if(err)
                 {
@@ -879,7 +1001,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunks', function(r
 });
 
 //DONE
-server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorId/UnAllocatedNumbers', function(req, res, next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorId/UnAllocatedNumbers', authorization({resource:"trunk", action:"read"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     var numberDetails = [];
@@ -889,9 +1011,17 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorI
 
         logger.debug('[DVP-PhoneNumberTrunkService.UnAllocatedNumbersForOperator] - [%s] - HTTP Request Received Req Params - operatorId : %s', reqId, operatorId);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(operatorId)
         {
-            gwBackendHandler.GetUnallocatedPhoneNumbersForOperator(reqId, operatorId, 1, 1, function(err, result)
+            gwBackendHandler.GetUnallocatedPhoneNumbersForOperator(reqId, operatorId, companyId, tenantId, function(err, result)
             {
 
                 if(err)
@@ -950,7 +1080,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorI
 });
 
 //DONE
-server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorId/AllocatedNumbers', function(req, res, next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorId/AllocatedNumbers', authorization({resource:"number", action:"read"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     var numberDetails = [];
@@ -960,9 +1090,17 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorI
 
         logger.debug('[DVP-PhoneNumberTrunkService.AllocatedNumbersForOperator] - [%s] - HTTP Request Received Req Params - operatorId : %s', reqId, operatorId);
 
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
         if(operatorId)
         {
-            gwBackendHandler.GetAllocatedPhoneNumbersForOperator(reqId, operatorId, 1, 1, function(err, result)
+            gwBackendHandler.GetAllocatedPhoneNumbersForOperator(reqId, operatorId, companyId, tenantId, function(err, result)
             {
                 if(err)
                 {
