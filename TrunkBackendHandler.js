@@ -111,6 +111,27 @@ var GetTrunkListDB = function(reqId, companyId, tenantId, callback)
     }
 };
 
+var GetTrunkIpAddressList = function(reqId, trunkId, companyId, tenantId, callback)
+{
+    var emptyList = [];
+    try
+    {
+        dbModel.TrunkIpAddress.findAll({where :[{CompanyId: companyId},{TenantId: tenantId},{TrunkId: trunkId}]}).then(function(trunkIpList)
+        {
+            callback(undefined, trunkIpList);
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.GetTrunkIpAddressList] - [%s] - PGSQL get trunk ips query failed', reqId, err);
+            callback(err, emptyList);
+        })
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.GetTrunkIpAddressList] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, false);
+    }
+};
+
 var GetCallServerByProfileIdDB = function(reqId, profileId, callback)
 {
     try
@@ -731,6 +752,53 @@ var AddTrunkOperator = function(reqId, opInfo, companyId, tenantId, callback)
     }
 };
 
+var AddTrunkIpAddress = function(reqId, trunkId, ipInfo, companyId, tenantId, callback)
+{
+    try
+    {
+        dbModel.Trunk.find({where: [{id: trunkId}, {CompanyId: companyId}, {TenantId: tenantId}]}).then(function (trObj)
+        {
+            if (trObj)
+            {
+                var trIp = dbModel.TrunkIpAddress.build({
+                    IpAddress: ipInfo.IpAddress,
+                    Mask: ipInfo.Mask,
+                    CompanyId: companyId,
+                    TenantId: tenantId,
+                    TrunkId: trunkId
+                });
+
+                trIp
+                    .save()
+                    .then(function (rslt)
+                    {
+                        callback(undefined, trIp);
+
+                    }).catch(function (err)
+                    {
+                        logger.error('[DVP-PhoneNumberTrunkService.AddTrunkIpAddress] - [%s] - insert trunk ipaddress PGSQL query failed', reqId, err);
+                        callback(err, undefined);
+                    })
+            }
+            else
+            {
+                callback(new Error("Trunk Not Found for Given Id"), undefined);
+            }
+        }).catch(function (err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.AddTrunkIpAddress] - [%s] - PGSQL get trunk query failed', reqId, err);
+            callback(err, undefined);
+        })
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.AddTrunkIpAddress] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, undefined);
+    }
+};
+
 var UpdateTrunkConfigurationDB = function(reqId, trunkId, trunkInfo, companyId, tenantId, callback)
 {
     try
@@ -806,6 +874,44 @@ var RemovePhoneNumberDB = function(reqId, phoneNumber, companyId, tenantId, call
     catch(ex)
     {
         logger.error('[DVP-PhoneNumberTrunkService.RemovePhoneNumberDB] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, false);
+    }
+};
+
+var RemoveIpAddress = function(reqId, ipAddressId, companyId, tenantId, callback)
+{
+    try
+    {
+        dbModel.TrunkIpAddress.find({where: [{id: ipAddressId}, {CompanyId: companyId}, {TenantId: tenantId}]}).then(function (ipAddr)
+        {
+            if(ipAddr)
+            {
+                ipAddr.destroy().then(function (rslt)
+                {
+                    callback(undefined, true);
+
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-PhoneNumberTrunkService.RemoveIpAddress] - [%s] - delete ip address PGSQL query failed', reqId, err);
+                    callback(err, false);
+                });
+            }
+            else
+            {
+                callback(new Error('Cannot find a phone number for the company'), false);
+            }
+
+
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.RemoveIpAddress] - [%s] - get ip address PGSQL query failed', reqId, err);
+            callback(err, false);
+        });
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.RemoveIpAddress] - [%s] - Exception occurred', reqId, ex);
         callback(ex, false);
     }
 };
@@ -1023,4 +1129,7 @@ module.exports.AssignOutboundLimitToTrunkNumberDB = AssignOutboundLimitToTrunkNu
 module.exports.AssignBothLimitToTrunkNumberDB = AssignBothLimitToTrunkNumberDB;
 module.exports.GetTrunkListDB = GetTrunkListDB;
 module.exports.GetLoadbalancerForCloud = GetLoadbalancerForCloud;
+module.exports.AddTrunkIpAddress = AddTrunkIpAddress;
+module.exports.GetTrunkIpAddressList = GetTrunkIpAddressList;
+module.exports.RemoveIpAddress = RemoveIpAddress;
 

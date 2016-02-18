@@ -255,6 +255,153 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk', authorizat
 
 });
 
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/IpAddress', authorization({resource:"trunk", action:"write"}), function(req, res, next)
+{
+    var reqId = nodeUuid.v1();
+    try
+    {
+        var ipInfo = req.body;
+        var trunkId = req.params.id;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.AddIpAddress] - [%s] - HTTP Request Received - Req Body : ', reqId, ipInfo);
+
+        if(ipInfo)
+        {
+            var companyId = req.user.company;
+            var tenantId = req.user.tenant;
+
+            if (!companyId || !tenantId)
+            {
+                throw new Error("Invalid company or tenant");
+            }
+
+            gwBackendHandler.AddTrunkIpAddress(reqId, trunkId, ipInfo, companyId, tenantId, function(err, result)
+            {
+
+                if(err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                    logger.debug('[DVP-PhoneNumberTrunkService.AddIpAddress] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "Trunk Ip Added Successfully", true, result);
+                    logger.debug('[DVP-PhoneNumberTrunkService.AddIpAddress] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+            })
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error("Empty Body"), "ERROR", false, undefined);
+            logger.debug('[DVP-PhoneNumberTrunkService.AddIpAddress] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+        }
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-PhoneNumberTrunkService.AddIpAddress] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/IpAddresses', authorization({resource:"trunk", action:"read"}), function(req, res, next)
+{
+    var reqId = nodeUuid.v1();
+
+    try
+    {
+        var trunkId = req.params.id;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.GetIpAddresses] - [%s] - HTTP Request Received - Req Params Trunk Id : ', reqId, trunkId);
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        gwBackendHandler.GetTrunkIpAddressList(reqId, trunkId, companyId, tenantId, function (err, result)
+        {
+
+            if (err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                logger.debug('[DVP-PhoneNumberTrunkService.GetIpAddresses] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Get trunk ip addresses success", true, result);
+                logger.debug('[DVP-PhoneNumberTrunkService.GetIpAddresses] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }
+        })
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-PhoneNumberTrunkService.GetIpAddresses] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
+server.del('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/IpAddress/:id', authorization({resource:"trunk", action:"delete"}), function(req, res, next)
+{
+    var reqId = nodeUuid.v1();
+
+    try
+    {
+        var ipAddrId = req.params.id;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.DeleteIpAddress] - [%s] - HTTP Request Received - Req Params Id : ', reqId, ipAddrId);
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        gwBackendHandler.RemoveIpAddress(reqId, ipAddrId, companyId, tenantId, function (err, result)
+        {
+
+            if (err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);
+                logger.debug('[DVP-PhoneNumberTrunkService.DeleteIpAddress] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Trunk Ip Added Successfully", true, result);
+                logger.debug('[DVP-PhoneNumberTrunkService.DeleteIpAddress] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }
+        })
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-PhoneNumberTrunkService.DeleteIpAddress] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
 //DONE
 //{"OperatorName": "TestOperator", "OperatorCode":"1234e", "ObjClass": "GGG", "ObjType": "FFF", "ObjCategory":"fff"}
 server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator', authorization({resource:"trunk", action:"write"}), function(req, res, next)
