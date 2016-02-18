@@ -4,17 +4,16 @@
   "description": "DVP-PhoneNumberTrunkService\r ===========================",
   "main": "app.js",
   "dependencies": {
+    "dvp-dbmodels": "^0.0.29",
     "config": "^1.12.0",
-    "dvp-common": "^0.0.16",
-    "dvp-dbmodels": "^0.0.39",
     "log4js": "^0.6.22",
     "node-uuid": "^1.4.3",
-    "redis": "^0.12.1",
     "restify": "^2.8.5",
-    "restify-jwt": "^0.4.0",
+    "redis": "^0.12.1",
     "stringify": "^3.1.0",
     "underscore": "^1.8.3",
-    "winston": "^0.9.0"
+    "winston": "^0.9.0",
+    "dvp-common": "^0.0.2"
   },
   "devDependencies": {},
   "scripts": {

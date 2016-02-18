@@ -1484,6 +1484,52 @@ var Company=1;
 return next();
 });
 
+// application development phase
+
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/PhoneNumbers', function(req, res, next)
+{
+    var reqId = nodeUuid.v1();
+    try
+    {
+        var trunkId = parseInt(req.params.id);
+
+        logger.debug('[DVP-PhoneNumberTrunkService.GetPhoneNumbersOfTrunk] - [%s] - HTTP Request Received Req Params - id : %s', reqId, trunkId);
+
+        if(trunkId)
+        {
+            gwBackendHandler.GetPhoneNumbersOfTrunk(reqId, trunkId, 1, 1, function(err, result){
+
+                if(err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                    logger.debug('[DVP-PBXService.GetPhoneNumbersOfTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(undefined, "Trunk Found", true, result);
+                    logger.debug('[DVP-PBXService.GetPhoneNumbersOfTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+            })
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error("Empty Body"), "ERROR", false, undefined);
+            logger.debug('[DVP-PBXService.GetPhoneNumbersOfTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+        }
+    }
+    catch(ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-PBXService.GetPhoneNumbersOfTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
 
 
 
