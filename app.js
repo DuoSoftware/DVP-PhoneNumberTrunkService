@@ -1311,7 +1311,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorI
 
 //.......................................post............................................................................
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:phonenumber/Availability/:enable',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:phonenumber/Availability/:enable',authorization({resource:"number", action:"write"}),function(req,res,next)
 {
     var reqId='';
 
@@ -1324,16 +1324,19 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:phone
 
     }
 
-var Company=1;
-
-
-
     try {
 
         logger.debug('[DVP-PhoneNumberTrunkService.ChangeNumberAvailability] - [%s] - [HTTP]  - Request received -  Data - Phone %s Company %s Status %s',reqId,req.params.phonenumber,Company,req.params.enable);
 
+        if(!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
-        number.ChangeNumberAvailability(req,Company,reqId,res);
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
+        number.ChangeNumberAvailability(req,Company,Tenant,reqId,res);
 
     }
     catch(ex)
@@ -1347,7 +1350,7 @@ var Company=1;
 
 //.......................................post............................................................................
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneNumber',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneNumber',authorization({resource:"trunk", action:"write"}),function(req,res,next)
 {
     var reqId='';
 
@@ -1360,11 +1363,17 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:Phone
 
     }
 
-var Company=1;
-
     try {
 
         logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [HTTP]  - Request received -  Data - Phone %s Company ',reqId,req.params.PhoneNumber,Company);
+
+        if(!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
 
         number.UpdatePhoneDetails(Company,req.params.PhoneNumber,req,reqId,res);
 
@@ -1383,7 +1392,7 @@ var Company=1;
 
 //check params
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/Category/:phone',function(req,res,next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/Category/:phone',authorization({resource:"trunk", action:"write"}),function(req,res,next)
 {
     var reqId='';
 
@@ -1396,12 +1405,17 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/Catego
 
     }
 
-var Company=1;
 
     try {
 
         logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [HTTP]  - Request received -  Data - %s',reqId,JSON.stringify(req));
+        if(!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
 
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
 
         number.UpdatePhoneNumberObjCategory(Company,req.params.phone,req,reqId,res);
 
@@ -1417,7 +1431,7 @@ var Company=1;
 //.......................................get............................................................................
 
 //server.get('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/get_all/:CompanyId/:PhoneNumber',function(req,res,next)
-server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneNumber',function(req,res,next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneNumber',authorization({resource:"trunk", action:"read"}),function(req,res,next)
 {
     var reqId='';
 
@@ -1430,11 +1444,17 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneN
 
     }
 
-var Company=1;
 
     try {
 
         logger.debug('[DVP-PhoneNumberTrunkService.GetAllPhoneDetails] - [%s] - [HTTP]  - Request received -  Data - Company %s Phone %s ',reqId,Company,req.params.PhoneNumber);
+        if(!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
 
         number.GetAllPhoneDetails(Company,req,reqId,res);
 
@@ -1450,7 +1470,7 @@ return next();
 });
 //.......................................get............................................................................
 
-server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumbers',function(req,res,next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumbers',authorization({resource:"trunk", action:"read"}),function(req,res,next)
 {
 
     var reqId='';
@@ -1464,11 +1484,17 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumbers',funct
 
     }
 
-var Company=1;
-
     try {
 
         logger.debug('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [HTTP]  - Request received -  Data - Company %s  ',reqId,Company);
+
+        if(!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
 
         number.GetCompanyPhones(Company,reqId,res);
 
@@ -1486,18 +1512,27 @@ return next();
 
 // application development phase
 
-server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/PhoneNumbers', function(req, res, next)
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/PhoneNumbers',authorization({resource:"number", action:"read"}), function(req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
     {
-        var trunkId = parseInt(req.params.id);
 
         logger.debug('[DVP-PhoneNumberTrunkService.GetPhoneNumbersOfTrunk] - [%s] - HTTP Request Received Req Params - id : %s', reqId, trunkId);
 
+        var trunkId = parseInt(req.params.id);
+
+        if(!req.user.company || !req.user.tenant)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        var Company=req.user.company;
+        var Tenant=req.user.tenant;
+
         if(trunkId)
         {
-            gwBackendHandler.GetPhoneNumbersOfTrunk(reqId, trunkId, 1, 1, function(err, result){
+            gwBackendHandler.GetPhoneNumbersOfTrunk(reqId, trunkId,Company, Tenant, function(err, result){
 
                 if(err)
                 {

@@ -20,14 +20,14 @@ var log = log4js.getLogger("pnum");
 //MF and TC done
 
 log.info("Phone number management starts........");
-function ChangeNumberAvailability(req,Company,reqId,res) {
+function ChangeNumberAvailability(req,Company,Tenant,reqId,res) {
 
 
 
     try
     {
 
-        DbConn.TrunkPhoneNumber.find({where: [{PhoneNumber: req.params.phonenumber}, {CompanyId:Company }]}).then(function (resTPhone) {
+        DbConn.TrunkPhoneNumber.find({where: [{PhoneNumber: req.params.phonenumber}, {CompanyId:Company },{TenantId:Tenant}]}).then(function (resTPhone) {
 
             if(resTPhone)
             {
@@ -255,7 +255,8 @@ function GetCompanyPhones(Company,reqId,res)
         });
 
 
-    }catch(ex)
+    }
+    catch(ex)
     {
         logger.error('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [PGSQL]  - Exception in starting method : GetCompanyPhones  - Data  %s   ',reqId,Company,ex);
         var jsonString = messageFormatter.FormatMessage(ex, "Exception", false, undefineds);
