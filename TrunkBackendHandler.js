@@ -1,27 +1,6 @@
 var dbModel = require('dvp-dbmodels');
 var underscore = require('underscore');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
-//var getGrpUsersById = function(grpId, callback)
-//{
-//    try
-//    {
-//        dbModel.UserGroup.find({ where: {id:grpId}, attributes: ['id'], include: [{model : dbModel.SipUACEndpoint, attributes:['id'], joinTableAttributes : ['createdAt']}]}).complete(function(err, trunkObj)
-//        {
-//            try
-//            {
-//                callback(err, trunkObj);
-//            }
-//            catch(ex)
-//            {
-//                callback(ex, undefined);
-//            }
-//        })
-//    }
-//    catch(ex)
-//    {
-//        callback(ex, false);
-//    }
-//};
 
 var SwitchPhoneNumberCompanyDB = function(reqId, phoneNumber, companyId, tenantId, companyToChange, tenantToChange, callback)
 {
