@@ -20,10 +20,12 @@ module.exports = {
     "port": 6379
 
   },
-
   "Host":{
     "Ip":"0.0.0.0",
     "Port":"9898",
     "Version":"1.0.0.0"
+  },
+  "Services": {
+    "limitServiceRootPath": "http://limithandler.104.131.67.21.xip.io/DVP/API/1.0.0.0"
   }
 };

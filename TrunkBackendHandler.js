@@ -1009,6 +1009,8 @@ var AddPhoneNumbersToTrunkDB = function(reqId, phoneNumberInfo, companyId, tenan
     }
 };
 
+
+
 var GetUnallocatedPhoneNumbersForOperator = function(reqId, operatorId, companyId, tenantId, callback)
 {
     try
@@ -1084,6 +1086,126 @@ var GetAllocatedPhoneNumbersForOperator = function(reqId, operatorId, companyId,
     {
         logger.error('[DVP-PhoneNumberTrunkService.GetAllocatedPhoneNumbersForOperator] - [%s] - Exception occurred', reqId, ex);
         callback(ex, undefined);
+    }
+};
+
+
+module.exports.AddPhoneNumbersToTrunk = function(reqId, phoneNumberInfo, companyId, tenantId,callback)
+{
+    try
+    {
+
+        if(phoneNumberInfo)
+        {
+
+            dbModel.Trunk.find({where: [{id: phoneNumberInfo.TrunkId}, {TenantId: tenantId}]}).then(function (gwObj)
+            {
+                try
+                {
+                    if (gwObj)
+                    {
+            //            logger.info('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Get Trunk PGSQL query success', reqId);
+
+                        dbModel.TrunkPhoneNumber.find({where: [{PhoneNumber: phoneNumberInfo.PhoneNumber}]}).then(function (phnNum)
+                        {
+                            if(phnNum)
+                            {
+              //                  logger.info('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Get Trunk number PGSQL query success', reqId);
+
+                                if(phnNum.CompanyId == companyId)
+                                {
+                                   return callback( new Error("Number already in use", -1, false));
+                                }
+                                else
+                                {
+                                    return callback( new Error("Another company using same phone number", -1, false));
+                                }
+                            }
+                            else
+                            {
+
+                                //add phone number
+                                var phoneNum = dbModel.TrunkPhoneNumber.build({
+                                    PhoneNumber: phoneNumberInfo.PhoneNumber,
+                                    ObjClass: phoneNumberInfo.ObjClass,
+                                    ObjType: phoneNumberInfo.ObjType,
+                                    ObjCategory: phoneNumberInfo.ObjCategory,
+                                    Enable: phoneNumberInfo.Enable,
+                                    TrunkId:phoneNumberInfo.TrunkId,
+                                    /*InboundLimitId:phoneNumberInfo.InboundLimitId,
+                                    OutboundLimitId:phoneNumberInfo.OutboundLimitId,
+                                    BothLimitId:phoneNumberInfo.BothLimitId,*/
+                                    CompanyId: phoneNumberInfo.CompanyId,
+                                    TenantId: phoneNumberInfo.TenantId
+                                });
+
+                                phoneNum
+                                    .save()
+                                    .then(function (rsltd)
+                                    {
+
+
+                //                        logger.info('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Insert phone number PGSQL query success', reqId);
+                                        try
+                                        {
+                                            gwObj.addTrunkPhoneNumber(phoneNum).then(function (rslt)
+                                            {
+
+                  //                              logger.info('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Update phone number with trunk id PGSQL query success', reqId);
+                                                return callback(true);
+                                            }).catch(function(err)
+                                            {
+                                                logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Update phone number with trunk id PGSQL query failed', reqId, err);
+                                                return callback(false);
+                                            });
+                                        }
+                                        catch(ex)
+                                        {
+                                            return callback(false);
+                                        }
+
+                                    }).catch(function(err)
+                                    {
+                                        logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Insert phone number PGSQL query failed', reqId, err);
+                                        return callback(false);
+                                    })
+
+                            }
+
+                        }).catch(function(err)
+                        {
+                            logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Get Trunk number PGSQL query failed', reqId, err);
+                            return callback(false);
+                        });
+
+
+                    }
+                    else
+                    {
+                        logger.info('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Get Trunk PGSQL query success', reqId);
+                        return callback(new Error("Trunk Not Found for Given Id and Company"));
+                    }
+                }
+                catch(ex)
+                {
+                    return callback(false);
+                }
+
+            }).catch(function(err)
+            {
+                logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Get Trunk PGSQL query failed', reqId, err);
+                return callback(false);
+            })
+        }
+        else
+        {
+            return callback(new Error("Empty phone number info"));
+        }
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Exception occurred', reqId, ex);
+        return callback(false);
     }
 };
 
