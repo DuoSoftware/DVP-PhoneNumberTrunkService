@@ -4,8 +4,8 @@ module.exports = {
     "User":"duo",
     "Password":"DuoS123",
     "Port":5432,
-    "Host":"104.131.105.222",
-    "Database":"duo"
+    "Host":"localhost",
+    "Database":"dvpdb"
   },
 
   "Security":
@@ -21,10 +21,12 @@ module.exports = {
     "password": "DuoS123"
 
   },
-
   "Host":{
     "Ip":"0.0.0.0",
     "Port":"9898",
     "Version":"1.0.0.0"
+  },
+  "Services": {
+    "limitServiceRootPath": "http://limithandler.104.131.67.21.xip.io/DVP/API/1.0.0.0"
   }
 };
