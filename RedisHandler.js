@@ -3,8 +3,13 @@ var Config = require('config');
 
 var redisIp = Config.Redis.ip;
 var redisPort = Config.Redis.port;
+var password = Config.Redis.password;
 
 var client = redis.createClient(redisPort, redisIp);
+
+client.auth(password, function (error) {
+    console.log("Redis Auth Error : "+error);
+});
 
 var SetObject = function(key, value, callback)
 {
@@ -46,13 +51,9 @@ var PublishToRedis = function(pattern, message, callback)
     {
         callback(ex, undefined);
     }
-}
+};
 
 
-client.on('error', function(msg)
-{
-
-});
 
 module.exports.SetObject = SetObject;
 module.exports.PublishToRedis = PublishToRedis;

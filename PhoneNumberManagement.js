@@ -3,8 +3,6 @@
  */
 
 var DbConn = require('dvp-dbmodels');
-
-var stringify=require('stringify');
 var messageFormatter = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 var log4js=require('log4js');
 var config=require('config');
