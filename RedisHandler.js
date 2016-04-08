@@ -10,6 +10,10 @@ var client = redis.createClient(redisPort, redisIp);
 client.auth(password, function (error) {
     console.log("Redis Auth Error : "+error);
 });
+client.on("error", function (err) {
+    console.log("Error " + err);
+
+});
 
 var SetObject = function(key, value, callback)
 {
