@@ -224,6 +224,7 @@ function GetAllPhoneDetails(Company,req,reqId,res)
 //MF and TC done
 function GetCompanyPhones(Company,reqId,res)
 {
+    var emptyArr = [];
 
 
     try {
@@ -239,7 +240,7 @@ function GetCompanyPhones(Company,reqId,res)
             else
             {
                 logger.error('[DVP-PhoneNumberTrunkService.GetCompanyPhones] - [%s] - [PGSQL]  - No Phones found for company %s   ',reqId,Company);
-                var jsonString = messageFormatter.FormatMessage("EMPTY", "ERROR/EXCEPTION", false, undefined);
+                var jsonString = messageFormatter.FormatMessage(null, "SUCCESS", true, emptyArr);
                 res.end(jsonString);
             }
 
