@@ -1207,7 +1207,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:phone
 //.......................................post............................................................................
 
 server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneNumber', authorization({
-    resource: "trunk",
+    resource: "number",
     action: "write"
 }), function (req, res, next) {
     var reqId = '';
@@ -1247,7 +1247,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:Phone
 //check params
 
 server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/Category/:phone', authorization({
-    resource: "trunk",
+    resource: "number",
     action: "write"
 }), function (req, res, next) {
     var reqId = '';
@@ -1284,7 +1284,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/Catego
 
 //server.get('/DVP/API/' + hostVersion + '/phone_number_trunk_service/phone_number_mgmt/get_all/:CompanyId/:PhoneNumber',function(req,res,next)
 server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneNumber', authorization({
-    resource: "trunk",
+    resource: "number",
     action: "read"
 }), function (req, res, next) {
     var reqId = '';
@@ -1321,7 +1321,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneN
 //.......................................get............................................................................
 
 server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumbers', authorization({
-    resource: "trunk",
+    resource: "number",
     action: "read"
 }), function (req, res, next) {
 
