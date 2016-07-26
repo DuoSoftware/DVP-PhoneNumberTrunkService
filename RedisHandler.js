@@ -19,7 +19,6 @@ var SetObject = function(key, value, callback)
 {
     try
     {
-        //var client = redis.createClient(redisPort, redisIp);
 
         client.set(key, value, function(err, response)
         {

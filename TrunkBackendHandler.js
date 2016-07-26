@@ -1,6 +1,12 @@
 var dbModel = require('dvp-dbmodels');
 var underscore = require('underscore');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
+var redisHandler = require('./RedisHandler.js');
+
+var redisCallback = function(err, resp)
+{
+
+};
 
 var SwitchPhoneNumberCompanyDB = function(reqId, phoneNumber, companyId, tenantId, companyToChange, tenantToChange, callback)
 {
@@ -948,17 +954,34 @@ var AddPhoneNumbersToTrunkDB = function(reqId, phoneNumberInfo, companyId, tenan
                                                 {
                                                     gwObj.addTrunkPhoneNumber(phoneNum).then(function (rslt)
                                                     {
+                                                        if(rslt)
+                                                        {
+                                                            redisHandler.SetObject('TRUNKNUMBER:' + rslt.PhoneNumber, JSON.stringify(rslt), redisCallback());
+                                                            redisHandler.SetObject('TRUNKNUMBERBYID:' + tenantId + ':' + companyId + ':' + rslt.id, JSON.stringify(rslt), redisCallback());
+                                                        }
+
                                                         logger.debug('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Update phone number with trunk id PGSQL query success', reqId);
                                                         callback(undefined, phoneNum.id, true);
 
                                                     }).catch(function(err)
                                                     {
+                                                        if(rsltd)
+                                                        {
+                                                            redisHandler.SetObject('TRUNKNUMBER:' + rsltd.PhoneNumber, JSON.stringify(rsltd), redisCallback());
+                                                            redisHandler.SetObject('TRUNKNUMBERBYID:' + tenantId + ':' + companyId + ':' + rsltd.id, JSON.stringify(rsltd), redisCallback());
+                                                        }
                                                         logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Update phone number with trunk id PGSQL query failed', reqId, err);
                                                         callback(err, phoneNum.id, false);
                                                     });
                                                 }
                                                 catch(ex)
                                                 {
+                                                    if(rsltd)
+                                                    {
+                                                        redisHandler.SetObject('TRUNKNUMBER:' + rsltd.PhoneNumber, JSON.stringify(rsltd), redisCallback());
+                                                        redisHandler.SetObject('TRUNKNUMBERBYID:' + tenantId + ':' + companyId + ':' + rsltd.id, JSON.stringify(rsltd), redisCallback());
+                                                    }
+
                                                     callback(err, phoneNum.id, false);
                                                 }
 
