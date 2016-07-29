@@ -8,10 +8,17 @@ var log4js=require('log4js');
 var config=require('config');
 var hpath=config.Host.hostpath;
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
+var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
 
 
 log4js.configure(config.Host.logfilepath, { cwd: hpath });
 var log = log4js.getLogger("pnum");
+
+
+var redisCallback = function(err, resp)
+{
+
+};
 
 
 
@@ -42,6 +49,13 @@ function ChangeNumberAvailability(req,Company,Tenant,reqId,res) {
                             where: [{PhoneNumber: req.params.phonenumber}]
                         }
                     ).then(function (resUpdate) {
+
+                            if(resUpdate)
+                            {
+                                redisCacheHandler.addTrunkNumberToCache(resUpdate.PhoneNumber, resUpdate);
+                                redisCacheHandler.addTrunkNumberByIdToCache(resUpdate.id, Company, Tenant, resUpdate);
+
+                            }
 
                             logger.debug('[DVP-PhoneNumberTrunkService.ChangeNumberAvailability] - [%s] - [PGSQL]  - Availability updated of Phone Number %s to %s is succeeded ',reqId,req.params.phonenumber,req.params.enable);
                             var jsonString = messageFormatter.FormatMessage(undefined, "SUCCESS", true, resUpdate);
@@ -116,6 +130,14 @@ function UpdatePhoneDetails(Company,Phone,req,reqId,res) {
                                 where: [{PhoneNumber: Phone},{CompanyId:Company}]
                             }
                         ).then(function (resUpdate) {
+
+                                if(resUpdate)
+                                {
+                                    redisCacheHandler.addTrunkNumberToCache(resUpdate.PhoneNumber, resUpdate);
+                                    redisCacheHandler.addTrunkNumberByIdToCache(resUpdate.id, Company, resUpdate.TenantId, resUpdate);
+
+                                }
+
                                 logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Trunk phone number updated successfully',reqId);
                                 var jsonString = messageFormatter.FormatMessage(undefined, "SUCCESS", true, resUpdate);
                                 res.end(jsonString);
@@ -280,7 +302,6 @@ function UpdatePhoneNumberObjCategory(Company,Phone,req,reqId,res)
                             .update(
                             {
 
-
                                 ObjCategory: req.body.ObjCategory
 
 
@@ -288,7 +309,15 @@ function UpdatePhoneNumberObjCategory(Company,Phone,req,reqId,res)
                             {
                                 where: [{PhoneNumber: Phone},{CompanyId:Company}]
                             }
-                        ).then(function (message) {
+                        ).then(function (resUpdate) {
+
+                                if(resUpdate)
+                                {
+                                    redisCacheHandler.addTrunkNumberToCache(resUpdate.PhoneNumber, resUpdate);
+                                    redisCacheHandler.addTrunkNumberByIdToCache(resUpdate.id, Company, resUpdate.TenantId, resUpdate);
+
+                                }
+
                                 logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Category is updated to %s of Phone %s  belongs to Company %s is succeeded ',reqId,req.body.ObjCategory,Phone,Company);
                                 var jsonString = messageFormatter.FormatMessage(undefined, "SUCCESS", true, message);
                                 res.end(jsonString);

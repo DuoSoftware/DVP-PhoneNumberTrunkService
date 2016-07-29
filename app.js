@@ -32,6 +32,8 @@ server.use(jwt({secret: secret.Secret}));
 server.listen(hostPort, hostIp, function () {
     console.log('%s listening at %s', server.name, server.url);
 });
+
+
 //DONE
 server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber', authorization({
     resource: "number",
@@ -326,7 +328,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/IpAddress
 
 });
 
-server.del('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/IpAddress/:id', authorization({
+server.del('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:trId/IpAddress/:id', authorization({
     resource: "trunk",
     action: "delete"
 }), function (req, res, next) {
@@ -339,12 +341,13 @@ server.del('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/IpAddress/:id', aut
 
         var companyId = req.user.company;
         var tenantId = req.user.tenant;
+        var trId = req.params.trId;
 
         if (!companyId || !tenantId) {
             throw new Error("Invalid company or tenant");
         }
 
-        gwBackendHandler.RemoveIpAddress(reqId, ipAddrId, companyId, tenantId, function (err, result) {
+        gwBackendHandler.RemoveIpAddress(reqId, ipAddrId, companyId, tenantId, trId, function (err, result) {
 
             if (err) {
                 var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, result);

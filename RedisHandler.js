@@ -15,6 +15,49 @@ client.on("error", function (err) {
 
 });
 
+var addTrunkToCache = function(trunkId)
+{
+    var ttl = 2000;
+    var lockKey = 'TRUNKLOCK:' + trunkId;
+
+    redlock.lock(lockKey, ttl).then(function(lock)
+    {
+        dbModel.Trunk.find({ where:[{id: trunkId}], include : [{model: dbModel.TrunkIpAddress, as: "TrunkIpAddress"}]})
+            .then(function (trunk)
+            {
+                if (trunk)
+                {
+                    client.set('TRUNK:' + trunkId, JSON.stringify(trunk), function(err, setResp)
+                    {
+                        lock.unlock()
+                            .catch(function(err) {
+                                logger.error('[DVP-ClusterConfiguration.addTrunkToCache] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                            });
+                    });
+                }
+                else
+                {
+                    lock.unlock()
+                        .catch(function(err) {
+                            logger.error('[DVP-ClusterConfiguration.addTrunkToCache] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                        });
+                }
+
+            }).catch(function(err)
+            {
+                lock.unlock()
+                    .catch(function(err) {
+                        logger.error('[DVP-ClusterConfiguration.addTrunkToCache] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                    });
+            });
+    }).catch(function(err)
+    {
+        logger.error('[DVP-ClusterConfiguration.addTrunkToCache] - [%s] - REDIS LOCK ACQUIRE FAILED', err);
+    });
+
+};
+
+
 var SetObject = function(key, value, callback)
 {
     try
@@ -33,30 +76,27 @@ var SetObject = function(key, value, callback)
 
 };
 
-var PublishToRedis = function(pattern, message, callback)
+var DeleteObject = function(key, callback)
 {
     try
     {
-        if(client.connected)
+        client.del(key, function(err, response)
         {
-            var result = client.publish(pattern, message);
-
-            callback(undefined, result);
-        }
-        else
-        {
-            callback(undefined, false);
-        }
-
+            callback(err, response);
+        });
 
     }
     catch(ex)
     {
-        callback(ex, undefined);
+        callback(ex, null);
     }
+
 };
 
 
 
+
+
 module.exports.SetObject = SetObject;
-module.exports.PublishToRedis = PublishToRedis;
+module.exports.DeleteObject = DeleteObject;
+module.exports.addTrunkToCache = addTrunkToCache;
