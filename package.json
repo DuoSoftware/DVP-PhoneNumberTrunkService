@@ -5,8 +5,8 @@
   "main": "app.js",
   "dependencies": {
     "config": "^1.12.0",
-    "dvp-common": "^0.1.9",
-    "dvp-dbmodels": "^0.0.52",
+    "dvp-common": "^0.2.5",
+    "dvp-dbmodels": "^0.3.4",
     "log4js": "^0.6.22",
     "node-uuid": "^1.4.3",
     "redis": "^0.12.1",

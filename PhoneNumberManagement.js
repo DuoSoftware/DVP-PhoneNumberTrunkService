@@ -38,17 +38,7 @@ function ChangeNumberAvailability(req,Company,Tenant,reqId,res) {
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.ChangeNumberAvailability] - [%s] - [PGSQL]  - Record found for Phone Number %s  ',reqId,req.params.phonenumber);
                 try {
-                    DbConn.TrunkPhoneNumber
-                        .update(
-                        {
-                            Enable: req.params.enable
-
-
-                        },
-                        {
-                            where: [{PhoneNumber: req.params.phonenumber}]
-                        }
-                    ).then(function (resUpdate) {
+                    resTPhone.updateAttributes({Enable: req.params.enable}).then(function (resUpdate) {
 
                             if(resUpdate)
                             {
@@ -109,27 +99,16 @@ function UpdatePhoneDetails(Company,Phone,req,reqId,res) {
     {
         try{
 
-            DbConn.TrunkPhoneNumber.findAll({where: [{CompanyId: Company}, {PhoneNumber: Phone}]}).then(function (resTPhone) {
+            DbConn.TrunkPhoneNumber.find({where: [{CompanyId: Company}, {PhoneNumber: Phone}]}).then(function (resTPhone) {
 
                 if(resTPhone)
                 {
                     logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneDetails] - [%s] - [PGSQL]  - Phone % is belongs to Company %s ',reqId,Phone,Company);
                     try {
 
-                        DbConn.TrunkPhoneNumber
-                            .update(
-                            {
-
-                                ObjClass: req.body.ObjClass,
-                                ObjType: req.body.ObjType,
-                                ObjCategory: req.body.ObjCategory
-
-
-                            },
-                            {
-                                where: [{PhoneNumber: Phone},{CompanyId:Company}]
-                            }
-                        ).then(function (resUpdate) {
+                        resTPhone.updateAttributes({ObjClass: req.body.ObjClass,
+                            ObjType: req.body.ObjType,
+                            ObjCategory: req.body.ObjCategory}).then(function (resUpdate) {
 
                                 if(resUpdate)
                                 {
@@ -298,18 +277,8 @@ function UpdatePhoneNumberObjCategory(Company,Phone,req,reqId,res)
                 {
                     try {
                         logger.debug('[DVP-PhoneNumberTrunkService.UpdatePhoneNumberCategory] - [%s] - [PGSQL]  - Phone %s is belongs to Company %s ',reqId,Phone,Company);
-                        DbConn.TrunkPhoneNumber
-                            .update(
-                            {
 
-                                ObjCategory: req.body.ObjCategory
-
-
-                            },
-                            {
-                                where: [{PhoneNumber: Phone},{CompanyId:Company}]
-                            }
-                        ).then(function (resUpdate) {
+                        resTPhone.updateAttributes({ObjCategory: req.body.ObjCategory}).then(function (resUpdate) {
 
                                 if(resUpdate)
                                 {
