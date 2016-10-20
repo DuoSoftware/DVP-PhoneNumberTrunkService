@@ -450,7 +450,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id', author
                     res.end(jsonString);
                 }
                 else {
-                    var jsonString = messageFormatter.FormatMessage(err, "Trunk Updated Successfully", result, undefined);
+                    var jsonString = messageFormatter.FormatMessage(null, "Trunk Updated Successfully", true, result);
                     logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
                     res.end(jsonString);
                 }

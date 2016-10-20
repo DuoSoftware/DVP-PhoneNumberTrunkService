@@ -700,7 +700,8 @@ var AddTrunkConfigurationDB = function(reqId, gwInfo, companyId, tenantId, callb
             Enable: gwInfo.Enable,
             CompanyId: companyId,
             TenantId: tenantId,
-            FaxType: gwInfo.FaxType
+            FaxType: gwInfo.FaxType,
+            TranslationId: gwInfo.TranslationId
         });
 
         gw
@@ -820,32 +821,32 @@ var UpdateTrunkConfigurationDB = function(reqId, trunkId, trunkInfo, companyId, 
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL get trunk query success', reqId);
                 //update
-                gwObj.updateAttributes({TrunkName: trunkInfo.TrunkName, Enable: trunkInfo.Enable, ObjClass: trunkInfo.ObjClass, IpUrl: trunkInfo.IpUrl, ObjType: trunkInfo.ObjType, ObjCategory: trunkInfo.ObjCategory, FaxType: trunkInfo.FaxType}).then(function (upRes)
+                gwObj.updateAttributes({TrunkName: trunkInfo.TrunkName, Enable: trunkInfo.Enable, ObjClass: trunkInfo.ObjClass, IpUrl: trunkInfo.IpUrl, ObjType: trunkInfo.ObjType, ObjCategory: trunkInfo.ObjCategory, FaxType: trunkInfo.FaxType, TranslationId: trunkInfo.TranslationId}).then(function (upRes)
                 {
                     redisCacheHandler.addTrunkToCache(trunkId);
                     logger.debug('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL update trunk query success', reqId);
-                    callback(undefined, true);
+                    callback(undefined, upRes);
 
                 }).catch(function(err)
                 {
                     logger.error('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL update trunk query failed', reqId, err);
-                    callback(err, false);
+                    callback(err, null);
                 })
             }
             else
             {
-                callback(new Error("Trunk Not Found for Given Id"), false);
+                callback(new Error("Trunk Not Found for Given Id"), null);
             }
         }).catch(function(err)
         {
             logger.error('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL get trunk query failed', reqId, err);
-            callback(err, false);
+            callback(err, null);
         })
     }
     catch(ex)
     {
         logger.error('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - Exception occurred', reqId, ex);
-        callback(ex, false);
+        callback(ex, null);
     }
 };
 
