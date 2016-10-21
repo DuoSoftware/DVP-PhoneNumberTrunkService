@@ -108,7 +108,12 @@ function UpdatePhoneDetails(Company,Phone,req,reqId,res) {
 
                         resTPhone.updateAttributes({ObjClass: req.body.ObjClass,
                             ObjType: req.body.ObjType,
-                            ObjCategory: req.body.ObjCategory}).then(function (resUpdate) {
+                            ObjCategory: req.body.ObjCategory,
+                            Enable: req.body.Enable,
+                            TrunkId: req.body.TrunkId,
+                            InboundLimitId: req.body.InboundLimitId,
+                            OutboundLimitId: req.body.OutboundLimitId,
+                            BothLimitId: req.body.BothLimitId}).then(function (resUpdate) {
 
                                 if(resUpdate)
                                 {

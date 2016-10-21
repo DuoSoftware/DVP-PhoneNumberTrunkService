@@ -939,7 +939,7 @@ var AddPhoneNumbersToTrunkDB = function(reqId, phoneNumberInfo, companyId, tenan
     {
         if(phoneNumberInfo)
         {
-            dbModel.Trunk.find({where: [{id: phoneNumberInfo.TrunkId}, {TenantId: tenantId}]}).then(function (gwObj)
+            dbModel.Trunk.find({where: [{id: phoneNumberInfo.TrunkId}, {CompanyId: companyId}, {TenantId: tenantId}]}).then(function (gwObj)
             {
                 try
                 {
@@ -972,53 +972,18 @@ var AddPhoneNumbersToTrunkDB = function(reqId, phoneNumberInfo, companyId, tenan
                                     ObjCategory: phoneNumberInfo.ObjCategory,
                                     Enable: phoneNumberInfo.Enable,
                                     CompanyId: companyId,
-                                    TenantId: tenantId
+                                    TenantId: tenantId,
+                                    TrunkId: phoneNumberInfo.TrunkId,
+                                    InboundLimitId: phoneNumberInfo.InboundLimitId,
+                                    OutboundLimitId: phoneNumberInfo.OutboundLimitId,
+                                    BothLimitId: phoneNumberInfo.BothLimitId
                                 });
 
                                 phoneNum
                                     .save()
                                     .then(function (rsltd)
                                     {
-
-
-                                                logger.debug('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Insert phone number PGSQL query success', reqId);
-                                                try
-                                                {
-                                                    gwObj.addTrunkPhoneNumber(phoneNum).then(function (rslt)
-                                                    {
-                                                        if(rslt)
-                                                        {
-                                                            redisCacheHandler.addTrunkNumberToCache(rslt.PhoneNumber, rslt);
-                                                            redisCacheHandler.addTrunkNumberByIdToCache(rslt.id, companyId, tenantId, rslt);
-                                                        }
-
-                                                        logger.debug('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Update phone number with trunk id PGSQL query success', reqId);
-                                                        callback(undefined, phoneNum.id, true);
-
-                                                    }).catch(function(err)
-                                                    {
-                                                        if(rsltd)
-                                                        {
-                                                            redisCacheHandler.addTrunkNumberToCache(rsltd.PhoneNumber, rsltd);
-                                                            redisCacheHandler.addTrunkNumberByIdToCache(rsltd.id, companyId, tenantId, rsltd);
-
-                                                        }
-                                                        logger.error('[DVP-PhoneNumberTrunkService.AddPhoneNumbersToTrunkDB] - [%s] - Update phone number with trunk id PGSQL query failed', reqId, err);
-                                                        callback(err, phoneNum.id, false);
-                                                    });
-                                                }
-                                                catch(ex)
-                                                {
-                                                    if(rsltd)
-                                                    {
-                                                        redisCacheHandler.addTrunkNumberToCache(rsltd.PhoneNumber, rsltd);
-                                                        redisCacheHandler.addTrunkNumberByIdToCache(rsltd.id, companyId, tenantId, rsltd);
-                                                    }
-
-                                                    callback(err, phoneNum.id, false);
-                                                }
-
-
+                                        callback(undefined, phoneNum.id, true);
 
                                     }).catch(function(err)
                                     {
