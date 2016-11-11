@@ -100,3 +100,4 @@ var DeleteObject = function(key, callback)
 module.exports.SetObject = SetObject;
 module.exports.DeleteObject = DeleteObject;
 module.exports.addTrunkToCache = addTrunkToCache;
+module.exports.redisClient = client;

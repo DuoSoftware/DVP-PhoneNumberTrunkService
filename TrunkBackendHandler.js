@@ -54,6 +54,7 @@ var SwitchPhoneNumberCompanyDB = function(reqId, phoneNumber, companyId, tenantI
     }
 };
 
+
 var GetTrunkByIdDB = function(reqId, trunkId, companyId, tenantId, callback)
 {
     try

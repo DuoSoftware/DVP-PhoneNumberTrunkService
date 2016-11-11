@@ -4,9 +4,10 @@
   "description": "DVP-PhoneNumberTrunkService\r ===========================",
   "main": "app.js",
   "dependencies": {
+    "bluebird": "^3.4.6",
     "config": "^1.12.0",
-    "dvp-common": "^0.2.5",
-    "dvp-dbmodels": "^0.3.4",
+    "dvp-common": "^0.5.6",
+    "dvp-dbmodels": "^0.5.5",
     "log4js": "^0.6.22",
     "node-uuid": "^1.4.3",
     "redis": "^0.12.1",

@@ -33,5 +33,10 @@ module.exports = {
         "user": "SYS_REDIS_USER",
         "password": "SYS_REDIS_PASSWORD"
 
+    },
+    "Services": {
+        "limitServiceHost": "SYS_LIMITHANDLER_HOST",
+        "limitServicePort": "SYS_LIMITHANDLER_PORT",
+        "limitServiceVersion": "SYS_LIMITHANDLER_VERSION"
     }
 };

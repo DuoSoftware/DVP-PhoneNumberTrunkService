@@ -11,6 +11,7 @@ var jwt = require('restify-jwt');
 var secret = require('dvp-common/Authentication/Secret.js');
 var authorization = require('dvp-common/Authentication/Authorization.js');
 var buyNumberHandler = require('./BuyNumberHandler.js');
+var buyNumberOp = require('./BuyNumberOperations.js');
 
 var hostIp = config.Host.Ip;
 var hostPort = config.Host.Port;
@@ -83,6 +84,167 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber', auth
 
 });
 
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorCode/TrunkNumber', authorization({resource: "number", action: "write"}), function (req, res, next)
+{
+    var reqId = nodeUuid.v1();
+    try
+    {
+        var phnInfo = req.body;
+        var operatorCode = req.params.operatorCode;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.AddTrunkNumberForOperator] - [%s] - HTTP Request Received - Req Body : ', reqId, phnInfo);
+
+        if (phnInfo)
+        {
+            var companyId = req.user.company;
+            var tenantId = req.user.tenant;
+
+            if (!companyId || !tenantId)
+            {
+                throw new Error("Invalid company or tenant");
+            }
+
+            buyNumberOp.buyNumberOperation(reqId, operatorCode, phnInfo, companyId, tenantId)
+                .then(function(result)
+                {
+                    var jsonString = messageFormatter.FormatMessage(null, "SUCCESS", true, result);
+                    logger.debug('[DVP-PhoneNumberTrunkService.AddTrunkNumberForOperator] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+
+                })
+                .catch(function(err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
+                    logger.debug('[DVP-PhoneNumberTrunkService.AddTrunkNumberForOperator] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+
+                })
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error("Empty Body"), "ERROR", false, null);
+            logger.debug('[DVP-PhoneNumberTrunkService.AddTrunkNumberForOperator] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+        }
+    }
+    catch (ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+        logger.debug('[DVP-PhoneNumberTrunkService.AddTrunkNumberForOperator] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorCode/AssignNumberLimit', authorization({resource: "number", action: "write"}), function (req, res, next)
+{
+    var reqId = nodeUuid.v1();
+    try
+    {
+        var phnInfo = req.body;
+        var operatorCode = req.params.operatorCode;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.AssignLimitsForOperator] - [%s] - HTTP Request Received - Req Body : ', reqId, phnInfo);
+
+        if (phnInfo)
+        {
+            var companyId = req.user.company;
+            var tenantId = req.user.tenant;
+
+            if (!companyId || !tenantId)
+            {
+                throw new Error("Invalid company or tenant");
+            }
+
+            buyNumberOp.assignNumberLimit(reqId, operatorCode, phnInfo, companyId, tenantId)
+                .then(function(result)
+                {
+                    var jsonString = messageFormatter.FormatMessage(null, "SUCCESS", true, result);
+                    logger.debug('[DVP-PhoneNumberTrunkService.AssignLimitsForOperator] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+
+                })
+                .catch(function(err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
+                    logger.debug('[DVP-PhoneNumberTrunkService.AssignLimitsForOperator] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+
+                })
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error("Empty Body"), "ERROR", false, null);
+            logger.debug('[DVP-PhoneNumberTrunkService.AssignLimitsForOperator] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+        }
+    }
+    catch (ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+        logger.debug('[DVP-PhoneNumberTrunkService.AssignLimitsForOperator] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorCode/TrunkLimit/:limit', authorization({resource: "number", action: "write"}), function (req, res, next)
+{
+    var reqId = nodeUuid.v1();
+    try
+    {
+        var limit = req.params.limit;
+        var operatorCode = req.params.operatorCode;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkLimitsForOperator] - [%s] - HTTP Request Received', reqId);
+
+        if (limit && operatorCode)
+        {
+            var companyId = req.user.company;
+            var tenantId = req.user.tenant;
+
+            if (!companyId || !tenantId)
+            {
+                throw new Error("Invalid company or tenant");
+            }
+
+            buyNumberOp.trunkLimitIncrementByOperator(reqId, operatorCode, limit, companyId, tenantId)
+                .then(function(result)
+                {
+                    var jsonString = messageFormatter.FormatMessage(null, "SUCCESS", true, result);
+                    logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkLimitsForOperator] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+
+                })
+                .catch(function(err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
+                    logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkLimitsForOperator] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+
+                })
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error("Empty Params"), "ERROR", false, null);
+            logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkLimitsForOperator] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+        }
+    }
+    catch (ex)
+    {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
+        logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkLimitsForOperator] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
 
 //DONE
 server.del('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:PhoneNumber', authorization({
