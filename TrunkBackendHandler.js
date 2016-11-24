@@ -1112,6 +1112,32 @@ var GetAllocatedPhoneNumbersForOperator = function(reqId, operatorId, companyId,
 };
 
 
+var GetTrunkOperatorByOperatorCode = function(operatorCode, callback)
+{
+    try
+    {
+
+        dbModel.TrunkOperator.find({where: [{OperatorCode: operatorCode}]}).then(function (result)
+        {
+
+            logger.debug('[DVP-PhoneNumberTrunkService.GetTrunkOperatorByOperatorCode] - [%s] - PGSQL query success', operatorCode);
+
+            callback(undefined, result);
+
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.GetTrunkOperatorByOperatorCode] - [%s] - PGSQL query failed', operatorCode, err);
+            callback(err, undefined);
+        })
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.GetTrunkOperatorByOperatorCode] - [%s] - Exception occurred', operatorCode, ex);
+        callback(ex, undefined);
+    }
+};
+
 module.exports.AddTrunkConfigurationDB = AddTrunkConfigurationDB;
 module.exports.AssignTrunkToLoadBalancer = AssignTrunkToLoadBalancer;
 module.exports.SetTrunkEnabledStatusDB = SetTrunkEnabledStatusDB;
@@ -1136,4 +1162,5 @@ module.exports.GetLoadbalancerForCloud = GetLoadbalancerForCloud;
 module.exports.AddTrunkIpAddress = AddTrunkIpAddress;
 module.exports.GetTrunkIpAddressList = GetTrunkIpAddressList;
 module.exports.RemoveIpAddress = RemoveIpAddress;
+module.exports.GetTrunkOperatorByOperatorCode = GetTrunkOperatorByOperatorCode
 

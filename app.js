@@ -1772,5 +1772,39 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:OperatorI
     return next();
 });
 
+server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:OperatorCode', authorization({
+    resource: "trunkoperator",
+    action: "read"
+}), function (req, res, next) {
+    var jsonString;
+    try {
+
+        //    logger.info('[GetSaleNumber] - [HTTP]  - Request received -  Data - %s', JSON.stringify(req.params));
+        if (!req.user.company || !req.user.tenant) {
+            throw new Error("Invalid company or tenant Ids");
+        }
+        var company = req.user.company;
+        var tenant = req.user.tenant;
+
+        gwBackendHandler.GetTrunkOperatorByOperatorCode(req.params.OperatorCode, function(err, result){
+            if(err){
+                logger.error('[GetOperator] - [HTTP]  - Exception in GetTrunkOperatorByOperatorCode  -  Data - %s', JSON.stringify(req.params), err);
+                jsonString = messageFormatter.FormatMessage(err, "EXCEPTION", false, undefined);
+                res.end(jsonString);
+            }else{
+                jsonString = messageFormatter.FormatMessage(undefined, "Get Trunk Operator By OperatorCode Success", true, result);
+                res.end(jsonString);
+            }
+        });
+
+    }
+    catch (ex) {
+        logger.error('[GetOperator] - [HTTP]  - Exception in Request  -  Data - %s', JSON.stringify(req.params), ex);
+        jsonString = messageFormatter.FormatMessage(ex, "EXCEPTION", false, undefined);
+        res.end(jsonString);
+    }
+    return next();
+});
+
 // ----------------------------------- || End Buy Number || --------------------------------------- \\
 
