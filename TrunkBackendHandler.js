@@ -702,7 +702,9 @@ var AddTrunkConfigurationDB = function(reqId, gwInfo, companyId, tenantId, callb
             CompanyId: companyId,
             TenantId: tenantId,
             FaxType: gwInfo.FaxType,
-            TranslationId: gwInfo.TranslationId
+            TranslationId: gwInfo.TranslationId,
+            Username: gwInfo.Username,
+            Password: gwInfo.Password
         });
 
         gw
@@ -822,7 +824,7 @@ var UpdateTrunkConfigurationDB = function(reqId, trunkId, trunkInfo, companyId, 
             {
                 logger.debug('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL get trunk query success', reqId);
                 //update
-                gwObj.updateAttributes({TrunkName: trunkInfo.TrunkName, Enable: trunkInfo.Enable, ObjClass: trunkInfo.ObjClass, IpUrl: trunkInfo.IpUrl, ObjType: trunkInfo.ObjType, ObjCategory: trunkInfo.ObjCategory, FaxType: trunkInfo.FaxType, TranslationId: trunkInfo.TranslationId}).then(function (upRes)
+                gwObj.updateAttributes({TrunkName: trunkInfo.TrunkName, Enable: trunkInfo.Enable, ObjClass: trunkInfo.ObjClass, IpUrl: trunkInfo.IpUrl, ObjType: trunkInfo.ObjType, ObjCategory: trunkInfo.ObjCategory, FaxType: trunkInfo.FaxType, TranslationId: trunkInfo.TranslationId, Username: trunkInfo.Username, Password: trunkInfo.Password}).then(function (upRes)
                 {
                     redisCacheHandler.addTrunkToCache(trunkId);
                     logger.debug('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL update trunk query success', reqId);
