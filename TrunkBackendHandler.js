@@ -3,6 +3,37 @@ var underscore = require('underscore');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
 
+var GetPhoneNumbersOfTrunk = function(reqId, trunkId, companyId, tenantId, callback)
+{
+    var emptyList = [];
+    try
+    {
+        dbModel.Trunk.find({where :[{id: trunkId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function(trunkObj)
+        {
+            if(trunkObj)
+            {
+                dbModel.TrunkPhoneNumber.findAll({where :[{TrunkId: trunkId}]}).then(function(trunkNumberList)
+                {
+                    callback(null, trunkNumberList);
+
+                }).catch(function(err)
+                {
+                    callback(err, emptyList);
+                })
+            }
+
+        }).catch(function(err)
+        {
+            callback(err, emptyList);
+        })
+    }
+    catch(ex)
+    {
+        callback(ex, emptyList);
+    }
+
+};
+
 
 var SwitchPhoneNumberCompanyDB = function(reqId, phoneNumber, companyId, tenantId, companyToChange, tenantToChange, callback)
 {
@@ -1164,5 +1195,6 @@ module.exports.GetLoadbalancerForCloud = GetLoadbalancerForCloud;
 module.exports.AddTrunkIpAddress = AddTrunkIpAddress;
 module.exports.GetTrunkIpAddressList = GetTrunkIpAddressList;
 module.exports.RemoveIpAddress = RemoveIpAddress;
-module.exports.GetTrunkOperatorByOperatorCode = GetTrunkOperatorByOperatorCode
+module.exports.GetTrunkOperatorByOperatorCode = GetTrunkOperatorByOperatorCode;
+module.exports.GetPhoneNumbersOfTrunk = GetPhoneNumbersOfTrunk;
 

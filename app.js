@@ -1529,6 +1529,8 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/PhoneNumb
     resource: "number",
     action: "read"
 }), function (req, res, next) {
+
+    var emptyArr = [];
     var reqId = nodeUuid.v1();
     try {
 
@@ -1543,29 +1545,34 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/PhoneNumb
         var Company = req.user.company;
         var Tenant = req.user.tenant;
 
-        if (trunkId) {
+
+        if (trunkId)
+        {
             gwBackendHandler.GetPhoneNumbersOfTrunk(reqId, trunkId, Company, Tenant, function (err, result) {
 
-                if (err) {
-                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                if (err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, emptyArr);
                     logger.debug('[DVP-PBXService.GetPhoneNumbersOfTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
                     res.end(jsonString);
                 }
-                else {
-                    var jsonString = messageFormatter.FormatMessage(undefined, "Trunk Found", true, result);
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(null, "Trunk Numbers Found", true, result);
                     logger.debug('[DVP-PBXService.GetPhoneNumbersOfTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
                     res.end(jsonString);
                 }
             })
         }
-        else {
-            var jsonString = messageFormatter.FormatMessage(new Error("Empty Body"), "ERROR", false, undefined);
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error("Empty Body"), "ERROR", false, emptyArr);
             logger.debug('[DVP-PBXService.GetPhoneNumbersOfTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
             res.end(jsonString);
         }
     }
     catch (ex) {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, emptyArr);
         logger.debug('[DVP-PBXService.GetPhoneNumbersOfTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
         res.end(jsonString);
     }
