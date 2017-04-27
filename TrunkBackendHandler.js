@@ -1382,6 +1382,31 @@ var GetLoadbalancerForCloud = function(reqId, cloudId, companyId, tenantId, call
     }
 };
 
+var GetLoadbalancerForTenant = function(reqId, companyId, tenantId, callback)
+{
+    try
+    {
+
+        dbModel.Cloud.find({where: [{CompanyId: companyId}, {TenantId: tenantId}], include : [{model: dbModel.LoadBalancer, as : "LoadBalancer"}]}).then(function (result)
+        {
+            logger.debug('[DVP-PhoneNumberTrunkService.GetUnallocatedPhoneNumbersForOperator] - [%s] - PGSQL query success', reqId);
+
+            callback(undefined, result);
+
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.GetUnallocatedPhoneNumbersForOperator] - [%s] - PGSQL query failed', reqId, err);
+            callback(err, undefined);
+        })
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.GetUnallocatedPhoneNumbersForOperator] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, undefined);
+    }
+};
+
 
 
 var GetAllocatedPhoneNumbersForOperator = function(reqId, operatorId, companyId, tenantId, callback)
@@ -1465,4 +1490,5 @@ module.exports.GetTrunkOperatorByOperatorCode = GetTrunkOperatorByOperatorCode;
 module.exports.GetPhoneNumbersOfTrunk = GetPhoneNumbersOfTrunk;
 module.exports.AddPhoneNumberToClientCompany = AddPhoneNumberToClientCompany;
 module.exports.UpdatePhoneNumberToClientCompany = UpdatePhoneNumberToClientCompany;
+module.exports.GetLoadbalancerForTenant = GetLoadbalancerForTenant;
 

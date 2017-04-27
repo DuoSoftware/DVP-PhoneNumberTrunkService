@@ -399,6 +399,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk', authorizat
 
 });
 
+
 server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/IpAddress', authorization({
     resource: "trunk",
     action: "write"
@@ -725,6 +726,101 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetCloud
     catch (ex) {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
         logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+});
+
+server.put('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetCloudForTenant', authorization({
+    resource: "tenant",
+    action: "write"
+}), function (req, res, next) {
+    var reqId = nodeUuid.v1();
+    try {
+        var trunkId = parseInt(req.params.id);
+
+        logger.debug('[DVP-PhoneNumberTrunkService.SetCloudForTenant] - [%s] - HTTP Request Received Req Params - Id : %s, cloudId : %s', reqId, trunkId, cloudId);
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId) {
+            throw new Error("Invalid company or tenant");
+        }
+
+        if (trunkId) {
+            gwBackendHandler.GetLoadbalancerForTenant(reqId, companyId, tenantId, function (err, result) {
+                if (err) {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                    logger.debug('[DVP-PBXService.SetCloudForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+
+                }
+                else {
+                    if (result && result.LoadBalancer) {
+                        gwBackendHandler.AssignTrunkToLoadBalancer(reqId, trunkId, result.LoadBalancer.id, companyId, tenantId, function (err, result2) {
+
+                            try {
+                                if (err) {
+                                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                                    logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                    res.end(jsonString);
+                                }
+                                else {
+                                    gwBackendHandler.GetCallServersRelatedToLoadBalancerDB(reqId, result.LoadBalancer.id, function (err, csRes) {
+                                        if (err) {
+                                            var jsonString = messageFormatter.FormatMessage(err, "Load Balancer added but error occurred while notifying call servers", false, undefined);
+                                            logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                            res.end(jsonString);
+                                        }
+                                        else {
+                                            //Publish to Redis
+                                            csRes.forEach(function (cs) {
+                                                var pattern = "CSCOMMAND:" + cs.id + "rescangateway";
+                                                var message = '{"profile": "external"}';
+
+                                                redisHandler.PublishToRedis(pattern, message, function (err, redisResult) {
+
+                                                })
+
+                                            });
+                                            var jsonString = messageFormatter.FormatMessage(undefined, "Load Balancer added successfully", true, undefined);
+                                            logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                            res.end(jsonString);
+                                        }
+                                    })
+
+                                }
+                            }
+                            catch (ex) {
+                                var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+                                logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                res.end(jsonString);
+                            }
+                        })
+                    }
+                    else {
+                        var jsonString = messageFormatter.FormatMessage(new Error('Cloud has no load balancers configured'), "ERROR", false, undefined);
+                        logger.debug('[DVP-PBXService.SetCloudForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+                    }
+                }
+
+            });
+        }
+        else {
+            var jsonString = messageFormatter.FormatMessage(new Error("Invalid trunk id or cloud id provided"), "ERROR", false, undefined);
+            logger.debug('[DVP-PBXService.SetCloudForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+
+        }
+
+
+    }
+    catch (ex) {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-PBXService.SetCloudForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
         res.end(jsonString);
     }
 
