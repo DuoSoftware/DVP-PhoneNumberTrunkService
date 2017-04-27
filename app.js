@@ -1407,6 +1407,108 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:Phone
     return next();
 });
 
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumberForTenant', authorization({
+    resource: "tenant",
+    action: "write"
+}), function (req, res, next)
+{
+    var reqId = nodeUuid.v1();
+    try
+    {
+        var body = req.body;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.SaveTrunkNumberForTenant] - [%s] - HTTP Request Received Req Body : %s', reqId, JSON.stringify(body));
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId) {
+            throw new Error("Invalid company or tenant");
+        }
+
+        if(body.ClientCompany && body.PhoneNumber)
+        {
+            gwBackendHandler.AddPhoneNumberToClientCompany(reqId, body, companyId, tenantId).then(function(result)
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Phone number saved successfully", true, result);
+                logger.debug('[DVP-PBXService.SaveTrunkNumberForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }).catch(function(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Error on adding phone number", false, null);
+                logger.debug('[DVP-PBXService.SaveTrunkNumberForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            })
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error("Insufficiant information"), "ERROR", false, null);
+            logger.debug('[DVP-PBXService.GetTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+        }
+
+
+    }
+    catch (ex) {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-PBXService.GetTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+});
+
+server.put('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/UpdateNumberForTenant', authorization({
+    resource: "tenant",
+    action: "write"
+}), function (req, res, next)
+{
+    var reqId = nodeUuid.v1();
+    try
+    {
+        var body = req.body;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.UpdateNumberForTenant] - [%s] - HTTP Request Received Req Body : %s', reqId, JSON.stringify(body));
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId) {
+            throw new Error("Invalid company or tenant");
+        }
+
+        if(body.ClientCompany && body.PhoneNumber)
+        {
+            gwBackendHandler.UpdatePhoneNumberToClientCompany(reqId, body, companyId, tenantId).then(function(result)
+            {
+                var jsonString = messageFormatter.FormatMessage(null, "Phone number updated successfully", true, result);
+                logger.debug('[DVP-PBXService.UpdateNumberForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }).catch(function(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Error on adding phone number", false, null);
+                logger.debug('[DVP-PBXService.UpdateNumberForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            })
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error("Insufficiant information"), "ERROR", false, null);
+            logger.debug('[DVP-PBXService.UpdateNumberForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+        }
+
+
+    }
+    catch (ex) {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-PBXService.UpdateNumberForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+});
+
 //.......................................post............................................................................
 
 //check params
@@ -1526,7 +1628,7 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumbers', auth
 // application development phase
 
 server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/PhoneNumbers', authorization({
-    resource: "number",
+    resource: "tenant",
     action: "read"
 }), function (req, res, next) {
 

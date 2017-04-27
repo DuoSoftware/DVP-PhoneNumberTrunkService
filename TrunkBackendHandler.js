@@ -2,6 +2,9 @@ var dbModel = require('dvp-dbmodels');
 var underscore = require('underscore');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
+var Promise = require('bluebird');
+var async = require('async');
+var extApiAccess = require('./ExternalApiAccess.js');
 
 var GetPhoneNumbersOfTrunk = function(reqId, trunkId, companyId, tenantId, callback)
 {
@@ -12,7 +15,7 @@ var GetPhoneNumbersOfTrunk = function(reqId, trunkId, companyId, tenantId, callb
         {
             if(trunkObj)
             {
-                dbModel.TrunkPhoneNumber.findAll({where :[{TrunkId: trunkId}]}).then(function(trunkNumberList)
+                dbModel.TrunkPhoneNumber.findAll({where :[{TrunkId: trunkId}], include:[{model: dbModel.LimitInfo, as: 'LimitInfoInbound'},{model: dbModel.LimitInfo, as: 'LimitInfoOutbound'},{model: dbModel.LimitInfo, as: 'LimitInfoBoth'}]}).then(function(trunkNumberList)
                 {
                     callback(null, trunkNumberList);
 
@@ -31,6 +34,269 @@ var GetPhoneNumbersOfTrunk = function(reqId, trunkId, companyId, tenantId, callb
     {
         callback(ex, emptyList);
     }
+
+};
+
+var AddPhoneNumberToClientCompany = function(reqId, phnNumInfo, companyId, tenantId)
+{
+
+    return new Promise(function(fulfill, reject)
+    {
+        try
+        {
+            //First validate whether trunk belongs to requesters company
+
+            dbModel.Trunk.find({where :[{id: phnNumInfo.TrunkId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function(trunkObj)
+            {
+                if(trunkObj)
+                {
+                    //check number already in use
+                    dbModel.TrunkPhoneNumber.find({where :[{PhoneNumber: phnNumInfo.PhoneNumber}]}).then(function(trunkNumber)
+                    {
+                        if(!trunkNumber)
+                        {
+                            //add limits
+                            var limitExecutionArr = [];
+                            var indexMapper = {};
+                            var i = 0;
+
+                            if(phnNumInfo.InboundLimit)
+                            {
+                                limitExecutionArr.push(extApiAccess.addNewLimitCallback.bind(this, reqId, phnNumInfo.PhoneNumber, phnNumInfo.PhoneNumber + ' INBOUND', phnNumInfo.InboundLimit, phnNumInfo.ClientCompany, tenantId));
+                                indexMapper['INBOUND'] = i;
+                                i++;
+                            }
+
+                            if(phnNumInfo.OutboundLimit)
+                            {
+                                limitExecutionArr.push(extApiAccess.addNewLimitCallback.bind(this, reqId, phnNumInfo.PhoneNumber, phnNumInfo.PhoneNumber + ' OUTBOUND', phnNumInfo.OutboundLimit, phnNumInfo.ClientCompany, tenantId));
+                                indexMapper['OUTBOUND'] = i;
+                                i++;
+                            }
+
+                            if(phnNumInfo.BothLimit)
+                            {
+                                limitExecutionArr.push(extApiAccess.addNewLimitCallback.bind(this, reqId, phnNumInfo.PhoneNumber, phnNumInfo.PhoneNumber + ' BOTH', phnNumInfo.BothLimit, phnNumInfo.ClientCompany, tenantId));
+                                indexMapper['BOTH'] = i;
+                            }
+
+                            async.parallel(limitExecutionArr, function(err, limitExecResult)
+                            {
+                                if (err)
+                                {
+                                    reject(err);
+                                }
+                                else
+                                {
+                                    var num = dbModel.TrunkPhoneNumber.build({
+                                        PhoneNumber: phnNumInfo.PhoneNumber,
+                                        ObjClass: 'DVP',
+                                        ObjType: phnNumInfo.ObjType,
+                                        ObjCategory: phnNumInfo.ObjCategory,
+                                        CompanyId: phnNumInfo.ClientCompany,
+                                        TenantId: tenantId,
+                                        Enable: phnNumInfo.Enable,
+                                        TrunkId: phnNumInfo.TrunkId
+                                    });
+
+                                    if (indexMapper.hasOwnProperty('INBOUND') && limitExecResult[indexMapper['INBOUND']])
+                                    {
+                                        num.InboundLimitId = limitExecResult[indexMapper['INBOUND']].LimitId;
+                                    }
+
+                                    if (indexMapper.hasOwnProperty('OUTBOUND') && limitExecResult[indexMapper['OUTBOUND']])
+                                    {
+                                        num.OutboundLimitId = limitExecResult[indexMapper['OUTBOUND']].LimitId;
+                                    }
+
+                                    if (indexMapper.hasOwnProperty('BOTH') && limitExecResult[indexMapper['BOTH']])
+                                    {
+                                        num.BothLimitId = limitExecResult[indexMapper['BOTH']].LimitId;
+                                    }
+
+                                    num
+                                        .save()
+                                        .then(function (rslt)
+                                        {
+                                            fulfill(rslt);
+
+                                        }).catch(function (err)
+                                        {
+                                            reject(err);
+                                        })
+                                }
+                            });
+                        }
+                        else
+                        {
+                            reject(new Error('Phone number exists'));
+                        }
+
+                    }).catch(function(err)
+                    {
+                        reject(err);
+                    })
+                }
+                else
+                {
+                    reject(new Error('Trunk does not belong to your company'));
+
+                }
+
+            }).catch(function(err)
+            {
+                reject(err);
+            })
+        }
+        catch(ex)
+        {
+            reject(ex);
+        }
+    });
+
+
+};
+
+var UpdatePhoneNumberToClientCompany = function(reqId, phnNumInfo, companyId, tenantId)
+{
+
+    return new Promise(function(fulfill, reject)
+    {
+        try
+        {
+            //First validate whether trunk belongs to requesters company
+
+            dbModel.Trunk.find({where :[{id: phnNumInfo.TrunkId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function(trunkObj)
+            {
+                if(trunkObj)
+                {
+                    //check number already in use
+                    dbModel.TrunkPhoneNumber.find({where :[{PhoneNumber: phnNumInfo.PhoneNumber, TrunkId: phnNumInfo.TrunkId, TenantId: tenantId}]}).then(function(trunkNumber)
+                    {
+                        if(trunkNumber)
+                        {
+                            //add limits
+                            var limitExecutionArr = [];
+                            var indexMapper = {};
+                            var i = 0;
+
+                            if(phnNumInfo.InboundLimitId)
+                            {
+                                if(!phnNumInfo.InboundLimit)
+                                {
+                                    phnNumInfo.InboundLimit = 0;
+                                }
+                                limitExecutionArr.push(extApiAccess.updateLimitCompSwitchCallback.bind(this, reqId, phnNumInfo.InboundLimitId, phnNumInfo.InboundLimit, phnNumInfo.ClientCompany, tenantId));
+                                indexMapper['INBOUND'] = i;
+                                i++;
+                            }
+                            else
+                            {
+                                limitExecutionArr.push(extApiAccess.addNewLimitCallback.bind(this, reqId, phnNumInfo.PhoneNumber, phnNumInfo.PhoneNumber + ' INBOUND', phnNumInfo.InboundLimit, phnNumInfo.ClientCompany, tenantId));
+                                indexMapper['INBOUND'] = i;
+                                i++;
+                            }
+
+                            if(phnNumInfo.OutboundLimitId)
+                            {
+                                if(!phnNumInfo.OutboundLimit)
+                                {
+                                    phnNumInfo.OutboundLimit = 0;
+                                }
+
+                                limitExecutionArr.push(extApiAccess.updateLimitCompSwitchCallback.bind(this, reqId, phnNumInfo.OutboundLimitId, phnNumInfo.OutboundLimit, phnNumInfo.ClientCompany, tenantId));
+                                indexMapper['OUTBOUND'] = i;
+                                i++;
+                            }
+                            else
+                            {
+                                limitExecutionArr.push(extApiAccess.addNewLimitCallback.bind(this, reqId, phnNumInfo.PhoneNumber, phnNumInfo.PhoneNumber + ' OUTBOUND', phnNumInfo.OutboundLimit, phnNumInfo.ClientCompany, tenantId));
+                                indexMapper['OUTBOUND'] = i;
+                                i++;
+                            }
+
+                            if(phnNumInfo.BothLimitId)
+                            {
+                                if(!phnNumInfo.BothLimit)
+                                {
+                                    phnNumInfo.BothLimit = 0;
+                                }
+                                limitExecutionArr.push(extApiAccess.updateLimitCompSwitchCallback.bind(this, reqId, phnNumInfo.BothLimitId, phnNumInfo.BothLimit, phnNumInfo.ClientCompany, tenantId));
+                                indexMapper['BOTH'] = i;
+                            }
+                            else
+                            {
+                                limitExecutionArr.push(extApiAccess.addNewLimitCallback.bind(this, reqId, phnNumInfo.PhoneNumber, phnNumInfo.PhoneNumber + ' BOTH', phnNumInfo.BothLimit, phnNumInfo.ClientCompany, tenantId));
+                                indexMapper['BOTH'] = i;
+                            }
+
+                            async.parallel(limitExecutionArr, function(err, limitExecResult)
+                            {
+                                if (err)
+                                {
+                                    reject(err);
+                                }
+                                else
+                                {
+                                    var obj = {
+
+                                        Enable: phnNumInfo.Enable,
+                                        CompanyId: phnNumInfo.ClientCompany
+
+                                    };
+
+                                    if (indexMapper.hasOwnProperty('INBOUND') && limitExecResult[indexMapper['INBOUND']])
+                                    {
+                                        obj.InboundLimitId = limitExecResult[indexMapper['INBOUND']].LimitId;
+                                    }
+
+                                    if (indexMapper.hasOwnProperty('OUTBOUND') && limitExecResult[indexMapper['OUTBOUND']])
+                                    {
+                                        obj.OutboundLimitId = limitExecResult[indexMapper['OUTBOUND']].LimitId;
+                                    }
+
+                                    if (indexMapper.hasOwnProperty('BOTH') && limitExecResult[indexMapper['BOTH']])
+                                    {
+                                        obj.BothLimitId = limitExecResult[indexMapper['BOTH']].LimitId;
+                                    }
+
+                                    trunkNumber.updateAttributes(obj).then(function(rslt)
+                                    {
+                                        fulfill(rslt);
+                                    }).catch(function(err)
+                                    {
+                                        reject(err);
+                                    });
+                                }
+                            });
+                        }
+                        else
+                        {
+                            reject(new Error('Phone number does not exist'));
+                        }
+
+                    }).catch(function(err)
+                    {
+                        reject(err);
+                    })
+                }
+                else
+                {
+                    reject(new Error('Trunk does not belong to your company'));
+
+                }
+
+            }).catch(function(err)
+            {
+                reject(err);
+            })
+        }
+        catch(ex)
+        {
+            reject(ex);
+        }
+    });
+
 
 };
 
@@ -1197,4 +1463,6 @@ module.exports.GetTrunkIpAddressList = GetTrunkIpAddressList;
 module.exports.RemoveIpAddress = RemoveIpAddress;
 module.exports.GetTrunkOperatorByOperatorCode = GetTrunkOperatorByOperatorCode;
 module.exports.GetPhoneNumbersOfTrunk = GetPhoneNumbersOfTrunk;
+module.exports.AddPhoneNumberToClientCompany = AddPhoneNumberToClientCompany;
+module.exports.UpdatePhoneNumberToClientCompany = UpdatePhoneNumberToClientCompany;
 
