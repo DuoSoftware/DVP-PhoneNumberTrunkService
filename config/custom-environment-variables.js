@@ -38,5 +38,6 @@ module.exports = {
         "limitServiceHost": "SYS_LIMITHANDLER_HOST",
         "limitServicePort": "SYS_LIMITHANDLER_PORT",
         "limitServiceVersion": "SYS_LIMITHANDLER_VERSION"
-    }
+    },
+    "Token": "HOST_TOKEN"
 };

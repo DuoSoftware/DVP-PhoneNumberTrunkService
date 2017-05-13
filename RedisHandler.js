@@ -93,6 +93,29 @@ var DeleteObject = function(key, callback)
 
 };
 
+var PublishToRedis = function(pattern, message, callback)
+{
+    try
+    {
+        if(client.connected)
+        {
+            var result = client.publish(pattern, message);
+            logger.debug('[DVP-DynamicConfigurationGenerator.SetObjectWithExpire] - REDIS SUCCESS');
+            callback(undefined, true);
+        }
+        else
+        {
+            callback(new Error('REDIS CLIENT DISCONNECTED'), false);
+        }
+
+
+    }
+    catch(ex)
+    {
+        callback(ex, undefined);
+    }
+}
+
 
 
 
@@ -100,4 +123,5 @@ var DeleteObject = function(key, callback)
 module.exports.SetObject = SetObject;
 module.exports.DeleteObject = DeleteObject;
 module.exports.addTrunkToCache = addTrunkToCache;
+module.exports.PublishToRedis = PublishToRedis;
 module.exports.redisClient = client;

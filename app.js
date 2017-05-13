@@ -399,6 +399,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk', authorizat
 
 });
 
+
 server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/IpAddress', authorization({
     resource: "trunk",
     action: "write"
@@ -725,6 +726,101 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetCloud
     catch (ex) {
         var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
         logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+});
+
+server.put('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetCloudForTenant', authorization({
+    resource: "tenant",
+    action: "write"
+}), function (req, res, next) {
+    var reqId = nodeUuid.v1();
+    try {
+        var trunkId = parseInt(req.params.id);
+
+        logger.debug('[DVP-PhoneNumberTrunkService.SetCloudForTenant] - [%s] - HTTP Request Received Req Params - Id : %s, cloudId : %s', reqId, trunkId, cloudId);
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId) {
+            throw new Error("Invalid company or tenant");
+        }
+
+        if (trunkId) {
+            gwBackendHandler.GetLoadbalancerForTenant(reqId, companyId, tenantId, function (err, result) {
+                if (err) {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                    logger.debug('[DVP-PBXService.SetCloudForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+
+                }
+                else {
+                    if (result && result.LoadBalancer) {
+                        gwBackendHandler.AssignTrunkToLoadBalancer(reqId, trunkId, result.LoadBalancer.id, companyId, tenantId, function (err, result2) {
+
+                            try {
+                                if (err) {
+                                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                                    logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                    res.end(jsonString);
+                                }
+                                else {
+                                    gwBackendHandler.GetCallServersRelatedToLoadBalancerDB(reqId, result.LoadBalancer.id, function (err, csRes) {
+                                        if (err) {
+                                            var jsonString = messageFormatter.FormatMessage(err, "Load Balancer added but error occurred while notifying call servers", false, undefined);
+                                            logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                            res.end(jsonString);
+                                        }
+                                        else {
+                                            //Publish to Redis
+                                            csRes.forEach(function (cs) {
+                                                var pattern = "CSCOMMAND:" + cs.id + "rescangateway";
+                                                var message = '{"profile": "external"}';
+
+                                                redisHandler.PublishToRedis(pattern, message, function (err, redisResult) {
+
+                                                })
+
+                                            });
+                                            var jsonString = messageFormatter.FormatMessage(undefined, "Load Balancer added successfully", true, undefined);
+                                            logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                            res.end(jsonString);
+                                        }
+                                    })
+
+                                }
+                            }
+                            catch (ex) {
+                                var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+                                logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                res.end(jsonString);
+                            }
+                        })
+                    }
+                    else {
+                        var jsonString = messageFormatter.FormatMessage(new Error('Cloud has no load balancers configured'), "ERROR", false, undefined);
+                        logger.debug('[DVP-PBXService.SetCloudForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+                    }
+                }
+
+            });
+        }
+        else {
+            var jsonString = messageFormatter.FormatMessage(new Error("Invalid trunk id or cloud id provided"), "ERROR", false, undefined);
+            logger.debug('[DVP-PBXService.SetCloudForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+
+        }
+
+
+    }
+    catch (ex) {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-PBXService.SetCloudForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
         res.end(jsonString);
     }
 
@@ -1407,6 +1503,108 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/:Phone
     return next();
 });
 
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumberForTenant', authorization({
+    resource: "tenant",
+    action: "write"
+}), function (req, res, next)
+{
+    var reqId = nodeUuid.v1();
+    try
+    {
+        var body = req.body;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.SaveTrunkNumberForTenant] - [%s] - HTTP Request Received Req Body : %s', reqId, JSON.stringify(body));
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId) {
+            throw new Error("Invalid company or tenant");
+        }
+
+        if(body.ClientCompany && body.PhoneNumber)
+        {
+            gwBackendHandler.AddPhoneNumberToClientCompany(reqId, body, companyId, tenantId).then(function(result)
+            {
+                var jsonString = messageFormatter.FormatMessage(undefined, "Phone number saved successfully", true, result);
+                logger.debug('[DVP-PBXService.SaveTrunkNumberForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }).catch(function(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Error on adding phone number", false, null);
+                logger.debug('[DVP-PBXService.SaveTrunkNumberForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            })
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error("Insufficiant information"), "ERROR", false, null);
+            logger.debug('[DVP-PBXService.GetTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+        }
+
+
+    }
+    catch (ex) {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-PBXService.GetTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+});
+
+server.put('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/UpdateNumberForTenant', authorization({
+    resource: "tenant",
+    action: "write"
+}), function (req, res, next)
+{
+    var reqId = nodeUuid.v1();
+    try
+    {
+        var body = req.body;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.UpdateNumberForTenant] - [%s] - HTTP Request Received Req Body : %s', reqId, JSON.stringify(body));
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId) {
+            throw new Error("Invalid company or tenant");
+        }
+
+        if(body.ClientCompany && body.PhoneNumber)
+        {
+            gwBackendHandler.UpdatePhoneNumberToClientCompany(reqId, body, companyId, tenantId).then(function(result)
+            {
+                var jsonString = messageFormatter.FormatMessage(null, "Phone number updated successfully", true, result);
+                logger.debug('[DVP-PBXService.UpdateNumberForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            }).catch(function(err)
+            {
+                var jsonString = messageFormatter.FormatMessage(err, "Error on adding phone number", false, null);
+                logger.debug('[DVP-PBXService.UpdateNumberForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                res.end(jsonString);
+            })
+        }
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error("Insufficiant information"), "ERROR", false, null);
+            logger.debug('[DVP-PBXService.UpdateNumberForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+        }
+
+
+    }
+    catch (ex) {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        logger.debug('[DVP-PBXService.UpdateNumberForTenant] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+});
+
 //.......................................post............................................................................
 
 //check params
@@ -1526,9 +1724,11 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumbers', auth
 // application development phase
 
 server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/PhoneNumbers', authorization({
-    resource: "number",
+    resource: "tenant",
     action: "read"
 }), function (req, res, next) {
+
+    var emptyArr = [];
     var reqId = nodeUuid.v1();
     try {
 
@@ -1543,29 +1743,34 @@ server.get('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/PhoneNumb
         var Company = req.user.company;
         var Tenant = req.user.tenant;
 
-        if (trunkId) {
+
+        if (trunkId)
+        {
             gwBackendHandler.GetPhoneNumbersOfTrunk(reqId, trunkId, Company, Tenant, function (err, result) {
 
-                if (err) {
-                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                if (err)
+                {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, emptyArr);
                     logger.debug('[DVP-PBXService.GetPhoneNumbersOfTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
                     res.end(jsonString);
                 }
-                else {
-                    var jsonString = messageFormatter.FormatMessage(undefined, "Trunk Found", true, result);
+                else
+                {
+                    var jsonString = messageFormatter.FormatMessage(null, "Trunk Numbers Found", true, result);
                     logger.debug('[DVP-PBXService.GetPhoneNumbersOfTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
                     res.end(jsonString);
                 }
             })
         }
-        else {
-            var jsonString = messageFormatter.FormatMessage(new Error("Empty Body"), "ERROR", false, undefined);
+        else
+        {
+            var jsonString = messageFormatter.FormatMessage(new Error("Empty Body"), "ERROR", false, emptyArr);
             logger.debug('[DVP-PBXService.GetPhoneNumbersOfTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
             res.end(jsonString);
         }
     }
     catch (ex) {
-        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, emptyArr);
         logger.debug('[DVP-PBXService.GetPhoneNumbersOfTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
         res.end(jsonString);
     }

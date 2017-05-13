@@ -4,6 +4,7 @@
   "description": "DVP-PhoneNumberTrunkService\r ===========================",
   "main": "app.js",
   "dependencies": {
+    "async": "^2.3.0",
     "bluebird": "^3.4.6",
     "config": "^1.12.0",
     "dvp-common": "^0.5.6",
