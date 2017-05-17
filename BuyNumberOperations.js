@@ -206,7 +206,7 @@ var addLimitAndSetToNumber = function(reqId, maxLimit, companyId, tenantId, phon
             }
             else
             {
-                externalApiAccess.addNewLimit(reqId, phoneNumberObj.PhoneNumber, maxLimit, companyId, tenantId)
+                externalApiAccess.addNewLimit(reqId, phoneNumberObj.PhoneNumber, phoneNumberObj.PhoneNumber + ' Inbounf Limit', maxLimit, companyId, tenantId)
                     .then(function(limitInfo)
                     {
                         if(limitInfo)
