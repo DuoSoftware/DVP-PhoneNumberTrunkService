@@ -8,7 +8,8 @@
 #EXPOSE 8818
 
 FROM node:5.10.0
-RUN git clone git://github.com/DuoSoftware/DVP-PhoneNumberTrunkService.git /usr/local/src/phonenumbertrunkservice
+ARG VERSION_TAG
+RUN git clone -b $VERSION_TAG https://github.com/DuoSoftware/DVP-PhoneNumberTrunkService.git /usr/local/src/phonenumbertrunkservice
 RUN cd /usr/local/src/phonenumbertrunkservice;
 WORKDIR /usr/local/src/phonenumbertrunkservice
 RUN npm install

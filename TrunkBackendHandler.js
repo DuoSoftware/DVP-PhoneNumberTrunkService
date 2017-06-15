@@ -241,7 +241,8 @@ var UpdatePhoneNumberToClientCompany = function(reqId, phnNumInfo, companyId, te
                                     var obj = {
 
                                         Enable: phnNumInfo.Enable,
-                                        CompanyId: phnNumInfo.ClientCompany
+                                        CompanyId: phnNumInfo.ClientCompany,
+                                        ObjCategory: phnNumInfo.ObjCategory
 
                                     };
 
