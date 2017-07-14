@@ -382,6 +382,14 @@ var GetTrunkListDB = function(reqId, companyId, tenantId, callback)
     {
         dbModel.Trunk.findAll({where :[{CompanyId: companyId},{TenantId: tenantId}]}).then(function(trunkList)
         {
+            trunkList.forEach(function(tr)
+            {
+                if(tr.Codecs)
+                {
+                    tr.Codecs = JSON.parse(tr.Codecs);
+                }
+
+            });
             logger.debug('[DVP-PhoneNumberTrunkService.GetTrunkByIdDB] - [%s] - PGSQL get trunk query success', reqId);
 
             callback(undefined, trunkList);
@@ -989,7 +997,7 @@ var AddTrunkConfigurationDB = function(reqId, gwInfo, companyId, tenantId, callb
     try
     {
 
-        var gw = dbModel.Trunk.build({
+        var gwData = {
             TrunkCode: gwInfo.TrunkCode,
             TrunkName: gwInfo.TrunkName,
             ObjClass: gwInfo.ObjClass,
@@ -1003,7 +1011,14 @@ var AddTrunkConfigurationDB = function(reqId, gwInfo, companyId, tenantId, callb
             TranslationId: gwInfo.TranslationId,
             Username: gwInfo.Username,
             Password: gwInfo.Password
-        });
+        };
+
+        if(gwInfo.Codecs)
+        {
+            gwData.Codecs = JSON.stringify(gwInfo.Codecs);
+        }
+
+        var gw = dbModel.Trunk.build(gwData);
 
         gw
             .save()
@@ -1120,9 +1135,17 @@ var UpdateTrunkConfigurationDB = function(reqId, trunkId, trunkInfo, companyId, 
         {
             if(gwObj)
             {
+
                 logger.debug('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL get trunk query success', reqId);
                 //update
-                gwObj.updateAttributes({TrunkName: trunkInfo.TrunkName, Enable: trunkInfo.Enable, ObjClass: trunkInfo.ObjClass, IpUrl: trunkInfo.IpUrl, ObjType: trunkInfo.ObjType, ObjCategory: trunkInfo.ObjCategory, FaxType: trunkInfo.FaxType, TranslationId: trunkInfo.TranslationId, Username: trunkInfo.Username, Password: trunkInfo.Password}).then(function (upRes)
+                var gwData = {TrunkName: trunkInfo.TrunkName, Enable: trunkInfo.Enable, ObjClass: trunkInfo.ObjClass, IpUrl: trunkInfo.IpUrl, ObjType: trunkInfo.ObjType, ObjCategory: trunkInfo.ObjCategory, FaxType: trunkInfo.FaxType, TranslationId: trunkInfo.TranslationId, Username: trunkInfo.Username, Password: trunkInfo.Password};
+
+                if(trunkInfo.Codecs)
+                {
+                    gwData.Codecs = JSON.stringify(trunkInfo.Codecs);
+                }
+
+                gwObj.updateAttributes(gwData).then(function (upRes)
                 {
                     redisCacheHandler.addTrunkToCache(trunkId);
                     logger.debug('[DVP-PhoneNumberTrunkService.UpdateTrunkConfigurationDB] - [%s] - PGSQL update trunk query success', reqId);
