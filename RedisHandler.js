@@ -97,16 +97,9 @@ var PublishToRedis = function(pattern, message, callback)
 {
     try
     {
-        if(client.connected)
-        {
             var result = client.publish(pattern, message);
             logger.debug('[DVP-DynamicConfigurationGenerator.SetObjectWithExpire] - REDIS SUCCESS');
             callback(undefined, true);
-        }
-        else
-        {
-            callback(new Error('REDIS CLIENT DISCONNECTED'), false);
-        }
 
 
     }
