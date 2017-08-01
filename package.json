@@ -9,6 +9,7 @@
     "config": "^1.12.0",
     "dvp-common": "0.8.4",
     "dvp-dbmodels": "1.2.9",
+    "ioredis": "^3.1.2",
     "log4js": "^0.6.22",
     "node-uuid": "^1.4.3",
     "redis": "^0.12.1",
