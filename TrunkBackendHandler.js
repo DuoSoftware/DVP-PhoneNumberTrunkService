@@ -37,6 +37,26 @@ var GetPhoneNumbersOfTrunk = function(reqId, trunkId, companyId, tenantId, callb
 
 };
 
+var GetPhoneNumber = function(reqId, tenantId, phnNum, callback)
+{
+    try
+    {
+        dbModel.TrunkPhoneNumber.find({where :[{PhoneNumber: phnNum, TenantId: tenantId}]}).then(function(trunkNumber)
+        {
+            callback(null, trunkNumber);
+
+        }).catch(function(err)
+        {
+            callback(err, null);
+        })
+    }
+    catch(ex)
+    {
+        callback(ex, null);
+    }
+
+};
+
 var AddPhoneNumberToClientCompany = function(reqId, phnNumInfo, companyId, tenantId)
 {
 
@@ -1515,4 +1535,5 @@ module.exports.GetPhoneNumbersOfTrunk = GetPhoneNumbersOfTrunk;
 module.exports.AddPhoneNumberToClientCompany = AddPhoneNumberToClientCompany;
 module.exports.UpdatePhoneNumberToClientCompany = UpdatePhoneNumberToClientCompany;
 module.exports.GetLoadbalancerForTenant = GetLoadbalancerForTenant;
+module.exports.GetPhoneNumber = GetPhoneNumber;
 
