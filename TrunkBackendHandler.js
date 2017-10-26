@@ -645,6 +645,42 @@ var AssignTrunkToProfile = function(reqId, gwId, profileId, companyId, tenantId,
 
 };
 
+var UnAssignProfileFromTrunk = function(reqId, gwId, companyId, tenantId, callback)
+{
+    try
+    {
+        dbModel.Trunk.find({where: [{id: gwId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function (gwRec)
+        {
+            if(gwRec)
+            {
+                gwRec.updateAttributes({ProfileId: null}).then(function (result)
+                {
+                    redisCacheHandler.addTrunkToCache(gwRec.id);
+                    callback(null, true);
+
+                }).catch(function(err)
+                {
+                    callback(err, false);
+                })
+            }
+            else
+            {
+                callback(new Error('Trunk not found'), false);
+            }
+
+        }).catch(function(err)
+        {
+            callback(err, false);
+        })
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.UnAssignProfileFromTrunk] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, false);
+    }
+
+};
+
 var AssignTrunkToLoadBalancer = function(reqId, gwId, lbId, companyId, tenantId, callback)
 {
     try
@@ -698,6 +734,48 @@ var AssignTrunkToLoadBalancer = function(reqId, gwId, lbId, companyId, tenantId,
     catch(ex)
     {
         logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, false);
+    }
+
+};
+
+var UnAssignLoadBalancerFromTrunk = function(reqId, gwId, companyId, tenantId, callback)
+{
+    try
+    {
+        dbModel.Trunk.find({where: [{id: gwId},{CompanyId : companyId},{TenantId : tenantId}]}).then(function (gwRec)
+        {
+            if(gwRec)
+            {
+                logger.debug('[DVP-PhoneNumberTrunkService.UnAssignLoadBalancerFromTrunk] - [%s] - PGSQL get trunk query success', reqId);
+
+                gwRec.updateAttributes({LoadBalancerId: null}).then(function (result)
+                {
+                    redisCacheHandler.addTrunkToCache(gwRec.id);
+                    logger.debug('[DVP-PhoneNumberTrunkService.UnAssignLoadBalancerFromTrunk] - [%s] - PGSQL update trunk with loadbalancer id query success', reqId);
+                    callback(undefined, true);
+
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-PhoneNumberTrunkService.UnAssignLoadBalancerFromTrunk] - [%s] - PGSQL update trunk with loadbalancer id query failed', reqId, err);
+                    callback(err, false);
+                })
+            }
+            else
+            {
+                logger.debug('[DVP-PhoneNumberTrunkService.UnAssignLoadBalancerFromTrunk] - [%s] - PGSQL get trunk query success', reqId);
+                callback(new Error('Trunk Not Found'), false);
+            }
+
+        }).catch(function(err)
+        {
+            logger.error('[DVP-PhoneNumberTrunkService.UnAssignLoadBalancerFromTrunk] - [%s] - PGSQL get trunk query failed', reqId, err);
+            callback(err, false);
+        })
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.UnAssignLoadBalancerFromTrunk] - [%s] - Exception occurred', reqId, ex);
         callback(ex, false);
     }
 
@@ -757,6 +835,42 @@ var AssignTrunkTranslation = function(reqId, gwId, transId, companyId, tenantId,
     catch(ex)
     {
         logger.error('[DVP-PhoneNumberTrunkService.AssignTrunkTranslation] - [%s] - Exception occurred', reqId, ex);
+        callback(ex, false);
+    }
+
+};
+
+var UnAssignTrunkTranslation = function(reqId, gwId, companyId, tenantId, callback)
+{
+    try
+    {
+        dbModel.Trunk.find({where: [{id: gwId}]}).then(function (gwRec)
+        {
+            if(gwRec)
+            {
+                gwRec.updateAttributes({TranslationId: null}).then(function (result)
+                {
+                    redisCacheHandler.addTrunkToCache(gwRec.id);
+                    callback(null, true);
+
+                }).catch(function(err)
+                {
+                    callback(err, false);
+                })
+            }
+            else
+            {
+                callback(new Error('No trunk found'), false);
+            }
+
+        }).catch(function(err)
+        {
+            callback(err, false);
+        })
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-PhoneNumberTrunkService.UnAssignTrunkTranslation] - [%s] - Exception occurred', reqId, ex);
         callback(ex, false);
     }
 
@@ -1536,4 +1650,7 @@ module.exports.AddPhoneNumberToClientCompany = AddPhoneNumberToClientCompany;
 module.exports.UpdatePhoneNumberToClientCompany = UpdatePhoneNumberToClientCompany;
 module.exports.GetLoadbalancerForTenant = GetLoadbalancerForTenant;
 module.exports.GetPhoneNumber = GetPhoneNumber;
+module.exports.UnAssignLoadBalancerFromTrunk= UnAssignLoadBalancerFromTrunk;
+module.exports.UnAssignProfileFromTrunk = UnAssignProfileFromTrunk;
+module.exports.UnAssignTrunkTranslation = UnAssignTrunkTranslation;
 
