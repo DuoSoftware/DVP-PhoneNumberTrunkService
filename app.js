@@ -654,65 +654,97 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetCloud
             throw new Error("Invalid company or tenant");
         }
 
-        if (trunkId && cloudId) {
-            gwBackendHandler.GetLoadbalancerForCloud(reqId, cloudId, companyId, tenantId, function (err, result) {
-                if (err) {
-                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
-                    logger.debug('[DVP-PBXService.AssignTrunkToCloud] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                    res.end(jsonString);
+        if (trunkId && cloudId)
+        {
+            if(cloudId > 0)
+            {
+                gwBackendHandler.GetLoadbalancerForCloud(reqId, cloudId, companyId, tenantId, function (err, result) {
+                    if (err) {
+                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                        logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToCloud] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
 
-                }
-                else {
-                    if (result && result.LoadBalancer) {
-                        gwBackendHandler.AssignTrunkToLoadBalancer(reqId, trunkId, result.LoadBalancer.id, companyId, tenantId, function (err, result2) {
-
-                            try {
-                                if (err) {
-                                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
-                                    logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                                    res.end(jsonString);
-                                }
-                                else {
-                                    gwBackendHandler.GetCallServersRelatedToLoadBalancerDB(reqId, result.LoadBalancer.id, function (err, csRes) {
-                                        if (err) {
-                                            var jsonString = messageFormatter.FormatMessage(err, "Load Balancer added but error occurred while notifying call servers", false, undefined);
-                                            logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                                            res.end(jsonString);
-                                        }
-                                        else {
-                                            //Publish to Redis
-                                            csRes.forEach(function (cs) {
-                                                var pattern = "CSCOMMAND:" + cs.id + "rescangateway";
-                                                var message = '{"profile": "external"}';
-
-                                                redisHandler.PublishToRedis(pattern, message, function (err, redisResult) {
-
-                                                })
-
-                                            });
-                                            var jsonString = messageFormatter.FormatMessage(undefined, "Load Balancer added successfully", true, undefined);
-                                            logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                                            res.end(jsonString);
-                                        }
-                                    })
-
-                                }
-                            }
-                            catch (ex) {
-                                var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
-                                logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                                res.end(jsonString);
-                            }
-                        })
                     }
                     else {
-                        var jsonString = messageFormatter.FormatMessage(new Error('Cloud has no load balancers configured'), "ERROR", false, undefined);
+                        if (result && result.LoadBalancer) {
+                            gwBackendHandler.AssignTrunkToLoadBalancer(reqId, trunkId, result.LoadBalancer.id, companyId, tenantId, function (err, result2) {
+
+                                try {
+                                    if (err) {
+                                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                                        logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                        res.end(jsonString);
+                                    }
+                                    else {
+                                        gwBackendHandler.GetCallServersRelatedToLoadBalancerDB(reqId, result.LoadBalancer.id, function (err, csRes) {
+                                            if (err) {
+                                                var jsonString = messageFormatter.FormatMessage(err, "Load Balancer added but error occurred while notifying call servers", false, undefined);
+                                                logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                                res.end(jsonString);
+                                            }
+                                            else {
+                                                //Publish to Redis
+                                                csRes.forEach(function (cs) {
+                                                    var pattern = "CSCOMMAND:" + cs.id + "rescangateway";
+                                                    var message = '{"profile": "external"}';
+
+                                                    redisHandler.PublishToRedis(pattern, message, function (err, redisResult) {
+
+                                                    })
+
+                                                });
+                                                var jsonString = messageFormatter.FormatMessage(undefined, "Load Balancer added successfully", true, undefined);
+                                                logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                                res.end(jsonString);
+                                            }
+                                        })
+
+                                    }
+                                }
+                                catch (ex) {
+                                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+                                    logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                    res.end(jsonString);
+                                }
+                            })
+                        }
+                        else {
+                            var jsonString = messageFormatter.FormatMessage(new Error('Cloud has no load balancers configured'), "ERROR", false, undefined);
+                            logger.debug('[DVP-PhoneNumberTrunkService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                            res.end(jsonString);
+                        }
+                    }
+
+                });
+            }
+            else
+            {
+                gwBackendHandler.UnAssignLoadBalancerFromTrunk(reqId, trunkId, companyId, tenantId, function (err, result2) {
+
+                    try
+                    {
+                        if (err)
+                        {
+                            var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, null);
+                            logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                            res.end(jsonString);
+                        }
+                        else
+                        {
+                            var jsonString = messageFormatter.FormatMessage(null, "Load Balancer unassigned successfully", true, null);
+                            logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                            res.end(jsonString);
+
+                        }
+                    }
+                    catch (ex) {
+                        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, null);
                         logger.debug('[DVP-PBXService.AssignTrunkToLoadBalancer] - [%s] - API RESPONSE : %s', reqId, jsonString);
                         res.end(jsonString);
                     }
-                }
+                })
+            }
 
-            });
         }
         else {
             var jsonString = messageFormatter.FormatMessage(new Error("Invalid trunk id or cloud id provided"), "ERROR", false, undefined);
@@ -846,50 +878,76 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetSipPr
             throw new Error("Invalid company or tenant");
         }
 
-        if (trunkId && profId) {
-            gwBackendHandler.AssignTrunkToProfile(reqId, trunkId, profId, companyId, tenantId, function (err, result) {
+        if (trunkId && profId)
+        {
+            if(profId > 0)
+            {
+                gwBackendHandler.AssignTrunkToProfile(reqId, trunkId, profId, companyId, tenantId, function (err, result) {
 
-                try {
-                    if (err) {
+                    try {
+                        if (err) {
+                            var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                            logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                            res.end(jsonString);
+                        }
+                        else {
+                            gwBackendHandler.GetCallServerByProfileIdDB(reqId, profId, function (err, csRes) {
+                                if (err) {
+                                    var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added to trunk but error occurred while notifying call servers", false, undefined);
+                                    logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                    res.end(jsonString);
+                                }
+                                else if (csRes) {
+                                    if (csRes.CallServer) {
+                                        var pattern = "CSCOMMAND:" + csRes.CallServer.id + "rescangateway";
+                                        var message = '{"profile":"' + csRes.ProfileName + '"}';
+
+                                        redisHandler.PublishToRedis(pattern, message, function (err, redisResult) {
+
+                                        })
+                                    }
+
+                                    var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added successfully", true, undefined);
+                                    logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                    res.end(jsonString);
+                                }
+                                else {
+                                    var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added successfully - call servers not notfied", true, undefined);
+                                    logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                                    res.end(jsonString);
+                                }
+                            });
+                        }
+                    }
+                    catch (ex) {
+                        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
+                        logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+                    }
+                })
+            }
+            else
+            {
+                gwBackendHandler.UnAssignProfileFromTrunk(reqId, trunkId, companyId, tenantId, function (err, result)
+                {
+
+                    if (err)
+                    {
                         var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
                         logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
                         res.end(jsonString);
                     }
-                    else {
-                        gwBackendHandler.GetCallServerByProfileIdDB(reqId, profId, function (err, csRes) {
-                            if (err) {
-                                var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added to trunk but error occurred while notifying call servers", false, undefined);
-                                logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                                res.end(jsonString);
-                            }
-                            else if (csRes) {
-                                if (csRes.CallServer) {
-                                    var pattern = "CSCOMMAND:" + csRes.CallServer.id + "rescangateway";
-                                    var message = '{"profile":"' + csRes.ProfileName + '"}';
-
-                                    redisHandler.PublishToRedis(pattern, message, function (err, redisResult) {
-
-                                    })
-                                }
-
-                                var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added successfully", true, undefined);
-                                logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                                res.end(jsonString);
-                            }
-                            else {
-                                var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile added successfully - call servers not notfied", true, undefined);
-                                logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                                res.end(jsonString);
-                            }
-                        });
+                    else
+                    {
+                        var jsonString = messageFormatter.FormatMessage(err, "Sip Network Profile unassigned successfully", true, undefined);
+                        logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
                     }
-                }
-                catch (ex) {
-                    var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, undefined);
-                    logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                    res.end(jsonString);
-                }
-            })
+
+
+                })
+            }
+
         }
         else {
             var jsonString = messageFormatter.FormatMessage(new Error("Invalid trunk id or profile id provided"), "ERROR", false, undefined);
@@ -926,22 +984,45 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Trunk/:id/SetTrans
             throw new Error("Invalid company or tenant");
         }
 
-        if (trunkId && transId) {
-            gwBackendHandler.AssignTrunkTranslation(reqId, trunkId, transId, companyId, tenantId, function (err, result) {
+        if (trunkId && transId)
+        {
+            if(transId > 0)
+            {
+                gwBackendHandler.AssignTrunkTranslation(reqId, trunkId, transId, companyId, tenantId, function (err, result) {
 
 
-                if (err) {
-                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
-                    logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                    res.end(jsonString);
-                }
-                else {
-                    var jsonString = messageFormatter.FormatMessage(err, "Translation assigned to trunk successfully", result, undefined);
-                    logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
-                    res.end(jsonString);
-                }
+                    if (err) {
+                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                        logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+                    }
+                    else {
+                        var jsonString = messageFormatter.FormatMessage(err, "Translation assigned to trunk successfully", result, undefined);
+                        logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+                    }
 
-            })
+                })
+            }
+            else
+            {
+                gwBackendHandler.UnAssignTrunkTranslation(reqId, trunkId, companyId, tenantId, function (err, result) {
+
+
+                    if (err) {
+                        var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, undefined);
+                        logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+                    }
+                    else {
+                        var jsonString = messageFormatter.FormatMessage(err, "Translation unassigned from trunk successfully", result, undefined);
+                        logger.debug('[DVP-PBXService.UpdateTrunk] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                        res.end(jsonString);
+                    }
+
+                })
+            }
+
         }
         else {
             var jsonString = messageFormatter.FormatMessage(new Error("Invalid trunk id or profile id provided"), "ERROR", false, undefined);
