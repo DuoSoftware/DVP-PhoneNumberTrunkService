@@ -84,13 +84,14 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber', auth
 
 });
 
-server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorCode/TrunkNumber', authorization({resource: "number", action: "write"}), function (req, res, next)
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorCode/TrunkNumber/:trunkCode', authorization({resource: "number", action: "write"}), function (req, res, next)
 {
     var reqId = nodeUuid.v1();
     try
     {
         var phnInfo = req.body;
         var operatorCode = req.params.operatorCode;
+        var trunkCode = req.params.trunkCode;
 
         logger.debug('[DVP-PhoneNumberTrunkService.AddTrunkNumberForOperator] - [%s] - HTTP Request Received - Req Body : ', reqId, phnInfo);
 
@@ -104,7 +105,7 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operator
                 throw new Error("Invalid company or tenant");
             }
 
-            buyNumberOp.buyNumberOperation(reqId, operatorCode, phnInfo, companyId, tenantId)
+            buyNumberOp.buyNumberOperation(reqId, operatorCode, trunkCode, phnInfo)
                 .then(function(result)
                 {
                     var jsonString = messageFormatter.FormatMessage(null, "SUCCESS", true, result);
