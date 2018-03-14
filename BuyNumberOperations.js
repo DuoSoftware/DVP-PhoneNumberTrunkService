@@ -26,13 +26,13 @@ redlock.on('clientError', function(err)
 
 });
 
-var getTrunkListForOperator = function(operatorCode, companyId, tenantId)
+var getTrunkListForOperator = function(operatorCode, trunkCode)
 {
     return new Promise(function(resolve, reject)
     {
         try
         {
-            dbModel.TrunkOperator.find({where :[{OperatorCode: operatorCode, CompanyId: companyId, TenantId: tenantId}], include:[{model: dbModel.Trunk, as: "Trunk", where :[{CompanyId: companyId, TenantId: tenantId}]}]})
+            dbModel.TrunkOperator.find({where :[{OperatorCode: operatorCode}], include:[{model: dbModel.Trunk, as: "Trunk", where :[{TrunkCode: trunkCode}]}]})
                 .then(function(operatorObj)
                 {
                     resolve(operatorObj);
@@ -74,7 +74,7 @@ var getTrunkForNumber = function(phoneNumber, companyId, tenantId)
 
 };
 
-var addPhoneNumberToTrunk = function(reqId, trunkId, companyId, tenantId, phoneNumberObj)
+var addPhoneNumberToTrunk = function(reqId, trunkId, phoneNumberObj)
 {
     return new Promise(function(resolve, reject)
     {
@@ -92,9 +92,9 @@ var addPhoneNumberToTrunk = function(reqId, trunkId, companyId, tenantId, phoneN
                         //call limit api to add a new limit
                         var phoneNum = dbModel.TrunkPhoneNumber.build({
                             PhoneNumber: phoneNumberObj.PhoneNumber,
-                            ObjClass: 'VEERY',
+                            ObjClass: 'FACETONE',
                             ObjType: 'CALL',
-                            ObjCategory: 'INBOUND',
+                            ObjCategory: 'BOTH',
                             Enable: true,
                             CompanyId: phoneNumberObj.ClientCompany,
                             TenantId: phoneNumberObj.ClientTenant,
@@ -169,10 +169,10 @@ var addLimitAndSetToNumber = function(reqId, maxLimit, companyId, tenantId, phon
     {
         try
         {
-            if(phoneNumberObj.InboundLimitId)
+            if(phoneNumberObj.BothLimitId)
             {
                 //update
-                dbModel.LimitInfo.find({where :[{LimitId: phoneNumberObj.InboundLimitId}]})
+                dbModel.LimitInfo.find({where :[{LimitId: phoneNumberObj.BothLimitId}]})
                     .then(function(limit)
                     {
                         var tempCount = maxLimit;
@@ -206,12 +206,12 @@ var addLimitAndSetToNumber = function(reqId, maxLimit, companyId, tenantId, phon
             }
             else
             {
-                externalApiAccess.addNewLimit(reqId, phoneNumberObj.PhoneNumber, phoneNumberObj.PhoneNumber + ' Inbounf Limit', maxLimit, companyId, tenantId)
+                externalApiAccess.addNewLimit(reqId, phoneNumberObj.PhoneNumber, phoneNumberObj.PhoneNumber + ' Both Limit', maxLimit, companyId, tenantId)
                     .then(function(limitInfo)
                     {
                         if(limitInfo)
                         {
-                            phoneNumberObj.updateAttributes({InboundLimitId: limitInfo.LimitId})
+                            phoneNumberObj.updateAttributes({BothLimitId: limitInfo.LimitId})
                                 .then(function(updateResult)
                                 {
                                     if(updateResult)
@@ -260,16 +260,24 @@ var verifyPhoneNumberLimit = function(trunkLimit, numberLimit, phoneNumbers)
                 var currentCount = 0;
                 phoneNumbers.forEach(function(number)
                 {
-                    if(number.LimitInfoInbound && number.LimitInfoInbound.MaxCount && number.LimitInfoInbound.MaxCount > 0)
-                    {
-                        currentCount = currentCount + number.LimitInfoInbound.MaxCount;
-
-                    }
-                    else if(number.LimitInfoBoth && number.LimitInfoBoth.MaxCount && number.LimitInfoBoth.MaxCount > 0)
+                    if(number.LimitInfoBoth && number.LimitInfoBoth.MaxCount && number.LimitInfoBoth.MaxCount > 0)
                     {
                         currentCount = currentCount + number.LimitInfoBoth.MaxCount;
                     }
-                })
+                    else
+                    {
+                        if(number.LimitInfoInbound && number.LimitInfoInbound.MaxCount && number.LimitInfoInbound.MaxCount > 0)
+                        {
+                            currentCount = currentCount + number.LimitInfoInbound.MaxCount;
+                        }
+
+                        if(number.LimitInfoOutbound && number.LimitInfoOutbound.MaxCount && number.LimitInfoOutbound.MaxCount > 0)
+                        {
+                            currentCount = currentCount + number.LimitInfoOutbound.MaxCount;
+                        }
+                    }
+
+                });
 
                 if((currentCount + numberLimit) > trunkLimit)
                 {
@@ -298,19 +306,19 @@ var verifyPhoneNumberLimit = function(trunkLimit, numberLimit, phoneNumbers)
 
 };
 
-var buyNumberOperation = function(reqId, operatorCode, phoneNumberObj, companyId, tenantId)
+var buyNumberOperation = function(reqId, operatorCode, trunkCode, phoneNumberObj)
 {
     return new Promise(function(resolve, reject)
     {
         var trunk = null;
-        getTrunkListForOperator(operatorCode, companyId, tenantId)
+        getTrunkListForOperator(operatorCode, trunkCode)
             .then(function(operator)
             {
-                if(operator && operator.Trunk)
+                if(operator && operator.Trunk && operator.Trunk.length > 0)
                 {
                     trunk = operator.Trunk[0];
 
-                    return addPhoneNumberToTrunk(reqId, trunk.id, companyId, tenantId, phoneNumberObj);
+                    return addPhoneNumberToTrunk(reqId, trunk.id, phoneNumberObj);
                 }
                 else
                 {
