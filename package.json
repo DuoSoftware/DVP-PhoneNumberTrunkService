@@ -14,7 +14,7 @@
     "node-uuid": "^1.4.3",
     "redis": "^0.12.1",
     "request": "^2.69.0",
-    "restify": "^4.0.4",
+    "restify": "^4.0.3",
     "restify-jwt": "^0.4.0",
     "stringify": "^3.1.0",
     "underscore": "^1.8.3",
