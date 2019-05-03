@@ -84,6 +84,54 @@ server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber', auth
 
 });
 
+server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber/Any', authorization({
+    resource: "number",
+    action: "write"
+}), function (req, res, next) {
+    var reqId = nodeUuid.v1();
+    try {
+        var phnInfo = req.body;
+
+        logger.debug('[DVP-PhoneNumberTrunkService.AddTrunkNumberAny] - [%s] - HTTP Request Received - Req Body : ', reqId, phnInfo);
+
+        if (phnInfo) {
+            var companyId = req.user.company;
+            var tenantId = req.user.tenant;
+
+            if (!companyId || !tenantId) {
+                throw new Error("Invalid company or tenant");
+            }
+
+            gwBackendHandler.AddPhoneNumbersToAnyTrunkDB(reqId, phnInfo, companyId, tenantId, function (err, recordId, result) {
+
+                if (err) {
+                    var jsonString = messageFormatter.FormatMessage(err, "ERROR", false, recordId);
+                    logger.debug('[DVP-PBXService.AddTrunkNumberAny] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+                else {
+                    var jsonString = messageFormatter.FormatMessage(err, "Number Added Successfully", result, recordId);
+                    logger.debug('[DVP-PBXService.AddTrunkNumberAny] - [%s] - API RESPONSE : %s', reqId, jsonString);
+                    res.end(jsonString);
+                }
+            })
+        }
+        else {
+            var jsonString = messageFormatter.FormatMessage(new Error("Empty Body"), "ERROR", false, -1);
+            logger.debug('[DVP-PBXService.AddTrunkNumberAny] - [%s] - API RESPONSE : %s', reqId, jsonString);
+            res.end(jsonString);
+        }
+    }
+    catch (ex) {
+        var jsonString = messageFormatter.FormatMessage(ex, "ERROR", false, -1);
+        logger.debug('[DVP-PBXService.AddTrunkNumberAny] - [%s] - API RESPONSE : %s', reqId, jsonString);
+        res.end(jsonString);
+    }
+
+    return next();
+
+});
+
 server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/Operator/:operatorCode/TrunkNumber/:trunkCode', authorization({resource: "number", action: "write"}), function (req, res, next)
 {
     var reqId = nodeUuid.v1();
