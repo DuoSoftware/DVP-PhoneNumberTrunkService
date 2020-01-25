@@ -17,7 +17,7 @@
 # CMD [ "node", "/usr/local/src/phonenumbertrunkservice/app.js" ]
 
 FROM node:10-alpine
-WORKDIR /usr/src/phonenumbertrunkservice
+WORKDIR /usr/local/src/phonenumbertrunkservice
 COPY package*.json ./
 RUN npm install
 COPY . .
