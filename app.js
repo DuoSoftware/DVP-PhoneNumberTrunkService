@@ -12,6 +12,7 @@ var secret = require('dvp-common/Authentication/Secret.js');
 var authorization = require('dvp-common/Authentication/Authorization.js');
 var buyNumberHandler = require('./BuyNumberHandler.js');
 var buyNumberOp = require('./BuyNumberOperations.js');
+var healthcheck = require("dvp-healthcheck/DBHealthChecker");
 
 var hostIp = config.Host.Ip;
 var hostPort = config.Host.Port;
@@ -46,6 +47,12 @@ server.listen(hostPort, hostIp, function () {
     console.log('%s listening at %s', server.name, server.url);
 });
 
+var hc = new healthcheck(server, {
+    redis: redisHandler.redisClient,
+    pg: gwBackendHandler.DbConn
+  });
+  hc.Initiate();
+  
 
 //DONE
 server.post('/DVP/API/' + hostVersion + '/PhoneNumberTrunkApi/TrunkNumber', authorization({

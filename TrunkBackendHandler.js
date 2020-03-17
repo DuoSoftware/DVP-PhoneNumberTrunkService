@@ -1751,4 +1751,5 @@ module.exports.GetPhoneNumber = GetPhoneNumber;
 module.exports.UnAssignLoadBalancerFromTrunk= UnAssignLoadBalancerFromTrunk;
 module.exports.UnAssignProfileFromTrunk = UnAssignProfileFromTrunk;
 module.exports.UnAssignTrunkTranslation = UnAssignTrunkTranslation;
+module.exports.DbConn = dbModel.SequelizeConn;
 
