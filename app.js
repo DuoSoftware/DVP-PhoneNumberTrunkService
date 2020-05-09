@@ -41,7 +41,7 @@ server.use(restify.fullResponse());
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
-server.use(jwt({secret: secret.Secret}));
+server.use(jwt({secret: secret.Secret}).unless({path: ['/healthcheck']}));
 
 server.listen(hostPort, hostIp, function () {
     console.log('%s listening at %s', server.name, server.url);
