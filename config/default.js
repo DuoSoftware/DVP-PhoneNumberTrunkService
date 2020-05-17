@@ -49,7 +49,8 @@ module.exports = {
     "limitServiceRootPath": "",
     "limitServiceHost": "",
     "limitServicePort": 8085,
-    "limitServiceVersion": "1.0.0.0"
+    "limitServiceVersion": "1.0.0.0",
+    "dynamicPort": false
   },
 
   "Token": ""

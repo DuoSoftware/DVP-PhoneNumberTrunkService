@@ -30,7 +30,7 @@ var addNewLimit = function(reqId, phoneNumber, description, maxLimit, companyId,
             {
                 var httpUrl = util.format('http://%s/DVP/API/%s/LimitAPI/Limit', limitServiceHost, limitServiceVersion);
 
-                if(validator.isIP(limitServiceHost))
+                if(config.Services.dynamicPort || validator.isIP(limitServiceHost))
                 {
                     httpUrl = util.format('http://%s:%s/DVP/API/%s/LimitAPI/Limit', limitServiceHost, limitServicePort, limitServiceVersion);
                 }
@@ -118,7 +118,7 @@ var addNewLimitCallback = function(reqId, phoneNumber, description, maxLimit, co
         {
             var httpUrl = util.format('http://%s/DVP/API/%s/LimitAPI/Limit', limitServiceHost, limitServiceVersion);
 
-            if(validator.isIP(limitServiceHost))
+            if(config.Services.dynamicPort || validator.isIP(limitServiceHost))
             {
                 httpUrl = util.format('http://%s:%s/DVP/API/%s/LimitAPI/Limit', limitServiceHost, limitServicePort, limitServiceVersion);
             }
@@ -205,7 +205,7 @@ var updateLimitCompSwitchCallback = function(reqId, limitId, maxLimit, companyId
         {
             var httpUrl = util.format('http://%s/DVP/API/%s/LimitAPI/SwitchLimit/%s/Max/%s', limitServiceHost, limitServiceVersion, limitId, maxLimit);
 
-            if(validator.isIP(limitServiceHost))
+            if(config.Services.dynamicPort || validator.isIP(limitServiceHost))
             {
                 httpUrl = util.format('http://%s:%s/DVP/API/%s/LimitAPI/SwitchLimit/%s/Max/%s', limitServiceHost, limitServicePort, limitServiceVersion, limitId, maxLimit);
             }
