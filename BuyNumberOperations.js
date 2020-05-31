@@ -5,7 +5,7 @@ var redisClient = require('./RedisHandler.js').redisClient;
 var Promise = require('bluebird');
 var Redlock = require('redlock');
 var dbModel = require('dvp-dbmodels');
-var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
+var logger = require('dvp-common-lite/LogHandler/CommonLogHandler.js').logger;
 var externalApiAccess = require('./ExternalApiAccess.js');
 
 var redlock = new Redlock(
