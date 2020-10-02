@@ -50,7 +50,7 @@ module.exports = {
     "limitServiceHost": "",
     "limitServicePort": 8085,
     "limitServiceVersion": "1.0.0.0",
-    "dynamicPort": true
+    "dynamicPort": false
   },
 
   "Token": ""
