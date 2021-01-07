@@ -14,6 +14,7 @@ module.exports = {
     },
 
     "Host":{
+        "Ip": "HOST_NAME",
         "Port":"HOST_PHONENUMBERTRUNKSERVICE_PORT",
         "Version":"HOST_VERSION"
     },
@@ -25,6 +26,7 @@ module.exports = {
         "port": "SYS_REDIS_PORT",
         "user": "SYS_REDIS_USER",
         "password": "SYS_REDIS_PASSWORD",
+        "redisDB": "SYS_REDIS_DB",
         "sentinels":{
             "hosts": "SYS_REDIS_SENTINEL_HOSTS",
             "port":"SYS_REDIS_SENTINEL_PORT",
